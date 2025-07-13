@@ -118,486 +118,81 @@
 
 {% block extra_js %}
 <script>
-    // Handle form submission with real-time progress
+    // Simple mock progress bar with form submission
     document.getElementById('analyseForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent normal form submission
+        const thai_text = document.getElementById('thai_text').value.trim();
         
-        console.log('🚀 Form submission started');
-        
-        const formData = new FormData(this);
-        const thai_text = formData.get('thai_text');
-        
-        console.log('📝 Thai text:', thai_text);
-        
-        if (!thai_text || thai_text.trim() === '') {
-            console.error('❌ No Thai text provided');
+        if (!thai_text) {
             alert('กรุณาใส่ข้อความภาษาไทย / Please enter Thai text');
+            e.preventDefault();
             return;
         }
         
-        // Verify DOM elements exist
+        // Show progress bar and disable form
         const progressContainer = document.getElementById('progressContainer');
-        const resultsContainer = document.getElementById('resultsContainer');
+        const submitBtn = document.getElementById('submitBtn');
         
-        if (!progressContainer) {
-            console.error('❌ Progress container not found');
-            return;
-        }
-        if (!resultsContainer) {
-            console.error('❌ Results container not found');
-            return;
-        }
-        
-        console.log('✅ DOM elements verified');
-        
-        // Show progress, hide results
         progressContainer.classList.remove('d-none');
-        resultsContainer.classList.add('d-none');
-        console.log('👁️ Progress shown, results hidden');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing...';
         
-        // Disable form and reset progress
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        resetProgress();
-        console.log('🔒 Form disabled, progress reset');
+        // Start mock progress animation
+        startMockProgress();
         
-        // Add timeout and abort controller for the request
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => {
-            console.log('⏰ Request timeout reached (60 seconds)');
-            controller.abort();
-        }, 60000); // 60 second timeout
-        
-        // Start streaming request
-        console.log('🌐 Starting fetch request to /predict_stream');
-        fetch('/predict_stream', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({thai_text: thai_text}),
-            signal: controller.signal
-        })
-        .then(response => {
-            // Clear timeout since we got a response
-            clearTimeout(timeoutId);
-            console.log('📡 Response received:', response.status, response.statusText);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let eventCount = 0;
-            
-            console.log('🔄 Starting stream reading');
-            
-            function readStream() {
-                return reader.read().then(({ done, value }) => {
-                    if (done) {
-                        console.log('✅ Stream completed - total events:', eventCount);
-                        // Add safety check - if no completion event was received
-                        if (eventCount > 0) {
-                            console.log('⚠️ Stream ended without completion event - checking final state');
-                            // Give a small delay to ensure any pending events are processed
-                            setTimeout(() => {
-                                const progressContainer = document.getElementById('progressContainer');
-                                const resultsContainer = document.getElementById('resultsContainer');
-                                if (progressContainer && !progressContainer.classList.contains('d-none')) {
-                                    console.log('🔄 Attempting manual completion check');
-                                    showError('Stream completed unexpectedly. Please try again.');
-                                    resetForm();
-                                }
-                            }, 1000);
-                        }
-                        return;
-                    }
-                    
-                    const chunk = decoder.decode(value);
-                    console.log('📦 Received chunk:', chunk.substring(0, 100) + (chunk.length > 100 ? '...' : ''));
-                    
-                    const lines = chunk.split('\n');
-                    
-                    for (let line of lines) {
-                        if (line.startsWith('data: ')) {
-                            eventCount++;
-                            console.log(`📨 Event ${eventCount}:`, line.substring(0, 150) + (line.length > 150 ? '...' : ''));
-                            
-                            try {
-                                const data = JSON.parse(line.substring(6));
-                                console.log('📊 Parsed data:', data);
-                                handleProgressUpdate(data);
-                            } catch (e) {
-                                console.error('❌ Error parsing event data:', e);
-                                console.error('🔍 Raw line:', line);
-                            }
-                        }
-                    }
-                    
-                    return readStream();
-                });
-            }
-            
-            return readStream();
-        })
-        .catch(error => {
-            // Clear timeout on error
-            clearTimeout(timeoutId);
-            
-            console.error('❌ Fetch error:', error);
-            
-            if (error.name === 'AbortError') {
-                console.log('⏰ Request was aborted due to timeout');
-                // Offer fallback option for timeout
-                if (confirm('Request timed out. Would you like to try using the traditional method instead? (This will redirect to a new page with results)')) {
-                    fallbackToTraditionalSubmit(thai_text);
-                    return;
-                }
-                showError('Request timed out. Please try again.');
-            } else {
-                console.log('🔄 Offering fallback for connection error');
-                // Offer fallback option for other errors
-                if (confirm('Streaming failed. Would you like to try using the traditional method instead? (This will redirect to a new page with results)')) {
-                    fallbackToTraditionalSubmit(thai_text);
-                    return;
-                }
-                showError('Connection error: ' + error.message);
-            }
-            resetForm();
-        });
+        // Let the form submit normally - don't prevent it
+        // The progress bar will show during the actual processing
     });
     
-    function handleProgressUpdate(data) {
-        console.log('🎯 Handling progress update:', data);
-        
-        if (data.error) {
-            console.error('💥 Error received:', data.error);
-            showError(data.error);
-            resetForm();
-            return;
-        }
-        
-        if (data.complete) {
-            console.log('🎉 Completion event received!');
-            console.log('📋 Result data:', data.result);
-            
-            // Verify result has required fields
-            if (!data.result) {
-                console.error('❌ No result data in completion event');
-                showError('Invalid completion data received');
-                resetForm();
-                return;
-            }
-            
-            console.log('✅ Calling showResults with valid data');
-            // Show results
-            showResults(data.result);
-            resetForm();
-            return;
-        }
-        
-        // Update progress
-        console.log(`⏳ Progress update - Step ${data.step}: ${data.progress}%`);
-        updateProgress(data.step, data.progress, data.message, data.message_thai);
-    }
-    
-    function updateProgress(step, progress, message, messageThai) {
+    function startMockProgress() {
         const progressBar = document.getElementById('progressBar');
         const progressText = document.getElementById('progressText');
         const progressTextThai = document.getElementById('progressTextThai');
         const progressIcon = document.getElementById('progressIcon');
         
-        // Update progress bar
-        progressBar.style.width = progress + '%';
-        progressBar.setAttribute('aria-valuenow', progress);
+        let currentStep = 1;
+        let currentProgress = 0;
         
-        // Update text
-        progressText.textContent = message;
-        progressTextThai.textContent = messageThai;
+        const steps = [
+            {step: 1, duration: 1500, endProgress: 33, message: "Translating...", messageThai: "กำลังแปล...", icon: "🔤"},
+            {step: 2, duration: 1500, endProgress: 66, message: "Classifying tense...", messageThai: "กำลังจำแนกกาล...", icon: "🏷️"},
+            {step: 3, duration: 2000, endProgress: 100, message: "Generating explanation...", messageThai: "กำลังสร้างคำอธิบาย...", icon: "💡"}
+        ];
         
-        // Update icon based on step
-        const icons = {
-            1: '🔤', // Translation
-            2: '🏷️', // Classification  
-            3: '💡', // Explanation
-        };
-        progressIcon.textContent = icons[step] || '🔄';
-        
-        // Add visual feedback
-        progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-primary';
-        if (progress === 100) {
-            progressBar.className = 'progress-bar bg-success';
-        }
-    }
-    
-    function showResults(result) {
-        console.log('🎨 showResults called with:', result);
-        
-        // Verify resultsContainer exists
-        const resultsContainer = document.getElementById('resultsContainer');
-        const progressContainer = document.getElementById('progressContainer');
-        
-        if (!resultsContainer) {
-            console.error('❌ resultsContainer not found in DOM');
-            showError('Results container missing from page');
-            return;
-        }
-        
-        if (!progressContainer) {
-            console.error('❌ progressContainer not found in DOM');
-        }
-        
-        // Process explanation sections
-        let explanation_sections = {};
-        const explanation = result.explanation;
-        
-        console.log('🔍 Processing explanation:', typeof explanation, explanation);
-        
-        if (typeof explanation === 'object' && explanation.parsed_sections) {
-            console.log('✅ Using parsed sections from explanation');
-            explanation_sections = {
-                'section_1': {
-                    'title': 'วิเคราะห์ Tense ที่ใช้',
-                    'content': explanation.parsed_sections.tense_analysis || 'ส่วนนี้ไม่สามารถแยกได้'
-                },
-                'section_2': {
-                    'title': 'คำศัพท์ที่น่าสนใจ',
-                    'content': explanation.parsed_sections.vocabulary || 'ส่วนนี้ไม่สามารถแยกได้'
-                },
-                'section_3': {
-                    'title': 'ข้อผิดพลาดที่พบบ่อย',
-                    'content': explanation.parsed_sections.common_mistakes || 'ส่วนนี้ไม่สามารถแยกได้'
-                }
-            };
-        } else {
-            console.log('⚠️ Using legacy explanation parsing');
-            // Fallback to legacy parsing
-            explanation_sections = parseLegacyExplanation(explanation);
-        }
-        
-        console.log('📝 Final explanation sections:', explanation_sections);
-        
-        // Generate results HTML
-        console.log('🏗️ Generating results HTML');
-        const resultsHTML = generateResultsHTML(result, explanation_sections);
-        
-        console.log('📄 Generated HTML length:', resultsHTML.length);
-        console.log('📄 HTML preview:', resultsHTML.substring(0, 200) + '...');
-        
-        // Update DOM
-        resultsContainer.innerHTML = resultsHTML;
-        console.log('✅ Results HTML inserted into container');
-        
-        resultsContainer.classList.remove('d-none');
-        console.log('👁️ Results container made visible');
-        
-        if (progressContainer) {
-            progressContainer.classList.add('d-none');
-            console.log('🚫 Progress container hidden');
-        }
-        
-        console.log('🎉 showResults completed successfully!');
-    }
-    
-    function generateResultsHTML(result, explanation_sections) {
-        return `
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <h2 class="card-title text-center mb-4">
-                        <i class="bi bi-check-circle text-success"></i> Analysis Results
-                    </h2>
+        function animateStep(stepIndex) {
+            if (stepIndex >= steps.length) return;
+            
+            const step = steps[stepIndex];
+            const startProgress = stepIndex === 0 ? 0 : steps[stepIndex - 1].endProgress;
+            const progressIncrement = (step.endProgress - startProgress) / (step.duration / 50);
+            
+            // Update step info
+            progressText.textContent = step.message;
+            progressTextThai.textContent = step.messageThai;
+            progressIcon.textContent = step.icon;
+            
+            const progressInterval = setInterval(() => {
+                currentProgress += progressIncrement;
+                
+                if (currentProgress >= step.endProgress) {
+                    currentProgress = step.endProgress;
+                    progressBar.style.width = currentProgress + '%';
+                    progressBar.setAttribute('aria-valuenow', currentProgress);
                     
-                    <!-- Input and Translation -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <i class="bi bi-chat-left-text"></i> Thai Input
-                                    </h5>
-                                    <p class="card-text fs-5">${result.input_thai}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <i class="bi bi-translate"></i> English Translation
-                                    </h5>
-                                    <p class="card-text fs-5">${result.translation}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tense Classification -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="card border-primary">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title text-primary">Coarse Tense</h5>
-                                    <p class="card-text fs-3 fw-bold text-primary">
-                                        ${result.coarse_label}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card border-success">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title text-success">Fine Tense</h5>
-                                    <p class="card-text fs-3 fw-bold text-success">
-                                        ${result.fine_label}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Grammar Explanation -->
-            <div class="card shadow mb-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">
-                        <i class="bi bi-lightbulb"></i> Grammar Explanation
-                    </h4>
-                </div>
-                <div class="card-body">
-                    ${Object.keys(explanation_sections).length > 0 ? 
-                        Object.entries(explanation_sections).map(([key, section]) => `
-                            <div class="mb-4">
-                                <h5 class="text-primary">
-                                    <i class="bi bi-bookmark"></i> ${section.title}
-                                </h5>
-                                <div class="ps-3">
-                                    <div class="explanation-content">${formatExplanationContent(section.content)}</div>
-                                </div>
-                            </div>
-                            ${key !== 'section_3' ? '<hr class="my-3">' : ''}
-                        `).join('') : 
-                        '<p class="text-muted">No explanation available.</p>'
-                    }
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="text-center">
-                <button onclick="location.reload()" class="btn btn-primary btn-lg">
-                    <i class="bi bi-arrow-clockwise"></i> Try Another Sentence
-                </button>
-                <a href="/performance" class="btn btn-outline-secondary btn-lg ms-2">
-                    <i class="bi bi-speedometer2"></i> View Model Performance
-                </a>
-            </div>
-        `;
-    }
-    
-    function parseLegacyExplanation(explanation_text) {
-        // Legacy parsing for old format explanations
-        const sections = {};
-        const pattern = /\[SECTION (\d+): ([^\]]+)\](.*?)(?=\[SECTION|\Z)/gs;
-        let matches = [...explanation_text.matchAll(pattern)];
-        
-        for (let match of matches) {
-            const section_num = match[1];
-            const section_title = match[2].trim();
-            const section_content = match[3].trim();
-            sections[`section_${section_num}`] = {
-                'title': section_title,
-                'content': section_content
-            };
+                    clearInterval(progressInterval);
+                    
+                    // Move to next step after a brief pause
+                    setTimeout(() => {
+                        animateStep(stepIndex + 1);
+                    }, 200);
+                } else {
+                    progressBar.style.width = currentProgress + '%';
+                    progressBar.setAttribute('aria-valuenow', currentProgress);
+                }
+            }, 50);
         }
         
-        // If no sections found, return the full text as a single section
-        if (Object.keys(sections).length === 0) {
-            sections['section_1'] = {
-                'title': 'Explanation',
-                'content': explanation_text
-            };
-        }
-        
-        return sections;
-    }
-    
-    function resetProgress() {
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const progressTextThai = document.getElementById('progressTextThai');
-        const progressIcon = document.getElementById('progressIcon');
-        
-        progressBar.style.width = '0%';
-        progressBar.setAttribute('aria-valuenow', '0');
-        progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-primary';
-        progressText.textContent = 'Starting analysis...';
-        progressTextThai.textContent = 'เริ่มการวิเคราะห์...';
-        progressIcon.textContent = '🔄';
-    }
-    
-    function resetForm() {
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = false;
-    }
-    
-    function showError(message) {
-        console.error('🚨 Showing error to user:', message);
-        alert('Error: ' + message);
-        document.getElementById('progressContainer').classList.add('d-none');
-        resetForm();
-    }
-    
-    function fallbackToTraditionalSubmit(thai_text) {
-        console.log('🔄 Attempting fallback to traditional form submission');
-        
-        // Create a hidden form for traditional submission
-        const fallbackForm = document.createElement('form');
-        fallbackForm.method = 'POST';
-        fallbackForm.action = '/predict';
-        fallbackForm.style.display = 'none';
-        
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'thai_text';
-        input.value = thai_text;
-        
-        fallbackForm.appendChild(input);
-        document.body.appendChild(fallbackForm);
-        
-        console.log('📤 Submitting fallback form');
-        fallbackForm.submit();
-    }
-    
-    function formatExplanationContent(content) {
-        if (!content) return '';
-        
-        // Enhanced content formatting for better readability
-        let formatted = content
-            // Convert newlines to proper breaks
-            .replace(/\n\n/g, '</p><p class="mb-2">')
-            .replace(/\n/g, '<br>')
-            
-            // Format bold text with better styling
-            .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>')
-            
-            // Add spacing around colons for definitions
-            .replace(/(<strong[^>]*>[^<]*<\/strong>):\s*/g, '$1:</strong> <span class="definition-text">')
-            .replace(/(<span class="definition-text">[^<]*)/g, '$1</span>')
-            
-            // Format bullet points
-            .replace(/^\s*[•\-\*]\s+/gm, '<span class="bullet-point">• </span>')
-            
-            // Clean up extra spaces
-            .replace(/\s+/g, ' ')
-            .trim();
-        
-        // Wrap in paragraph tags if not already wrapped
-        if (!formatted.startsWith('<p')) {
-            formatted = '<p class="mb-2">' + formatted + '</p>';
-        }
-        
-        return formatted;
+        // Start the animation
+        animateStep(0);
     }
 </script>
 {% endblock %}
