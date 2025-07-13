@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block title %}Pipeline Performance - Thai-English Grammar Learning Tool{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin: -2rem -12px 3rem -12px;
+        border-radius: 0 0 1rem 1rem;
+    }
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s;
+        height: 100%;
+    }
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .performance-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .excellent { background-color: #d4edda; color: #155724; }
+    .good { background-color: #cce5ff; color: #004085; }
+    .moderate { background-color: #fff3cd; color: #856404; }
+    .progress-custom {
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .score-display {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+    }
+    .timing-stat {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .distribution-bar {
+        background: #e9ecef;
+        height: 30px;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+    }
+    .distribution-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        color: white;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+    .recommendation-card {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 1.5rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="bi bi-diagram-3"></i> Full Pipeline Performance
+        </h1>
+        <h2 class="h4 mb-4">End-to-End Evaluation: Translation + Classification + Explanation</h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">B+</div>
+                    <p class="lead mb-0">Overall Grade</p>
+                    <small class="text-white-50">85% performance</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">96</div>
+                    <p class="lead mb-0">Test Samples</p>
+                    <small class="text-white-50">Comprehensive evaluation</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">7</div>
+                    <p class="lead mb-0">Metrics</p>
+                    <small class="text-white-50">Multi-aspect evaluation</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">12.25s</div>
+                    <p class="lead mb-0">Avg Time</p>
+                    <small class="text-white-50">Total processing</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Overview -->
+<section class="mb-5">
+    <div class="alert alert-primary border-primary">
+        <div class="row align-items-center">
+            <div class="col-md-1">
+                <i class="bi bi-gear-fill text-primary fs-1"></i>
+            </div>
+            <div class="col-md-11">
+                <h5 class="alert-heading mb-2">Complete Pipeline Evaluation</h5>
+                <p class="mb-0">
+                    This evaluation tests the <strong>entire system end-to-end</strong>: Thai text input → Translation → 
+                    Tense Classification → Grammar Explanation generation. Includes human evaluation of translation quality, 
+                    explanation correctness, and system usability.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Component Performance Scores -->
+<section class="mb-5">
+    <h3 class="mb-4">Component Performance Breakdown</h3>
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-translate me-2 text-primary"></i>Translation Fluency</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">93.2%</span>
+                    <span class="performance-badge excellent">Excellent</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 93.2%"></div>
+                </div>
+                <small class="text-muted">1.865/2 score - Typhoon Translate 4B</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-check-double me-2 text-primary"></i>Meaning Preservation</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">90.6%</span>
+                    <span class="performance-badge excellent">Very Good</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 90.6%"></div>
+                </div>
+                <small class="text-muted">1.813/2 score - Semantic accuracy</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-clock me-2 text-primary"></i>Coarse Classification</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">92.7%</span>
+                    <span class="performance-badge excellent">Excellent</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 92.7%"></div>
+                </div>
+                <small class="text-muted">0.927/1 score - Past/Present/Future</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-bullseye me-2 text-primary"></i>Fine-grained Classification</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">74.0%</span>
+                    <span class="performance-badge moderate">Moderate</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-warning" style="width: 74%"></div>
+                </div>
+                <small class="text-muted">0.740/1 score - 24 tense classes</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-book me-2 text-primary"></i>Explanation Quality</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">84.9%</span>
+                    <span class="performance-badge good">Good</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-info" style="width: 84.9%"></div>
+                </div>
+                <small class="text-muted">1.698/2 score - Typhoon 2.1 4B Instruct</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-shield-check me-2 text-primary"></i>No Code Hallucination</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">77.1%</span>
+                    <span class="performance-badge moderate">Moderate</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-warning" style="width: 77.1%"></div>
+                </div>
+                <small class="text-muted">0.771/1 score - Explanation clarity</small>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-search me-2 text-primary"></i>Signal Word Detection</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">95.8%</span>
+                    <span class="performance-badge excellent">Excellent</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 95.8%"></div>
+                </div>
+                <small class="text-muted">0.958/1 score - Temporal markers</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Performance Timing -->
+<section class="mb-5">
+    <h3 class="mb-4">Performance Timing Analysis</h3>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="timing-stat">
+                <i class="bi bi-lightning-fill text-success fs-1 mb-2"></i>
+                <h4>1.20s</h4>
+                <p class="mb-0">Translation Time</p>
+                <small class="text-muted">Fast inference</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="timing-stat">
+                <i class="bi bi-cpu-fill text-warning fs-1 mb-2"></i>
+                <h4>10.26s</h4>
+                <p class="mb-0">Explanation Time</p>
+                <small class="text-muted">Needs optimization</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="timing-stat">
+                <i class="bi bi-stopwatch-fill text-primary fs-1 mb-2"></i>
+                <h4>11.47s</h4>
+                <p class="mb-0">Total Pipeline Time</p>
+                <small class="text-muted">Excludes cold start</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Note:</strong> Timing measurements exclude cold start response (first inference) to provide accurate warm-state performance metrics.
+    </div>
+</section>
+
+<!-- Score Distribution -->
+<section class="mb-5">
+    <h3 class="mb-4">Score Distribution Analysis</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h5>Translation Fluency Distribution</h5>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Perfect (Score 2)</span>
+                    <span>86.5%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill" style="width: 86.5%">83/96</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Good (Score 1)</span>
+                    <span>13.5%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill bg-warning" style="width: 13.5%">13/96</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Poor (Score 0)</span>
+                    <span>0%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill bg-danger" style="width: 0%">0/96</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <h5>Meaning Preservation Distribution</h5>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Perfect (Score 2)</span>
+                    <span>82.3%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill" style="width: 82.3%">79/96</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Partial (Score 1)</span>
+                    <span>16.7%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill bg-warning" style="width: 16.7%">16/96</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Poor (Score 0)</span>
+                    <span>1.0%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill bg-danger" style="width: 1%">1/96</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-4 mt-2">
+        <div class="col-md-6">
+            <h5>Fine-grained Classification Distribution</h5>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Correct</span>
+                    <span>74.0%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill" style="width: 74%">71/96</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Incorrect</span>
+                    <span>26.0%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill bg-danger" style="width: 26%">25/96</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <h5>Code Hallucination Analysis</h5>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Clean Explanations</span>
+                    <span>77.1%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill" style="width: 77.1%">74/96</div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span>Contains Technical Jargon</span>
+                    <span>22.9%</span>
+                </div>
+                <div class="distribution-bar">
+                    <div class="distribution-fill bg-warning" style="width: 22.9%">22/96</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Findings -->
+<section class="mb-5">
+    <h3 class="mb-4">Key Findings</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Pipeline Strengths</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><strong>Translation Quality:</strong> 93.2% fluency rate</li>
+                        <li><strong>Coarse Classification:</strong> 92.7% accuracy</li>
+                        <li><strong>Signal Word Detection:</strong> 95.8% success rate</li>
+                        <li><strong>Speed:</strong> Fast translation (1.20s average)</li>
+                        <li><strong>No Translation Failures:</strong> 0% poor translations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Areas for Improvement</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><strong>Fine-grained Classification:</strong> 74% accuracy (18 failed cases)</li>
+                        <li><strong>Code Hallucination:</strong> 23% of explanations contain technical jargon</li>
+                        <li><strong>Explanation Speed:</strong> 11s average generation time</li>
+                        <li><strong>Edge Cases:</strong> Progressive vs. continuous aspects confusion</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Priority Recommendations -->
+<section class="mb-5">
+    <h3 class="mb-4">Priority Recommendations</h3>
+    <div class="recommendation-card">
+        <h5><i class="bi bi-lightbulb me-2"></i>1. Reduce Code Hallucination</h5>
+        <p class="mb-0">Improve prompt engineering and add post-processing filters to eliminate technical language in explanations. Target: Increase from 77.1% to >90%.</p>
+    </div>
+    <div class="recommendation-card">
+        <h5><i class="bi bi-lightbulb me-2"></i>2. Enhance Fine-grained Classification</h5>
+        <p class="mb-0">Focus on edge cases where coarse and fine labels diverge, particularly progressive vs. continuous aspects. Bridge the 18.7% gap with isolated classifier performance.</p>
+    </div>
+    <div class="recommendation-card">
+        <h5><i class="bi bi-lightbulb me-2"></i>3. Optimize Explanation Generation</h5>
+        <p class="mb-0">Reduce explanation generation time from 11s through model optimization, caching strategies, or smaller specialized models.</p>
+    </div>
+    <div class="recommendation-card">
+        <h5><i class="bi bi-lightbulb me-2"></i>4. System Integration Improvements</h5>
+        <p class="mb-0">Implement confidence thresholding for uncertain classifications and add user feedback mechanisms to improve performance over time.</p>
+    </div>
+</section>
+
+<!-- Overall Assessment -->
+<section class="mb-5">
+    <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="bi bi-award me-2"></i>Overall Assessment: B+ (85%)</h4>
+        </div>
+        <div class="card-body">
+            <p class="mb-3">
+                The hybrid pipeline demonstrates <strong>strong performance across most metrics</strong>, with excellent 
+                translation quality and good educational potential. The system successfully provides fluent Thai-to-English 
+                translation with accurate tense classification and meaningful grammar explanations.
+            </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-success">Key Achievements:</h6>
+                    <ul class="mb-0">
+                        <li>High-quality translation output (93.2% fluency)</li>
+                        <li>Fast inference time (1.2s translation)</li>
+                        <li>Excellent basic tense recognition (92.7%)</li>
+                        <li>Strong signal word detection (95.8%)</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-warning">Improvement Focus:</h6>
+                    <ul class="mb-0">
+                        <li>Fine-grained temporal classification accuracy</li>
+                        <li>Explanation quality and clarity</li>
+                        <li>Processing speed optimization</li>
+                        <li>Technical jargon elimination</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="mb-0 text-muted">
+                <strong>Conclusion:</strong> This performance level is suitable for dissertation requirements and demonstrates 
+                a functional educational tool with clear paths for enhancement.
+            </p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

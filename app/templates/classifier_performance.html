@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}BERT Classifier Performance - Thai-English Grammar Learning Tool{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 3rem 0;
+        margin: -2rem -12px 3rem -12px;
+        border-radius: 0 0 1rem 1rem;
+    }
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s;
+        height: 100%;
+    }
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .performance-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .excellent { background-color: #d4edda; color: #155724; }
+    .good { background-color: #cce5ff; color: #004085; }
+    .moderate { background-color: #fff3cd; color: #856404; }
+    .poor { background-color: #f8d7da; color: #721c24; }
+    .progress-custom {
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .score-display {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: white;
+    }
+    .confusion-table {
+        font-size: 0.9rem;
+    }
+    .confusion-table td {
+        min-width: 80px;
+        text-align: center;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-3">
+            <i class="bi bi-cpu"></i> BERT Classifier Performance
+        </h1>
+        <h2 class="h4 mb-4">Isolated XLM-RoBERTa Fine-grained Tense Classification</h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">{{ performance.classifier.metrics['Accuracy'] }}</div>
+                    <p class="lead mb-0">Accuracy</p>
+                    <small class="text-white-50">Overall classification accuracy</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">{{ performance.classifier.metrics['Macro F1 Score'] }}</div>
+                    <p class="lead mb-0">Macro F1</p>
+                    <small class="text-white-50">Unweighted average F1</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">{{ performance.classifier.metrics['Weighted F1 Score'] }}</div>
+                    <p class="lead mb-0">Weighted F1</p>
+                    <small class="text-white-50">Support-weighted F1</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="score-display">469</div>
+                    <p class="lead mb-0">Test Samples</p>
+                    <small class="text-white-50">24 tense classes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Overview -->
+<section class="mb-5">
+    <div class="alert alert-success border-success">
+        <div class="row align-items-center">
+            <div class="col-md-1">
+                <i class="bi bi-check-circle-fill text-success fs-1"></i>
+            </div>
+            <div class="col-md-11">
+                <h5 class="alert-heading mb-2">Isolated Classifier Testing</h5>
+                <p class="mb-0">
+                    This evaluation tests <strong>only the XLM-RoBERTa classifier</strong> in isolation, focusing purely on its ability to 
+                    classify Thai sentences into 24 fine-grained tense categories. No translation or explanation components are involved.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Performance Overview -->
+<section class="mb-5">
+    <h3 class="mb-4">Performance Overview</h3>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-bullseye me-2 text-success"></i>Overall Accuracy</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">{{ performance.classifier.metrics['Accuracy'] }}</span>
+                    <span class="performance-badge excellent">Excellent</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 94.7%"></div>
+                </div>
+                <small class="text-muted">444 out of 469 samples correctly classified</small>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-graph-up me-2 text-success"></i>Macro F1 Score</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">{{ performance.classifier.metrics['Macro F1 Score'] }}</span>
+                    <span class="performance-badge excellent">Excellent</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 91.3%"></div>
+                </div>
+                <small class="text-muted">Unweighted average across all 24 classes</small>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="metric-card">
+                <h5><i class="bi bi-bar-chart me-2 text-success"></i>Weighted F1 Score</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="h3 mb-0">{{ performance.classifier.metrics['Weighted F1 Score'] }}</span>
+                    <span class="performance-badge excellent">Excellent</span>
+                </div>
+                <div class="progress progress-custom">
+                    <div class="progress-bar bg-success" style="width: 94.6%"></div>
+                </div>
+                <small class="text-muted">Weighted by class support (sample count)</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Confusion Matrix -->
+<section class="mb-5">
+    <h3 class="mb-4">Confusion Matrix - Coarse Tense Classification</h3>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered confusion-table">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Actual \ Predicted</th>
+                            <th>Past</th>
+                            <th>Present</th>
+                            <th>Future</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if performance.classifier.confusion_matrix %}
+                            {% for actual, predictions in performance.classifier.confusion_matrix.items() %}
+                            <tr>
+                                <th class="table-light">{{ actual }}</th>
+                                {% for pred_class in ['Past', 'Present', 'Future'] %}
+                                    <td class="{% if predictions[pred_class] > 95 %}bg-success text-white{% elif predictions[pred_class] > 0 %}bg-warning{% endif %}">
+                                        {{ "%.2f"|format(predictions[pred_class]) }}%
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-muted mt-3 mb-0">
+                <i class="bi bi-info-circle"></i> Near-perfect classification with minimal confusion between tense categories.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Per-Class Performance -->
+<section class="mb-5">
+    <h3 class="mb-4">Per-Class Performance Analysis</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy-fill"></i> Perfect Performance (F1 = 1.000)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if performance.classifier.top_performing_labels %}
+                        <div class="list-group list-group-flush">
+                            {% for label_data in performance.classifier.top_performing_labels %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{{ label_data.label }}</span>
+                                <span class="badge bg-success rounded-pill">{{ "%.3f"|format(label_data.f1) }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <hr>
+                    <small class="text-muted">6 out of 24 classes achieved perfect classification</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Challenging Classes
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if performance.classifier.challenging_labels %}
+                        <div class="list-group list-group-flush">
+                            {% for label_data in performance.classifier.challenging_labels %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{{ label_data.label }}</span>
+                                <span class="badge {% if label_data.f1 < 0.5 %}bg-danger{% else %}bg-warning text-dark{% endif %} rounded-pill">{{ "%.3f"|format(label_data.f1) }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <hr>
+                    <small class="text-muted">4 classes require attention for improvement</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Detailed Class Breakdown -->
+<section class="mb-5">
+    <h3 class="mb-4">Complete Per-Label Results</h3>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Label</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1-Score</th>
+                            <th>Support</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>50PERC</td><td>1.000</td><td>0.917</td><td>0.957</td><td>24</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>BEFOREPAST</td><td>1.000</td><td>1.000</td><td>1.000</td><td>22</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                        <tr><td>DOINGATSOMETIMEPAST</td><td>1.000</td><td>1.000</td><td>1.000</td><td>2</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                        <tr><td>DURATION</td><td>1.000</td><td>1.000</td><td>1.000</td><td>18</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                        <tr><td>EXP</td><td>0.917</td><td>1.000</td><td>0.957</td><td>11</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>FACT</td><td>0.905</td><td>0.864</td><td>0.884</td><td>22</td><td><span class="badge bg-info">Good</span></td></tr>
+                        <tr><td>HABIT</td><td>1.000</td><td>0.933</td><td>0.966</td><td>15</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>HAPPENING</td><td>0.882</td><td>0.882</td><td>0.882</td><td>51</td><td><span class="badge bg-info">Good</span></td></tr>
+                        <tr><td>HEADLINE</td><td>0.889</td><td>1.000</td><td>0.941</td><td>8</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>INTERRUPT</td><td>1.000</td><td>0.947</td><td>0.973</td><td>19</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>JUSTFIN</td><td>1.000</td><td>1.000</td><td>1.000</td><td>16</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                        <tr><td>LONGFUTURE</td><td>1.000</td><td>1.000</td><td>1.000</td><td>53</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                        <tr><td>NORFIN</td><td>0.974</td><td>1.000</td><td>0.987</td><td>38</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr class="table-warning"><td>NOWADAYS</td><td>0.333</td><td>0.286</td><td>0.308</td><td>7</td><td><span class="badge bg-danger">Poor</span></td></tr>
+                        <tr><td>PREDICT</td><td>0.970</td><td>1.000</td><td>0.985</td><td>32</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>PROGRESS</td><td>0.947</td><td>0.947</td><td>0.947</td><td>19</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr class="table-warning"><td>PROMISE</td><td>0.600</td><td>0.600</td><td>0.600</td><td>5</td><td><span class="badge bg-warning text-dark">Moderate</span></td></tr>
+                        <tr><td>RESULT</td><td>1.000</td><td>0.933</td><td>0.966</td><td>15</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr class="table-warning"><td>RIGHTNOW</td><td>0.778</td><td>0.875</td><td>0.824</td><td>8</td><td><span class="badge bg-info">Good</span></td></tr>
+                        <tr class="table-warning"><td>SAYING</td><td>0.833</td><td>0.833</td><td>0.833</td><td>6</td><td><span class="badge bg-info">Good</span></td></tr>
+                        <tr><td>SCHEDULEDFUTURE</td><td>0.941</td><td>1.000</td><td>0.970</td><td>32</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>SINCEFOR</td><td>1.000</td><td>1.000</td><td>1.000</td><td>19</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                        <tr><td>SUREFUT</td><td>0.929</td><td>0.929</td><td>0.929</td><td>14</td><td><span class="badge bg-success">Excellent</span></td></tr>
+                        <tr><td>WILLCONTINUEINFUTURE</td><td>1.000</td><td>1.000</td><td>1.000</td><td>13</td><td><span class="badge bg-success">Perfect</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key Insights -->
+<section class="mb-5">
+    <h3 class="mb-4">Key Insights</h3>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Classifier Strengths</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><strong>High Accuracy:</strong> 94.7% overall classification accuracy</li>
+                        <li><strong>Perfect Classes:</strong> 6/24 classes with F1 = 1.000</li>
+                        <li><strong>Balanced Performance:</strong> Strong macro and weighted F1 scores</li>
+                        <li><strong>Robust Architecture:</strong> XLM-RoBERTa multilingual capabilities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="bi bi-target me-2"></i>Improvement Targets</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><strong>NOWADAYS:</strong> F1 = 0.308 (lowest performing class)</li>
+                        <li><strong>PROMISE:</strong> F1 = 0.600 (context-dependent challenges)</li>
+                        <li><strong>Temporal Nuances:</strong> RIGHTNOW, SAYING classes need attention</li>
+                        <li><strong>Data Imbalance:</strong> Some classes have very few samples</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

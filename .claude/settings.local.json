@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(true)",
+      "Bash(python:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:opentyphoon.ai)"
+    ],
+    "deny": []
+  }
+}

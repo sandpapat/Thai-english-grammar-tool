@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Thai-English Grammar Learning Tool{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Results Header -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">
+                    <i class="bi bi-check-circle text-success"></i> Analysis Results
+                </h2>
+                
+                <!-- Input and Translation -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-chat-left-text"></i> Thai Input
+                                </h5>
+                                <p class="card-text fs-5">{{ result.input_thai }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-translate"></i> English Translation
+                                </h5>
+                                <p class="card-text fs-5">{{ result.translation }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tense Classification -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-primary">Coarse Tense</h5>
+                                <p class="card-text fs-3 fw-bold text-primary">
+                                    {{ result.coarse_label }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-success">Fine Tense</h5>
+                                <p class="card-text fs-3 fw-bold text-success">
+                                    {{ result.fine_label }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grammar Explanation -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-lightbulb"></i> Grammar Explanation
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if explanation_sections %}
+                    {% for section_key, section in explanation_sections.items() %}
+                        <div class="mb-4">
+                            <h5 class="text-primary">
+                                <i class="bi bi-bookmark"></i> {{ section.title }}
+                            </h5>
+                            <div class="ps-3">
+                                <p class="mb-2">{{ section.content|safe }}</p>
+                            </div>
+                        </div>
+                        {% if not loop.last %}
+                            <hr class="my-3">
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">No explanation available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                <i class="bi bi-arrow-clockwise"></i> Try Another Sentence
+            </a>
+            <a href="{{ url_for('performance') }}" class="btn btn-outline-secondary btn-lg ms-2">
+                <i class="bi bi-speedometer2"></i> View Model Performance
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

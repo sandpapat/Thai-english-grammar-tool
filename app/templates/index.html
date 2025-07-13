@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Thai-English Grammar Learning Tool{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <h1 class="card-title text-center mb-4">
+                    <i class="bi bi-chat-text"></i> Thai-English Grammar Learning Tool
+                </h1>
+                
+                <p class="text-center text-muted mb-4">
+                    Enter a Thai sentence to analyse its English translation and tense
+                </p>
+
+                <form method="POST" action="{{ url_for('predict') }}" id="analyseForm">
+                    <div class="mb-4">
+                        <label for="thai_text" class="form-label">
+                            <i class="bi bi-pencil-square"></i> Thai Sentence
+                        </label>
+                        <textarea 
+                            class="form-control form-control-lg" 
+                            id="thai_text" 
+                            name="thai_text" 
+                            rows="3" 
+                            placeholder="พิมพ์ประโยคภาษาไทยที่นี่..."
+                            required
+                            autofocus
+                        ></textarea>
+                        <div class="form-text">
+                            Example: ฉันกินข้าวเช้าทุกวัน, เมื่อวานฉันไปตลาด, พรุ่งนี้ฉันจะไปเรียน
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <i class="bi bi-play-circle"></i> Analyse
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Information Cards -->
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-translate text-primary" style="font-size: 2rem;"></i>
+                        <h5 class="card-title mt-2">Translation</h5>
+                        <p class="card-text small">
+                            Thai to English using Typhoon Translate 4B
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-tags text-success" style="font-size: 2rem;"></i>
+                        <h5 class="card-title mt-2">Classification</h5>
+                        <p class="card-text small">
+                            Tense detection using XLM-RoBERTa
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;"></i>
+                        <h5 class="card-title mt-2">Explanation</h5>
+                        <p class="card-text small">
+                            Grammar tips using Typhoon 2.1 Instruct
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Show loading state on form submission
+    document.getElementById('analyseForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    });
+</script>
+{% endblock %}

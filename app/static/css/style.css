@@ -1,0 +1,97 @@
+/* Custom styles for Thai-English Grammar Learning Tool */
+
+/* General */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Cards */
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Form */
+#thai_text {
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
+
+/* Results */
+.card-text.fs-3 {
+    letter-spacing: 0.05em;
+}
+
+/* Performance page */
+.progress {
+    background-color: #e9ecef;
+}
+
+/* Loading state */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .fs-3 {
+        font-size: 1.5rem !important;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 0.5rem;
+}
+
+/* Footer */
+footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* Thai text specific */
+#thai_text {
+    font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+}
+
+/* Explanation sections */
+.ps-3 {
+    border-left: 3px solid #0d6efd;
+    padding-left: 1.5rem !important;
+}
+
+/* Performance metrics */
+.bi-circle-fill {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}

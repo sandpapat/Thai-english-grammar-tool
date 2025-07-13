@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}คู่มือ Tense - Thai-English Grammar Learning Tool{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-center mb-4">
+            <i class="bi bi-book"></i> คู่มือการใช้ Tense ภาษาอังกฤษ
+        </h1>
+        
+        <p class="text-center text-muted mb-5">
+            ความเข้าใจการใช้ Tense ภาษาอังกฤษที่แตกต่างกันสำหรับการแปลไทย-อังกฤษ
+        </p>
+
+        <!-- Present Tenses -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-clock"></i> Present Tenses (ปัจจุบัน)
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Present Simple -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-primary">
+                            <div class="card-header bg-light">
+                                <h5 class="text-primary mb-0">Present Simple</h5>
+                                <div class="badge bg-primary text-white">Subject + V<sub>1</sub> (s/es)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>กิจวัตรและพฤติกรรมประจำ:</strong><br>
+                                        <small class="text-muted">ใช้เมื่อพูดถึงกิจวัตรหรือพฤติกรรมที่ทำเป็นประจำ</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>ข้อเท็จจริงและความรู้วิทยาศาสตร์:</strong><br>
+                                        <small class="text-muted">ใช้กับข้อเท็จจริงที่เป็นสัจธรรมหรือเป็นความรู้ทางวิทยาศาสตร์</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>ตารางเวลาและแผนการ:</strong><br>
+                                        <small class="text-muted">ใช้เมื่อกล่าวถึงตารางเวลา เช่น ตารางเดินรถ หรือแผนที่กำหนดไว้</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>สุภาษิตและคำกล่าวทั่วไป:</strong><br>
+                                        <small class="text-muted">ใช้กับสุภาษิต คำพังเพย หรือคำกล่าวทั่วไป</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>พาดหัวข่าว:</strong><br>
+                                        <small class="text-muted">ใช้ในพาดหัวข่าวหรือข้อความที่เน้นย่อประโยค สังเกตว่าแม้จะพูดถึงเหตุการณ์ที่เกิดขึ้นแล้ว แต่พาดหัวข่าวมักใช้ Present Simple เพื่อสร้างความรู้สึกสดใหม่และดึงดูดความสนใจผู้อ่าน</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>แผนการและความตั้งใจในอนาคต:</strong><br>
+                                        <small class="text-muted">ใช้เมื่อพูดถึง "แผนการ" หรือ "ความตั้งใจ" ในอนาคต แม้ว่าโครงสร้างจะใช้ Present Simple แต่ความหมายมักชี้ไปยังสิ่งที่ผู้พูดหรือผู้ถูกถาม "ตั้งใจจะทำ" ในอนาคต</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Present Continuous -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-header bg-light">
+                                <h5 class="text-success mb-0">Present Continuous</h5>
+                                <div class="badge bg-success text-white">Subject + am/is/are + V<sub>ing</sub> (Present Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำที่เกิดขึ้นขณะพูด:</strong><br>
+                                        <small class="text-muted">สิ่งที่ทำอยู่ขณะพูด</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>กิจกรรมในช่วงเวลานี้:</strong><br>
+                                        <small class="text-muted">สิ่งที่ทำอยู่ในช่วงนี้ เช่น โปรเจค หรือ สิ่งที่ใช้เวลาทำนาน เป็นหลักวัน</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>เหตุการณ์ในอนาคตที่วางแผนแล้ว:</strong><br>
+                                        <small class="text-muted">เหตุการณ์ที่จะเกิดขึ้นในอนาคตโดยมี "การวางแผนไว้แล้ว" โดยมักจะเจอ "v.to be + going to"</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>การเปลี่ยนแปลงที่กำลังดำเนินอยู่:</strong><br>
+                                        <small class="text-muted">เหตุการณ์ที่กำลังมีการเปลี่ยนแปลง พัฒนาขึ้น หรือก้าวหน้าขึ้น</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Present Perfect -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-info">
+                            <div class="card-header bg-light">
+                                <h5 class="text-info mb-0">Present Perfect</h5>
+                                <div class="badge bg-info text-white">Subject + have/has + V<sub>3</sub> (Past Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำที่เพิ่งสิ้นสุด:</strong><br>
+                                        <small class="text-muted">ใช้เมื่อเหตุการณ์เพิ่งจะสิ้นสุดลง</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>การกระทำในอดีตที่มีผลต่อปัจจุบัน:</strong><br>
+                                        <small class="text-muted">สิ่งที่เกิดขึ้นตั้งแต่อดีตและมีผลหรือคงสภาพจนถึงปัจจุบัน (การกระทำอาจจะจบไปแล้ว)</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>ประสบการณ์:</strong><br>
+                                        <small class="text-muted">ประสบการณ์ (เจอคำว่า "First / ... time")</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Present Perfect Continuous -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-warning">
+                            <div class="card-header bg-light">
+                                <h5 class="text-warning mb-0">Present Perfect Continuous</h5>
+                                <div class="badge bg-warning text-white">Subject + have/has + been + V<sub>ing</sub> (Present Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำต่อเนื่องจากอดีตถึงปัจจุบัน:</strong><br>
+                                        <small class="text-muted">สิ่งที่ทำเรื่อยมาจนถึงปัจจุบัน โดยเน้น ระยะเวลา มักเจอ For since</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Past Tenses -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-clock-history"></i> Past Tenses (อดีต)
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Past Simple -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-secondary">
+                            <div class="card-header bg-light">
+                                <h5 class="text-secondary mb-0">Past Simple</h5>
+                                <div class="badge bg-secondary text-white">Subject + V<sub>2</sub></div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำในอดีตทั่วไป:</strong><br>
+                                        <small class="text-muted">การกระทำในอดีตทั่วไป โดยไม่มีบริบทหรือรายละเอียดเพิ่มเติม</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Continuous -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-dark">
+                            <div class="card-header bg-light">
+                                <h5 class="text-dark mb-0">Past Continuous</h5>
+                                <div class="badge bg-dark text-white">Subject + was/were + V<sub>ing</sub> (Present Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำที่ถูกขัดจังหวะ:</strong><br>
+                                        <small class="text-muted">ใช้คู่กับ Past Simple เพื่อบอกว่าเหตุการณ์ใน Past simple เกิด "แทรก" อีกเหตุการณ์ที่กำลังทำในอดีต</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>การกระทำ ณ เวลาหนึ่งในอดีต:</strong><br>
+                                        <small class="text-muted">สิ่งที่กำลังทำอยู่ ณ เวลาหนึ่งในอดีต</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Past Perfect -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-danger">
+                            <div class="card-header bg-light">
+                                <h5 class="text-danger mb-0">Past Perfect</h5>
+                                <div class="badge bg-danger text-white">Subject + had + V<sub>3</sub> (Past Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำที่เกิดก่อนเหตุการณ์อื่นในอดีต:</strong><br>
+                                        <small class="text-muted">ใช้เมื่อต้องการแสดงว่าเหตุการณ์หนึ่งเกิดขึ้นและเสร็จก่อนอีกเหตุการณ์ในอดีต (เช่น Past Simple หรือ ตัวบอกเวลาในอดีต) เช่นในประโยคนี้ "เธอทำการบ้านเสร็จก่อนที่จะทานข้าวเย็น"</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Perfect Continuous -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-primary">
+                            <div class="card-header bg-light">
+                                <h5 class="text-primary mb-0">Past Perfect Continuous</h5>
+                                <div class="badge bg-primary text-white">Subject + had + been + V<sub>ing</sub> (Present Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำต่อเนื่องก่อนเหตุการณ์ในอดีต:</strong><br>
+                                        <small class="text-muted">ใช้คู่กับ Past Simple หรือ ตัวบอกเวลาในอดีต เพื่อบอกสิ่งที่กำลังทำอยู่สักพักหนึ่งก่อนอีกสิ่งจะเกิดในอดีต (เน้นว่ากำลังทำอยู่ตอนนั้น)</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Future Tenses -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-clock-forward"></i> Future Tenses (อนาคต)
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Future Simple -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-success">
+                            <div class="card-header bg-light">
+                                <h5 class="text-success mb-0">Future Simple</h5>
+                                <div class="badge bg-success text-white">Subject + will + V<sub>inf</sub> (Verb Infinitive)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การคาดการณ์ (50% ความเป็นไปได้):</strong><br>
+                                        <small class="text-muted">สิ่งที่คาดจะเกิด หรือมีแนวโน้มในอนาคต (50%)</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>คำสัญญาและการเสนอความช่วยเหลือ:</strong><br>
+                                        <small class="text-muted">การให้คำสัญญา หรือเสนออะไรให้ใคร (promise)</small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>การตัดสินใจฉับพลัน:</strong><br>
+                                        <small class="text-muted">สิ่งที่เพิ่งคิดว่าจะทำเดี๋ยวนั้น (ไม่ได้วางแผนว่าจะทำมาก่อน)</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Future Continuous -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-info">
+                            <div class="card-header bg-light">
+                                <h5 class="text-info mb-0">Future Continuous</h5>
+                                <div class="badge bg-info text-white">Subject + will + be + V<sub>ing</sub> (Present Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำในอนาคตที่ยาวนาน:</strong><br>
+                                        <small class="text-muted">สิ่งที่คาดว่าน่าจะเกิดขึ้น คงจะทำอยู่ หรือวางแผนว่าจะทำ ณ เวลาหนึ่งในอนาคต</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Future Perfect -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-warning">
+                            <div class="card-header bg-light">
+                                <h5 class="text-warning mb-0">Future Perfect</h5>
+                                <div class="badge bg-warning text-white">Subject + will + have + V<sub>3</sub> (Past Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำที่จะเสร็จสิ้นในอนาคต:</strong><br>
+                                        <small class="text-muted">สิ่งที่คาดว่าคงจบ เสร็จสิ้น หรือครบเวลาแล้ว ณ เวลาหนึ่งในอนาคต</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Future Perfect Continuous -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 border-danger">
+                            <div class="card-header bg-light">
+                                <h5 class="text-danger mb-0">Future Perfect Continuous</h5>
+                                <div class="badge bg-danger text-white">Subject + will + have + been + V<sub>ing</sub> (Present Participle)</div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>การกระทำที่จะเสร็จและต่อเนื่องในอนาคต:</strong><br>
+                                        <small class="text-muted">สิ่งที่คาดว่าคงจบ เสร็จสิ้น หรือครบเวลาแล้ว ณ เวลาหนึ่งในอนาคต และจะคงสภาพหรือทำแบบนี้ต่อไปอีก</small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Note -->
+        <div class="alert alert-info">
+            <h5><i class="bi bi-info-circle"></i> หมายเหตุสำหรับการแปลไทย-อังกฤษ</h5>
+            <p class="mb-0">
+                เนื่องจากกริยาภาษาไทยไม่เปลี่ยนรูปเพื่อแสดง Tense ดังนั้น Tense ในภาษาอังกฤษจึงต้องอนุมานจากบริบท เช่น คำบอกเวลา 
+                อนุภาค (เช่น จะ สำหรับอนาคต) และบริบทของสถานการณ์ ระบบการจำแนกประเภทนี้ช่วยระบุ Tense ภาษาอังกฤษที่เหมาะสมที่สุด
+                โดยอิงจากความหมายและบริบทของประโยคภาษาไทย
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
