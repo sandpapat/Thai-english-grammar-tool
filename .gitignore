@@ -1,0 +1,64 @@
+# Environment variables
+.env
+*.env
+.env.*
+
+# Config files with sensitive data
+config.py
+secrets.py
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Virtual environments
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models (large files)
+models/
+*.gguf
+*.safetensors
+*.pt
+*.pth
+*.bin
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+.cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Flask
+instance/
+.webassets-cache
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/

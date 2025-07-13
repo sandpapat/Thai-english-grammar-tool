@@ -15,6 +15,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import XLMRobertaModel, AutoConfig, PreTrainedModel, AutoTokenizer
 from safetensors.torch import load_file as safe_load_file
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 try:
     from together import Together
 except ImportError:
@@ -506,7 +511,7 @@ class GrammarExplainer:
     def __init__(self):
         # Initialize Together AI client
         self.client = None
-        self.api_key = "tgp_v1_4gCVX2YrOKGcCRnfeVmodBtMLPyggA5xs3f-31Fl0P4"
+        self.api_key = os.getenv('TOGETHER_API_KEY')
         self.model_name = "scb10x/scb10x-typhoon-2-1-gemma3-12b"
         
         # Initialize tense definitions for context
@@ -514,11 +519,15 @@ class GrammarExplainer:
         
         # Initialize API client
         if Together:
-            try:
-                self.client = Together(api_key=self.api_key)
-                print("✓ Together AI client initialized successfully")
-            except Exception as e:
-                print(f"✗ Error initializing Together AI client: {e}")
+            if self.api_key:
+                try:
+                    self.client = Together(api_key=self.api_key)
+                    print("✓ Together AI client initialized successfully")
+                except Exception as e:
+                    print(f"✗ Error initializing Together AI client: {e}")
+                    self.client = None
+            else:
+                print("⚠️ Warning: TOGETHER_API_KEY not found in environment. Using mock explanations.")
                 self.client = None
         else:
             print("✗ Together package not available. Using mock explanations.")
