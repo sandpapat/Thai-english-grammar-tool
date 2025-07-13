@@ -79,6 +79,42 @@ footer {
     padding-left: 1.5rem !important;
 }
 
+/* Enhanced explanation content formatting */
+.explanation-content {
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+.explanation-content p {
+    margin-bottom: 1rem;
+}
+
+.explanation-content strong {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+.explanation-content .definition-text {
+    color: #495057;
+    font-weight: 400;
+}
+
+.explanation-content .bullet-point {
+    color: #0d6efd;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+/* Improved spacing for structured content */
+.explanation-content p + p {
+    margin-top: 0.75rem;
+}
+
+.explanation-content br + strong {
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+
 /* Performance metrics */
 .bi-circle-fill {
     animation: pulse 2s infinite;

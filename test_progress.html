@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Progress Bar Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Real-time Progress Test</h2>
+        
+        <!-- Progress Bar Container -->
+        <div id="progressContainer" class="d-none mt-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-3">
+                        <i class="bi bi-gear-fill"></i> Processing Analysis
+                    </h5>
+                    
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div id="progressBar" 
+                             class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                             role="progressbar" 
+                             style="width: 0%"
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div id="progressIcon" style="font-size: 3rem;" class="mb-2">🔄</div>
+                        <h6 id="progressText" class="mb-1">Starting analysis...</h6>
+                        <p id="progressTextThai" class="text-muted small mb-0">เริ่มการวิเคราะห์...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="testProgress()" class="btn btn-primary">Test Progress Bar</button>
+    </div>
+
+    <script>
+        function testProgress() {
+            // Show progress container
+            document.getElementById('progressContainer').classList.remove('d-none');
+            
+            // Simulate the 3 progress steps
+            const steps = [
+                {step: 1, progress: 33, message: "Translating...", message_thai: "กำลังแปล...", icon: "🔤"},
+                {step: 2, progress: 66, message: "Classifying tense...", message_thai: "กำลังจำแนกกาล...", icon: "🏷️"},
+                {step: 3, progress: 100, message: "Generating explanation...", message_thai: "กำลังสร้างคำอธิบาย...", icon: "💡"}
+            ];
+            
+            let currentStep = 0;
+            
+            const interval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    updateProgress(step.step, step.progress, step.message, step.message_thai, step.icon);
+                    currentStep++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('progressContainer').classList.add('d-none');
+                        alert('Progress test completed! 🎉');
+                    }, 1000);
+                }
+            }, 1500);
+        }
+        
+        function updateProgress(step, progress, message, messageThai, icon) {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressTextThai = document.getElementById('progressTextThai');
+            const progressIcon = document.getElementById('progressIcon');
+            
+            // Update progress bar
+            progressBar.style.width = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+            
+            // Update text
+            progressText.textContent = message;
+            progressTextThai.textContent = messageThai;
+            
+            // Update icon
+            progressIcon.textContent = icon;
+            
+            // Add visual feedback
+            progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-primary';
+            if (progress === 100) {
+                progressBar.className = 'progress-bar bg-success';
+            }
+        }
+    </script>
+</body>
+</html>

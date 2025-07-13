@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, Response, jsonify
 import re
+import json
 from app.pipeline import ModelManager
 
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
@@ -56,6 +57,51 @@ def predict():
     except Exception as e:
         flash(f'An error occurred: {str(e)}', 'error')
         return render_template('index.html')
+
+@app.route('/predict_stream', methods=['POST'])
+def predict_stream():
+    """Stream progress updates during prediction using Server-Sent Events"""
+    def generate():
+        try:
+            # Get Thai text from request
+            data = request.get_json()
+            thai_text = data.get('thai_text', '').strip() if data else ''
+            
+            if not thai_text:
+                yield f"data: {json.dumps({'error': 'Please enter a Thai sentence.'})}\n\n"
+                return
+            
+            # Progress tracking variables to store yielded progress
+            yielded_updates = []
+            
+            def progress_callback(step, progress, message, message_thai):
+                """Callback that yields progress updates during pipeline execution"""
+                update = {
+                    'step': step,
+                    'progress': progress,
+                    'message': message,
+                    'message_thai': message_thai
+                }
+                yielded_updates.append(f"data: {json.dumps(update)}\n\n")
+            
+            # Run the full pipeline with progress callbacks
+            result = model_manager.full_pipeline(thai_text, progress_callback=progress_callback)
+            
+            # Yield all the progress updates that were collected
+            for update in yielded_updates:
+                yield update
+            
+            # Complete - send final result
+            yield f"data: {json.dumps({'complete': True, 'result': result})}\n\n"
+            
+        except Exception as e:
+            yield f"data: {json.dumps({'error': f'An error occurred: {str(e)}'})}\n\n"
+    
+    return Response(generate(), mimetype='text/plain', headers={
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Content-Type': 'text/plain; charset=utf-8'
+    })
 
 @app.route('/tenses')
 def tenses():

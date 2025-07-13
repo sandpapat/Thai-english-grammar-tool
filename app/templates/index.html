@@ -43,6 +43,39 @@
             </div>
         </div>
 
+        <!-- Progress Bar Container -->
+        <div id="progressContainer" class="d-none mt-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-3">
+                        <i class="bi bi-gear-fill"></i> Processing Analysis
+                    </h5>
+                    
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div id="progressBar" 
+                             class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                             role="progressbar" 
+                             style="width: 0%"
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div id="progressIcon" style="font-size: 3rem;" class="mb-2">🔄</div>
+                        <h6 id="progressText" class="mb-1">Starting analysis...</h6>
+                        <p id="progressTextThai" class="text-muted small mb-0">เริ่มการวิเคราะห์...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="d-none mt-4">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+
         <!-- Information Cards -->
         <div class="row mt-4">
             <div class="col-md-4 mb-3">
@@ -85,11 +118,323 @@
 
 {% block extra_js %}
 <script>
-    // Show loading state on form submission
-    document.getElementById('analyseForm').addEventListener('submit', function() {
+    // Handle form submission with real-time progress
+    document.getElementById('analyseForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent normal form submission
+        
+        const formData = new FormData(this);
+        const thai_text = formData.get('thai_text');
+        
+        // Show progress, hide results
+        document.getElementById('progressContainer').classList.remove('d-none');
+        document.getElementById('resultsContainer').classList.add('d-none');
+        
+        // Disable form and reset progress
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+        resetProgress();
+        
+        // Start streaming request
+        fetch('/predict_stream', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({thai_text: thai_text})
+        })
+        .then(response => {
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            
+            function readStream() {
+                return reader.read().then(({ done, value }) => {
+                    if (done) {
+                        console.log('Stream completed');
+                        return;
+                    }
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (let line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.substring(6));
+                                handleProgressUpdate(data);
+                            } catch (e) {
+                                console.error('Error parsing data:', e);
+                            }
+                        }
+                    }
+                    
+                    return readStream();
+                });
+            }
+            
+            return readStream();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Connection error occurred');
+            resetForm();
+        });
     });
+    
+    function handleProgressUpdate(data) {
+        if (data.error) {
+            showError(data.error);
+            resetForm();
+            return;
+        }
+        
+        if (data.complete) {
+            // Show results
+            showResults(data.result);
+            resetForm();
+            return;
+        }
+        
+        // Update progress
+        updateProgress(data.step, data.progress, data.message, data.message_thai);
+    }
+    
+    function updateProgress(step, progress, message, messageThai) {
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressTextThai = document.getElementById('progressTextThai');
+        const progressIcon = document.getElementById('progressIcon');
+        
+        // Update progress bar
+        progressBar.style.width = progress + '%';
+        progressBar.setAttribute('aria-valuenow', progress);
+        
+        // Update text
+        progressText.textContent = message;
+        progressTextThai.textContent = messageThai;
+        
+        // Update icon based on step
+        const icons = {
+            1: '🔤', // Translation
+            2: '🏷️', // Classification  
+            3: '💡', // Explanation
+        };
+        progressIcon.textContent = icons[step] || '🔄';
+        
+        // Add visual feedback
+        progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-primary';
+        if (progress === 100) {
+            progressBar.className = 'progress-bar bg-success';
+        }
+    }
+    
+    function showResults(result) {
+        // Process explanation sections
+        let explanation_sections = {};
+        const explanation = result.explanation;
+        
+        if (typeof explanation === 'object' && explanation.parsed_sections) {
+            explanation_sections = {
+                'section_1': {
+                    'title': 'วิเคราะห์ Tense ที่ใช้',
+                    'content': explanation.parsed_sections.tense_analysis || 'ส่วนนี้ไม่สามารถแยกได้'
+                },
+                'section_2': {
+                    'title': 'คำศัพท์ที่น่าสนใจ',
+                    'content': explanation.parsed_sections.vocabulary || 'ส่วนนี้ไม่สามารถแยกได้'
+                },
+                'section_3': {
+                    'title': 'ข้อผิดพลาดที่พบบ่อย',
+                    'content': explanation.parsed_sections.common_mistakes || 'ส่วนนี้ไม่สามารถแยกได้'
+                }
+            };
+        } else {
+            // Fallback to legacy parsing
+            explanation_sections = parseLegacyExplanation(explanation);
+        }
+        
+        // Generate results HTML
+        const resultsHTML = generateResultsHTML(result, explanation_sections);
+        document.getElementById('resultsContainer').innerHTML = resultsHTML;
+        document.getElementById('resultsContainer').classList.remove('d-none');
+        document.getElementById('progressContainer').classList.add('d-none');
+    }
+    
+    function generateResultsHTML(result, explanation_sections) {
+        return `
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="bi bi-check-circle text-success"></i> Analysis Results
+                    </h2>
+                    
+                    <!-- Input and Translation -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-chat-left-text"></i> Thai Input
+                                    </h5>
+                                    <p class="card-text fs-5">${result.input_thai}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-translate"></i> English Translation
+                                    </h5>
+                                    <p class="card-text fs-5">${result.translation}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tense Classification -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-primary">Coarse Tense</h5>
+                                    <p class="card-text fs-3 fw-bold text-primary">
+                                        ${result.coarse_label}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-success">Fine Tense</h5>
+                                    <p class="card-text fs-3 fw-bold text-success">
+                                        ${result.fine_label}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grammar Explanation -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-lightbulb"></i> Grammar Explanation
+                    </h4>
+                </div>
+                <div class="card-body">
+                    ${Object.keys(explanation_sections).length > 0 ? 
+                        Object.entries(explanation_sections).map(([key, section]) => `
+                            <div class="mb-4">
+                                <h5 class="text-primary">
+                                    <i class="bi bi-bookmark"></i> ${section.title}
+                                </h5>
+                                <div class="ps-3">
+                                    <div class="explanation-content">${formatExplanationContent(section.content)}</div>
+                                </div>
+                            </div>
+                            ${key !== 'section_3' ? '<hr class="my-3">' : ''}
+                        `).join('') : 
+                        '<p class="text-muted">No explanation available.</p>'
+                    }
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="text-center">
+                <button onclick="location.reload()" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-clockwise"></i> Try Another Sentence
+                </button>
+                <a href="/performance" class="btn btn-outline-secondary btn-lg ms-2">
+                    <i class="bi bi-speedometer2"></i> View Model Performance
+                </a>
+            </div>
+        `;
+    }
+    
+    function parseLegacyExplanation(explanation_text) {
+        // Legacy parsing for old format explanations
+        const sections = {};
+        const pattern = /\[SECTION (\d+): ([^\]]+)\](.*?)(?=\[SECTION|\Z)/gs;
+        let matches = [...explanation_text.matchAll(pattern)];
+        
+        for (let match of matches) {
+            const section_num = match[1];
+            const section_title = match[2].trim();
+            const section_content = match[3].trim();
+            sections[`section_${section_num}`] = {
+                'title': section_title,
+                'content': section_content
+            };
+        }
+        
+        // If no sections found, return the full text as a single section
+        if (Object.keys(sections).length === 0) {
+            sections['section_1'] = {
+                'title': 'Explanation',
+                'content': explanation_text
+            };
+        }
+        
+        return sections;
+    }
+    
+    function resetProgress() {
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const progressTextThai = document.getElementById('progressTextThai');
+        const progressIcon = document.getElementById('progressIcon');
+        
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', '0');
+        progressBar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-primary';
+        progressText.textContent = 'Starting analysis...';
+        progressTextThai.textContent = 'เริ่มการวิเคราะห์...';
+        progressIcon.textContent = '🔄';
+    }
+    
+    function resetForm() {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+    }
+    
+    function showError(message) {
+        alert('Error: ' + message);
+        document.getElementById('progressContainer').classList.add('d-none');
+        resetForm();
+    }
+    
+    function formatExplanationContent(content) {
+        if (!content) return '';
+        
+        // Enhanced content formatting for better readability
+        let formatted = content
+            // Convert newlines to proper breaks
+            .replace(/\n\n/g, '</p><p class="mb-2">')
+            .replace(/\n/g, '<br>')
+            
+            // Format bold text with better styling
+            .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-primary">$1</strong>')
+            
+            // Add spacing around colons for definitions
+            .replace(/(<strong[^>]*>[^<]*<\/strong>):\s*/g, '$1:</strong> <span class="definition-text">')
+            .replace(/(<span class="definition-text">[^<]*)/g, '$1</span>')
+            
+            // Format bullet points
+            .replace(/^\s*[•\-\*]\s+/gm, '<span class="bullet-point">• </span>')
+            
+            // Clean up extra spaces
+            .replace(/\s+/g, ' ')
+            .trim();
+        
+        // Wrap in paragraph tags if not already wrapped
+        if (!formatted.startsWith('<p')) {
+            formatted = '<p class="mb-2">' + formatted + '</p>';
+        }
+        
+        return formatted;
+    }
 </script>
 {% endblock %}

@@ -611,6 +611,13 @@ Tense ที่ระบบตรวจพบ: {fine_label} (ความมั�
 - **ใช้รูปแบบวิชาการ ไม่ใช่รูปแบบสนทนา**
 - **ห้ามเขียนหัวข้ออื่น ๆ ที่ไม่อยู่ใน Requirement**
 - **ใช้รูปแบบหัวข้อเป็น: **1) วิเคราะห์ Tense ที่ใช้** **2) คำศัพท์ที่น่าสนใจ** **3) ข้อผิดพลาดที่พบบ่อย****
+
+**การจัดรูปแบบข้อความ:**
+- แต่ละประโยคต้องแยกด้วยการขึ้นบรรทัดใหม่
+- ใช้ **ตัวหนา** สำหรับคำสำคัญ เช่น **Present Simple:** **โครงสร้าง:** **ตัวอย่าง:**
+- แยกแต่ละหัวข้อย่อยด้วยการขึ้นบรรทัดใหม่ 2 ครั้ง
+- ใส่ช่องว่างหลังเครื่องหมายจุลภาค จุด และเครื่องหมายโคลอน
+- เขียนให้อ่านง่าย ไม่รวมประโยคยาวๆ เป็นก้อนเดียว
 </format>"""
 
         messages = [
@@ -624,7 +631,14 @@ Tense ที่ระบบตรวจพบ: {fine_label} (ความมั�
 - เริ่มต้นด้วยการวิเคราะห์ทันที
 - ใช้ภาษาวิชาการที่เข้าใจง่าย
 - ตอบตรงประเด็นตามหัวข้อที่กำหนด
-- ใช้รูปแบบหัวข้อ **1) วิเคราะห์ Tense ที่ใช้** **2) คำศัพท์ที่น่าสนใจ** **3) ข้อผิดพลาดที่พบบ่อย** เท่านั้น"""
+- ใช้รูปแบบหัวข้อ **1) วิเคราะห์ Tense ที่ใช้** **2) คำศัพท์ที่น่าสนใจ** **3) ข้อผิดพลาดที่พบบ่อย** เท่านั้น
+
+กฎการจัดรูปแบบ (สำคัญมาก):
+- แต่ละประโยคขึ้นบรรทัดใหม่แยกจากกัน
+- ใช้ **ตัวหนา** สำหรับคำสำคัญและหัวข้อย่อย
+- เว้นบรรทัดว่างระหว่างหัวข้อย่อย
+- ไม่เขียนประโยคยาวต่อเนื่องกันเป็นก้อน
+- ใส่ช่องว่างหลังเครื่องหมายจุลภาคและจุด"""
             },
             {"role": "user", "content": prompt_body}
         ]
@@ -643,7 +657,7 @@ Tense ที่ระบบตรวจพบ: {fine_label} (ความมั�
         return response.choices[0].message.content.strip()
     
     def _parse_explanation_sections(self, explanation):
-        """Parse explanation into Thai sections using regex"""
+        """Parse explanation into Thai sections using regex with enhanced formatting"""
         sections = {}
         
         # Regex patterns for Thai sections with ** formatting
@@ -656,7 +670,10 @@ Tense ที่ระบบตรวจพบ: {fine_label} (ความมั�
         for section_name, pattern in patterns.items():
             match = re.search(pattern, explanation, re.DOTALL | re.IGNORECASE)
             if match:
-                sections[section_name] = match.group(1).strip()
+                raw_content = match.group(1).strip()
+                # Apply enhanced formatting to the section content
+                formatted_content = self._format_explanation_content(raw_content)
+                sections[section_name] = formatted_content
             else:
                 sections[section_name] = "ส่วนนี้ไม่สามารถแยกได้"
         
@@ -664,6 +681,42 @@ Tense ที่ระบบตรวจพบ: {fine_label} (ความมั�
             'raw_explanation': explanation,
             'parsed_sections': sections
         }
+    
+    def _format_explanation_content(self, content):
+        """Enhanced formatting for explanation content to improve readability"""
+        if not content:
+            return content
+        
+        # Clean up the content first
+        content = content.strip()
+        
+        # 1. Add line breaks after sentences that end with periods
+        content = re.sub(r'\.(\s*)([ก-๙])', r'.\n\n\2', content)
+        
+        # 2. Add line breaks before bullet points and numbered lists
+        content = re.sub(r'(\s*)([•\-\*]\s+)', r'\n\2', content)
+        
+        # 3. Add line breaks before bold/emphasized text patterns
+        content = re.sub(r'(\s*)(\*\*[^*]+\*\*)', r'\n\n\2', content)
+        
+        # 4. Add spacing around colons for definitions
+        content = re.sub(r'(\*\*[^*]+\*\*:)', r'\1\n', content)
+        
+        # 5. Add line breaks before "โครงสร้าง" and similar structural words
+        structure_words = ['โครงสร้าง', 'ตัวอย่าง', 'การใช้งาน', 'คำสัญญาณ', 'วิธีจำ']
+        for word in structure_words:
+            content = re.sub(f'(\s*)(\*\*{word}[^*]*\*\*)', r'\n\n\2', content)
+        
+        # 6. Clean up multiple consecutive newlines
+        content = re.sub(r'\n{3,}', '\n\n', content)
+        
+        # 7. Remove leading/trailing whitespace
+        content = content.strip()
+        
+        # 8. Ensure proper spacing after colons in definitions
+        content = re.sub(r':\s*([ก-๙])', r': \1', content)
+        
+        return content
     
     def _generate_mock_explanation(self, analysis_result):
         """Generate mock explanation as fallback"""
@@ -728,11 +781,14 @@ class ModelManager:
         except Exception as e:
             print(f"✗ Explanation model failed to load: {e}")
     
-    def full_pipeline(self, thai_text):
-        """Run full NLP pipeline on Thai text"""
+    def full_pipeline(self, thai_text, progress_callback=None):
+        """Run full NLP pipeline on Thai text with optional progress callbacks"""
         result = {"input_thai": thai_text}
         
         # Step 1: Translation
+        if progress_callback:
+            progress_callback(1, 33, "Translating...", "กำลังแปล...")
+        
         if self.translator:
             try:
                 result["translation"] = self.translator.translate(thai_text)
@@ -742,6 +798,9 @@ class ModelManager:
             result["translation"] = "Translation service unavailable"
         
         # Step 2: Tense Classification
+        if progress_callback:
+            progress_callback(2, 66, "Classifying tense...", "กำลังจำแนกกาล...")
+        
         if self.classifier and "translation" in result:
             try:
                 classification_result = self.classifier.classify(result["translation"])
@@ -764,6 +823,9 @@ class ModelManager:
             result["all_predictions"] = {}
         
         # Step 3: Grammar Explanation
+        if progress_callback:
+            progress_callback(3, 100, "Generating explanation...", "กำลังสร้างคำอธิบาย...")
+        
         if self.explainer:
             try:
                 result["explanation"] = self.explainer.explain(result)
