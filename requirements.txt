@@ -6,9 +6,10 @@ gunicorn==21.2.0
 
 # For the actual models (when integrating real models)
 llama-cpp-python==0.2.90  # For Typhoon Translate GGUF
-# transformers==4.35.0      # For XLM-RoBERTa and Typhoon Instruct
-# torch==2.1.0              # PyTorch for transformers
-# sentencepiece==0.1.99     # For tokenization
+transformers==4.35.0      # For XLM-RoBERTa and Typhoon Instruct
+torch==2.1.0              # PyTorch for transformers
+safetensors==0.4.0        # For loading model weights
+sentencepiece==0.1.99     # For tokenization
 # accelerate==0.24.1        # For model optimization
 
 # Optional for development
