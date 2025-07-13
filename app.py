@@ -8,54 +8,58 @@ def format_explanation_content(content):
     if not content:
         return content
     
-    # Clean up the content first
+    # Clean up the raw content
     content = content.strip()
     
-    # 1. Add line breaks after sentences that end with periods
-    content = re.sub(r'\.(\s*)([ก-๙A-Z])', r'.\n\n\2', content)
+    # Remove HTML tags
+    content = re.sub(r'<[^>]+>', '', content)
     
-    # 2. Add line breaks before bullet points and numbered lists
-    content = re.sub(r'(\s*)([•\-\*]\s+)', r'\n\2', content)
+    # Fix broken bold patterns like "**Text•*" or "**Text*"
+    content = re.sub(r'\*\*([^*]+?)[•\*]*\*+', r'**\1**', content)
     
-    # 2b. Handle standalone * characters as bullet points
-    content = re.sub(r'(\s+)(\*\s+)([^*])', r'\n• \3', content)
+    # Clean up scattered bullet symbols and newlines
+    # Remove standalone bullet symbols and asterisks on their own lines
+    content = re.sub(r'\n\s*[•\*]\s*\n', '\n', content)
+    content = re.sub(r'^[•\*]\s*$', '', content, flags=re.MULTILINE)
     
-    # 3. Add line breaks before bold/emphasized text patterns
-    content = re.sub(r'(\s*)(\*\*[^*]+\*\*)', r'\n\n\2', content)
+    # Fix patterns where content is broken across lines
+    # Join lines that end with "**Text" and start with bullet symbols
+    content = re.sub(r'(\*\*[^*\n]+)\n\s*[•\*]\s*\n\s*\*', r'\1**', content)
     
-    # 4. Add spacing around colons for definitions
-    content = re.sub(r'(\*\*[^*]+\*\*:)', r'\1\n', content)
+    # Clean up multiple consecutive newlines
+    content = re.sub(r'\n\s*\n\s*\n+', '\n\n', content)
     
-    # 5. Add line breaks before structural words
-    structure_words = ['โครงสร้าง', 'ตัวอย่าง', 'การใช้งาน', 'คำสัญญาณ', 'วิธีจำ']
-    for word in structure_words:
-        content = re.sub(f'(\s*)(\*\*{word}[^*]*\*\*)', r'\n\n\2', content)
+    # Process line by line for proper structure
+    lines = content.split('\n')
+    formatted_lines = []
     
-    # 6. Clean up multiple consecutive newlines
-    content = re.sub(r'\n{3,}', '\n\n', content)
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Handle bold text
+        line = re.sub(r'\*\*([^*]+)\*\*', r'<strong class="text-primary">\1</strong>', line)
+        
+        # Check if it's a structural header (ends with colon)
+        if (line.endswith(':') and 
+            (any(word in line for word in ['Continuous', 'Simple', 'Perfect', 'โครงสร้าง', 'ตัวอย่าง', 'วิธี']) or
+             line.count(' ') <= 3)):
+            formatted_lines.append(f'<h6 class="text-secondary mt-3 mb-2">{line}</h6>')
+        else:
+            # Regular content line
+            formatted_lines.append(line)
     
-    # 7. Remove leading/trailing whitespace
-    content = content.strip()
+    # Join lines with proper spacing
+    result = '<br>\n'.join(formatted_lines) if formatted_lines else content
     
-    # 8. Ensure proper spacing after colons in definitions
-    content = re.sub(r':\s*([ก-๙A-Z])', r': \1', content)
+    # Wrap in a paragraph if it doesn't start with HTML
+    if result and not result.startswith('<'):
+        result = f'<p class="mb-3">{result}</p>'
+    elif result.startswith('<br>'):
+        result = f'<p class="mb-3">{result[4:]}</p>'  # Remove leading <br>
     
-    # 9. Convert to HTML with proper formatting
-    # Convert newlines to HTML breaks
-    content = content.replace('\n\n', '</p><p class="mb-2">')
-    content = content.replace('\n', '<br>')
-    
-    # Format bold text with better styling
-    content = re.sub(r'\*\*([^*]+)\*\*', r'<strong class="text-primary">\1</strong>', content)
-    
-    # Format bullet points
-    content = re.sub(r'^([•\-\*]\s+)', r'<span class="bullet-point">• </span>', content, flags=re.MULTILINE)
-    
-    # Wrap in paragraph tags if not already wrapped
-    if not content.startswith('<p'):
-        content = '<p class="mb-2">' + content + '</p>'
-    
-    return content
+    return result
 
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 app.secret_key = 'your-secret-key-here-change-in-production'
