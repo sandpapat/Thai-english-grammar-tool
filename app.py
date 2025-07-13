@@ -3,6 +3,60 @@ import re
 import json
 from app.pipeline import ModelManager
 
+def format_explanation_content(content):
+    """Format explanation content for better readability"""
+    if not content:
+        return content
+    
+    # Clean up the content first
+    content = content.strip()
+    
+    # 1. Add line breaks after sentences that end with periods
+    content = re.sub(r'\.(\s*)([ก-๙A-Z])', r'.\n\n\2', content)
+    
+    # 2. Add line breaks before bullet points and numbered lists
+    content = re.sub(r'(\s*)([•\-\*]\s+)', r'\n\2', content)
+    
+    # 2b. Handle standalone * characters as bullet points
+    content = re.sub(r'(\s+)(\*\s+)([^*])', r'\n• \3', content)
+    
+    # 3. Add line breaks before bold/emphasized text patterns
+    content = re.sub(r'(\s*)(\*\*[^*]+\*\*)', r'\n\n\2', content)
+    
+    # 4. Add spacing around colons for definitions
+    content = re.sub(r'(\*\*[^*]+\*\*:)', r'\1\n', content)
+    
+    # 5. Add line breaks before structural words
+    structure_words = ['โครงสร้าง', 'ตัวอย่าง', 'การใช้งาน', 'คำสัญญาณ', 'วิธีจำ']
+    for word in structure_words:
+        content = re.sub(f'(\s*)(\*\*{word}[^*]*\*\*)', r'\n\n\2', content)
+    
+    # 6. Clean up multiple consecutive newlines
+    content = re.sub(r'\n{3,}', '\n\n', content)
+    
+    # 7. Remove leading/trailing whitespace
+    content = content.strip()
+    
+    # 8. Ensure proper spacing after colons in definitions
+    content = re.sub(r':\s*([ก-๙A-Z])', r': \1', content)
+    
+    # 9. Convert to HTML with proper formatting
+    # Convert newlines to HTML breaks
+    content = content.replace('\n\n', '</p><p class="mb-2">')
+    content = content.replace('\n', '<br>')
+    
+    # Format bold text with better styling
+    content = re.sub(r'\*\*([^*]+)\*\*', r'<strong class="text-primary">\1</strong>', content)
+    
+    # Format bullet points
+    content = re.sub(r'^([•\-\*]\s+)', r'<span class="bullet-point">• </span>', content, flags=re.MULTILINE)
+    
+    # Wrap in paragraph tags if not already wrapped
+    if not content.startswith('<p'):
+        content = '<p class="mb-2">' + content + '</p>'
+    
+    return content
+
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 app.secret_key = 'your-secret-key-here-change-in-production'
 
@@ -31,19 +85,19 @@ def predict():
         # Handle the new explanation format
         explanation = result.get('explanation', '')
         if isinstance(explanation, dict) and 'parsed_sections' in explanation:
-            # New format with parsed sections
+            # New format with parsed sections - apply formatting
             explanation_sections = {
                 'section_1': {
                     'title': 'วิเคราะห์ Tense ที่ใช้',
-                    'content': explanation['parsed_sections'].get('tense_analysis', 'ส่วนนี้ไม่สามารถแยกได้')
+                    'content': format_explanation_content(explanation['parsed_sections'].get('tense_analysis', 'ส่วนนี้ไม่สามารถแยกได้'))
                 },
                 'section_2': {
                     'title': 'คำศัพท์ที่น่าสนใจ',
-                    'content': explanation['parsed_sections'].get('vocabulary', 'ส่วนนี้ไม่สามารถแยกได้')
+                    'content': format_explanation_content(explanation['parsed_sections'].get('vocabulary', 'ส่วนนี้ไม่สามารถแยกได้'))
                 },
                 'section_3': {
                     'title': 'ข้อผิดพลาดที่พบบ่อย',
-                    'content': explanation['parsed_sections'].get('common_mistakes', 'ส่วนนี้ไม่สามารถแยกได้')
+                    'content': format_explanation_content(explanation['parsed_sections'].get('common_mistakes', 'ส่วนนี้ไม่สามารถแยกได้'))
                 }
             }
         else:
@@ -259,14 +313,14 @@ def parse_explanation(explanation_text):
         section_content = match[2].strip()
         sections[f'section_{section_num}'] = {
             'title': section_title,
-            'content': section_content
+            'content': format_explanation_content(section_content)
         }
     
     # If no sections found, return the full text as a single section
     if not sections:
         sections['section_1'] = {
             'title': 'Explanation',
-            'content': explanation_text
+            'content': format_explanation_content(explanation_text)
         }
     
     return sections
