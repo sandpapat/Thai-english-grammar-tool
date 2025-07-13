@@ -12,5 +12,8 @@ safetensors==0.4.0        # For loading model weights
 sentencepiece==0.1.99     # For tokenization
 # accelerate==0.24.1        # For model optimization
 
+# API integrations
+together==1.3.4               # For Together AI API calls
+
 # Optional for development
 python-dotenv==1.0.0

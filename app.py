@@ -27,8 +27,27 @@ def predict():
         # Run the pipeline
         result = model_manager.full_pipeline(thai_text)
         
-        # Parse the explanation sections
-        explanation_sections = parse_explanation(result.get('explanation', ''))
+        # Handle the new explanation format
+        explanation = result.get('explanation', '')
+        if isinstance(explanation, dict) and 'parsed_sections' in explanation:
+            # New format with parsed sections
+            explanation_sections = {
+                'section_1': {
+                    'title': 'วิเคราะห์ Tense ที่ใช้',
+                    'content': explanation['parsed_sections'].get('tense_analysis', 'ส่วนนี้ไม่สามารถแยกได้')
+                },
+                'section_2': {
+                    'title': 'คำศัพท์ที่น่าสนใจ',
+                    'content': explanation['parsed_sections'].get('vocabulary', 'ส่วนนี้ไม่สามารถแยกได้')
+                },
+                'section_3': {
+                    'title': 'ข้อผิดพลาดที่พบบ่อย',
+                    'content': explanation['parsed_sections'].get('common_mistakes', 'ส่วนนี้ไม่สามารถแยกได้')
+                }
+            }
+        else:
+            # Legacy format - try to parse as before
+            explanation_sections = parse_explanation(explanation)
         
         return render_template('result.html', 
                                result=result,

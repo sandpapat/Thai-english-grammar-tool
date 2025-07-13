@@ -8,11 +8,18 @@ Models:
 
 import os
 import json
+import re
+import time
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import XLMRobertaModel, AutoConfig, PreTrainedModel, AutoTokenizer
 from safetensors.torch import load_file as safe_load_file
+try:
+    from together import Together
+except ImportError:
+    Together = None
+    print("Warning: together package not installed. GrammarExplainer will use mock explanations.")
 
 
 class XLMRHierClassifier(PreTrainedModel):
@@ -495,69 +502,193 @@ class TenseClassifier:
 
 
 class GrammarExplainer:
-    """Grammar explanation using Typhoon 2.1 4B Instruct"""
+    """Grammar explanation using Typhoon 2.1 4B Instruct via Together AI API"""
     def __init__(self):
-        # In production, initialize transformers model here
-        # from transformers import AutoModelForCausalLM, AutoTokenizer
-        # self.model = AutoModelForCausalLM.from_pretrained("path/to/typhoon-2.1-instruct")
-        # self.tokenizer = AutoTokenizer.from_pretrained("path/to/typhoon-2.1-instruct")
-        self.model = None  # Mock for now
+        # Initialize Together AI client
+        self.client = None
+        self.api_key = "tgp_v1_4gCVX2YrOKGcCRnfeVmodBtMLPyggA5xs3f-31Fl0P4"
+        self.model_name = "scb10x/scb10x-typhoon-2-1-gemma3-12b"
+        
+        # Initialize tense definitions for context
+        self.tense_definitions = TenseTagDefinitions()
+        
+        # Initialize API client
+        if Together:
+            try:
+                self.client = Together(api_key=self.api_key)
+                print("✓ Together AI client initialized successfully")
+            except Exception as e:
+                print(f"✗ Error initializing Together AI client: {e}")
+                self.client = None
+        else:
+            print("✗ Together package not available. Using mock explanations.")
     
     def explain(self, analysis_result):
-        """Generate grammar explanation based on analysis"""
-        # Mock implementation - replace with actual model call
-        # In production: 
-        # prompt = self._create_prompt(analysis_result)
-        # inputs = self.tokenizer(prompt, return_tensors="pt")
-        # outputs = self.model.generate(**inputs, max_length=500)
-        # explanation = self.tokenizer.decode(outputs[0])
-        
-        coarse = analysis_result.get('coarse_label', 'UNKNOWN')
-        fine = analysis_result.get('fine_label', 'UNKNOWN')
+        """Generate grammar explanation based on analysis using Together AI API"""
+        thai_text = analysis_result.get('input_thai', '')
         translation = analysis_result.get('translation', '')
+        fine_code = analysis_result.get('fine_code', 'UNKNOWN')
+        confidence = analysis_result.get('confidence', 0.0)
         
-        # Mock explanation based on tense
-        if coarse == "PRESENT" and fine == "HABIT":
-            explanation = """[SECTION 1: Context Cues]
-The phrase "every day" (ทุกวัน) is a clear temporal marker indicating habitual action. This type of time expression signals that the action happens regularly or repeatedly.
-
-[SECTION 2: Tense Decision]
-The combination of the habitual marker "every day" with the action verb leads to Present Simple tense in English. This tense is used for routines, habits, and repeated actions.
-
-[SECTION 3: Grammar Tips]
-In English, habitual actions use Present Simple: Subject + base verb (+ s/es for 3rd person singular). Thai doesn't mark tense on verbs, so English tense must be inferred from context clues like ทุกวัน (every day)."""
+        if self.client:
+            try:
+                explanation = self._generate_explanation_api(thai_text, translation, fine_code, confidence)
+                return self._parse_explanation_sections(explanation)
+            except Exception as e:
+                print(f"API explanation failed: {e}")
+                # Fall back to mock explanation
         
-        elif coarse == "PAST":
-            explanation = """[SECTION 1: Context Cues]
-The word "yesterday" (เมื่อวาน) is a definite past time marker. This clearly indicates the action happened in the past.
-
-[SECTION 2: Tense Decision]
-With a specific past time reference, English requires Past Simple tense. The verb changes to its past form.
-
-[SECTION 3: Grammar Tips]
-Past Simple in English: Subject + past verb form. Regular verbs add -ed, while irregular verbs have special forms (go→went, eat→ate)."""
+        # Mock explanation as fallback
+        return self._generate_mock_explanation(analysis_result)
+    
+    def _generate_explanation_api(self, thai_text, english_translation, fine_label, confidence):
+        """Generate explanation using Together AI API with exact prompt from notebook 05"""
+        # Get detailed tag definitions
+        fine_def = self.tense_definitions.fine_definitions.get(fine_label, {})
         
-        elif coarse == "FUTURE":
-            explanation = """[SECTION 1: Context Cues]
-The word "tomorrow" (พรุ่งนี้) indicates future time. The Thai particle จะ also marks future intention.
+        # Build tag explanation context
+        tag_context = f"""
+Tense ที่ตรวจพบ: {fine_label}
+ประเภท: {fine_def.get('tense', 'Unknown')} - {fine_def.get('thai_name', '')}
+การใช้งาน: {fine_def.get('usage', '')}
+โครงสร้าง: {fine_def.get('structure', '')}
+คำสัญญาณ: {fine_def.get('keywords', '')}
+ตัวอย่าง: {fine_def.get('example', '')}
+"""
 
-[SECTION 2: Tense Decision]
-Future time markers require future tense in English, typically using "will" + base verb.
+        # Use exact prompt structure from notebook 05 with Thai sections
+        prompt_body = f"""<context>
+คุณคือระบบวิเคราะห์ไวยากรณ์ภาษาอังกฤษสำหรับผู้เรียนไทย
+คุณมีความรู้ลึกซึ้งเกี่ยวกับระบบ tense ในภาษาอังกฤษและความแตกต่างกับภาษาไทย
+</context>
 
-[SECTION 3: Grammar Tips]
-Future Simple in English: Subject + will + base verb. Thai จะ often corresponds to English "will"."""
+<tense_knowledge>
+{tag_context}
+</tense_knowledge>
+
+<task>
+วิเคราะห์การแปลประโยคและอธิบายการใช้ tense ที่เลือกอย่างละเอียด
+</task>
+
+<input>
+ประโยคภาษาไทย: {thai_text}
+การแปลภาษาอังกฤษ: {english_translation}
+Tense ที่ระบบตรวจพบ: {fine_label} (ความมั่นใจ: {confidence:.1%})
+</input>
+
+<requirements>
+โปรดอธิบายโดยครอบคลุมประเด็นต่อไปนี้:
+
+**1) วิเคราะห์ Tense ที่ใช้**
+- อธิบาย tense ทางไวยากรณ์ที่ใช้ (เช่น Present Simple, Past Perfect)
+- อธิบายการใช้งานในบริบทนี้โดยเฉพาะ
+- โครงสร้างไวยากรณ์: {fine_def.get('structure', '')}
+
+**2) คำศัพท์ที่น่าสนใจ**
+- เลือกคำศัพท์ / วลี ภาษาอังกฤษที่น่าสนใจจากประโยคมาหนึ่งคำ / วลี
+- อธิบายว่าทำไมถึงเลือกใช้คำนั้นในการแปล
+
+**3) ข้อผิดพลาดที่พบบ่อย**
+- ผู้เรียนไทยมักใช้ tense ที่ใช้ในประโยคผิดอย่างไร
+- วิธีจำง่าย ๆ
+</requirements>
+
+<format>
+- ใช้ภาษาไทยที่เข้าใจง่าย
+- อธิบายเป็นขั้นตอน มีหัวข้อชัดเจน
+- ยกตัวอย่างประกอบ
+- เน้นสิ่งที่ผู้เรียนไทยควรระวัง
+- **เริ่มต้นด้วยการวิเคราะห์ทันที**
+- **ใช้รูปแบบวิชาการ ไม่ใช่รูปแบบสนทนา**
+- **ห้ามเขียนหัวข้ออื่น ๆ ที่ไม่อยู่ใน Requirement**
+- **ใช้รูปแบบหัวข้อเป็น: **1) วิเคราะห์ Tense ที่ใช้** **2) คำศัพท์ที่น่าสนใจ** **3) ข้อผิดพลาดที่พบบ่อย****
+</format>"""
+
+        messages = [
+            {
+                "role": "system",
+                "content": """คุณคือระบบวิเคราะห์ไวยากรณ์ภาษาอังกฤษสำหรับผู้เรียนไทย คุณให้คำอธิบายที่ตรงประเด็น กระชับ และเป็นวิชาการ
+
+กฎสำคัญ:
+- อธิบาย TENSE ทางไวยากรณ์ (Present Simple, Past Perfect ฯลฯ) ไม่ใช่รหัสจัดหมวดหมู่
+- ไม่ใช้คำทักทาย คำลา หรือบทนำ
+- เริ่มต้นด้วยการวิเคราะห์ทันที
+- ใช้ภาษาวิชาการที่เข้าใจง่าย
+- ตอบตรงประเด็นตามหัวข้อที่กำหนด
+- ใช้รูปแบบหัวข้อ **1) วิเคราะห์ Tense ที่ใช้** **2) คำศัพท์ที่น่าสนใจ** **3) ข้อผิดพลาดที่พบบ่อย** เท่านั้น"""
+            },
+            {"role": "user", "content": prompt_body}
+        ]
+
+        # Call Together AI API with same parameters as notebook 05
+        response = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=messages,
+            max_tokens=600,
+            temperature=0.7,
+            top_p=0.9,
+            top_k=50,
+            repetition_penalty=1.1
+        )
+
+        return response.choices[0].message.content.strip()
+    
+    def _parse_explanation_sections(self, explanation):
+        """Parse explanation into Thai sections using regex"""
+        sections = {}
         
+        # Regex patterns for Thai sections with ** formatting
+        patterns = {
+            'tense_analysis': r'\*\*1\)\s*วิเคราะห์\s*Tense\s*ที่ใช้\*\*\s*(.*?)(?=\*\*2\)|$)',
+            'vocabulary': r'\*\*2\)\s*คำศัพท์ที่น่าสนใจ\*\*\s*(.*?)(?=\*\*3\)|$)', 
+            'common_mistakes': r'\*\*3\)\s*ข้อผิดพลาดที่พบบ่อย\*\*\s*(.*?)$'
+        }
+        
+        for section_name, pattern in patterns.items():
+            match = re.search(pattern, explanation, re.DOTALL | re.IGNORECASE)
+            if match:
+                sections[section_name] = match.group(1).strip()
+            else:
+                sections[section_name] = "ส่วนนี้ไม่สามารถแยกได้"
+        
+        return {
+            'raw_explanation': explanation,
+            'parsed_sections': sections
+        }
+    
+    def _generate_mock_explanation(self, analysis_result):
+        """Generate mock explanation as fallback"""
+        coarse = analysis_result.get('coarse_label', 'UNKNOWN')
+        
+        if "Present" in coarse:
+            explanation = """**1) วิเคราะห์ Tense ที่ใช้**
+ประโยคนี้ใช้ Present Simple Tense เพื่อแสดงการกระทำที่เป็นกิจวัตรประจำ โครงสร้าง: Subject + V1
+
+**2) คำศัพท์ที่น่าสนใจ**
+คำว่า "every day" เป็นคำสัญญาณที่บ่งบอกถึงความเป็นประจำ
+
+**3) ข้อผิดพลาดที่พบบ่อย**
+ผู้เรียนไทยมักลืมเติม s/es ให้กับประธานเอกพจน์บุรุษที่ 3"""
+        elif "Past" in coarse:
+            explanation = """**1) วิเคราะห์ Tense ที่ใช้**
+ประโยคนี้ใช้ Past Simple Tense เพื่อแสดงการกระทำที่เกิดขึ้นในอดีต โครงสร้าง: Subject + V2
+
+**2) คำศัพท์ที่น่าสนใจ**
+คำว่า "yesterday" เป็นคำสัญญาณบอกเวลาในอดีต
+
+**3) ข้อผิดพลาดที่พบบ่อย**
+ผู้เรียนไทยมักใช้ verb ช่องที่ 1 แทนช่องที่ 2 ในอดีต"""
         else:
-            explanation = """[SECTION 1: Context Cues]
-No specific time markers found in the sentence.
+            explanation = """**1) วิเคราะห์ Tense ที่ใช้**
+ประโยคนี้ใช้ Future Simple Tense เพื่อแสดงการกระทำที่จะเกิดขึ้นในอนาคต โครงสร้าง: Subject + will + V1
 
-[SECTION 2: Tense Decision]
-Without time markers, Present Simple is used as the default tense.
+**2) คำศัพท์ที่น่าสนใจ**
+คำว่า "will" เป็นคำช่วยที่บ่งบอกถึงอนาคต
 
-[SECTION 3: Grammar Tips]
-When translating from Thai without time markers, consider the context to determine the appropriate English tense."""
+**3) ข้อผิดพลาดที่พบบ่อย**
+ผู้เรียนไทยมักใช้ going to และ will สับสน"""
         
-        return explanation
+        return self._parse_explanation_sections(explanation)
 
 
 class ModelManager:
