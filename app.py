@@ -61,15 +61,20 @@ def predict():
 @app.route('/predict_stream', methods=['POST'])
 def predict_stream():
     """Stream progress updates during prediction using Server-Sent Events"""
-    def generate():
+    # Get Thai text from request OUTSIDE the generator function
+    try:
+        data = request.get_json()
+        thai_text = data.get('thai_text', '').strip() if data else ''
+    except Exception as e:
+        return Response(f"data: {json.dumps({'error': f'Request parsing error: {str(e)}'})}\n\n", 
+                       mimetype='text/plain')
+    
+    if not thai_text:
+        return Response(f"data: {json.dumps({'error': 'Please enter a Thai sentence.'})}\n\n", 
+                       mimetype='text/plain')
+    
+    def generate(text_input):
         try:
-            # Get Thai text from request
-            data = request.get_json()
-            thai_text = data.get('thai_text', '').strip() if data else ''
-            
-            if not thai_text:
-                yield f"data: {json.dumps({'error': 'Please enter a Thai sentence.'})}\n\n"
-                return
             
             # Progress tracking variables to store yielded progress
             yielded_updates = []
@@ -85,7 +90,7 @@ def predict_stream():
                 yielded_updates.append(f"data: {json.dumps(update)}\n\n")
             
             # Run the full pipeline with progress callbacks
-            result = model_manager.full_pipeline(thai_text, progress_callback=progress_callback)
+            result = model_manager.full_pipeline(text_input, progress_callback=progress_callback)
             
             # Yield all the progress updates that were collected
             for update in yielded_updates:
@@ -97,7 +102,7 @@ def predict_stream():
         except Exception as e:
             yield f"data: {json.dumps({'error': f'An error occurred: {str(e)}'})}\n\n"
     
-    return Response(generate(), mimetype='text/plain', headers={
+    return Response(generate(thai_text), mimetype='text/plain', headers={
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
         'Content-Type': 'text/plain; charset=utf-8'
