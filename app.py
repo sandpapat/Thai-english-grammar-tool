@@ -17,7 +17,7 @@ def format_explanation_content(content):
     # Fix broken bold patterns like "**Text•*" or "**Text*"
     content = re.sub(r'\*\*([^*]+?)[•\*]*\*+', r'**\1**', content)
     
-    # Clean up scattered bullet symbols and newlines
+    # Clean up scattered bullet symbols and newlines (but preserve actual bullet points)
     # Remove standalone bullet symbols and asterisks on their own lines
     content = re.sub(r'\n\s*[•\*]\s*\n', '\n', content)
     content = re.sub(r'^[•\*]\s*$', '', content, flags=re.MULTILINE)
@@ -38,20 +38,49 @@ def format_explanation_content(content):
         if not line:
             continue
             
-        # Handle bold text
+        # Handle bold text first
         line = re.sub(r'\*\*([^*]+)\*\*', r'<strong class="text-primary">\1</strong>', line)
         
+        # Check if it's a bullet point (starts with * followed by space and content)
+        if line.startswith('* ') and len(line) > 2:
+            # It's a bullet point - convert to list item
+            bullet_content = line[2:].strip()
+            formatted_lines.append(f'<li class="mb-1">{bullet_content}</li>')
         # Check if it's a structural header (ends with colon)
-        if (line.endswith(':') and 
-            (any(word in line for word in ['Continuous', 'Simple', 'Perfect', 'โครงสร้าง', 'ตัวอย่าง', 'วิธี']) or
-             line.count(' ') <= 3)):
+        elif (line.endswith(':') and 
+              (any(word in line for word in ['Continuous', 'Simple', 'Perfect', 'โครงสร้าง', 'ตัวอย่าง', 'วิธี', 'คำศัพท์', 'Got']) or
+               line.count(' ') <= 3)):
             formatted_lines.append(f'<h6 class="text-secondary mt-3 mb-2">{line}</h6>')
         else:
             # Regular content line
             formatted_lines.append(line)
     
+    # Group consecutive list items into proper <ul> tags
+    final_lines = []
+    in_list = False
+    
+    for line in formatted_lines:
+        if line.startswith('<li'):
+            if not in_list:
+                final_lines.append('<ul class="list-unstyled ps-3">')
+                in_list = True
+            final_lines.append('  ' + line)
+        else:
+            if in_list:
+                final_lines.append('</ul>')
+                in_list = False
+            final_lines.append(line)
+    
+    # Close any remaining list
+    if in_list:
+        final_lines.append('</ul>')
+    
     # Join lines with proper spacing
-    result = '<br>\n'.join(formatted_lines) if formatted_lines else content
+    result = '<br>\n'.join(final_lines) if final_lines else content
+    
+    # Clean up the result - remove <br> tags around lists
+    result = re.sub(r'<br>\n(<ul)', r'\1', result)
+    result = re.sub(r'(</ul>)\n<br>', r'\1', result)
     
     # Wrap in a paragraph if it doesn't start with HTML
     if result and not result.startswith('<'):
