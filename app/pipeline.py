@@ -6,18 +6,58 @@ Models:
 3. Typhoon 2.1 4B Instruct (Transformers)
 """
 
+import os
+
 class TyphoonTranslator:
     """Thai to English translation using Typhoon Translate 4B GGUF model"""
     def __init__(self):
-        # In production, initialize llama-cpp model here
-        # from llama_cpp import Llama
-        # self.model = Llama(model_path="path/to/typhoon-translate-4b.gguf")
-        self.model = None  # Mock for now
+        self.model = None
+        self.model_path = "./models/typhoon-translate-4b-q4_k_m.gguf"
+        
+        # Try to load the GGUF model
+        try:
+            from llama_cpp import Llama
+            
+            if os.path.exists(self.model_path):
+                self.model = Llama(
+                    model_path=self.model_path,
+                    verbose=False,
+                    n_ctx=2048,     # Context length
+                    n_threads=4,    # CPU threads
+                    n_batch=512     # Batch size
+                )
+                print("✓ Typhoon Translate GGUF model loaded successfully")
+            else:
+                print(f"✗ GGUF model not found at {self.model_path}")
+                print("  Using mock translations as fallback")
+        except ImportError:
+            print("✗ llama-cpp-python not installed. Using mock translations.")
+        except Exception as e:
+            print(f"✗ Error loading GGUF model: {e}")
+            print("  Using mock translations as fallback")
     
     def translate(self, thai_text):
         """Translate Thai text to English"""
-        # Mock implementation - replace with actual model call
-        # In production: result = self.model(thai_text, max_tokens=200)
+        if self.model:
+            try:
+                # Use proper prompt format for Typhoon
+                prompt = f"<s>Translate Thai to English: {thai_text}\nEnglish:"
+                
+                response = self.model(
+                    prompt,
+                    max_tokens=200,
+                    temperature=0.1,  # Lower temperature for consistent output
+                    stop=["</s>", "\n", "Thai:"],  # Stop tokens
+                    echo=False  # Don't echo the prompt
+                )
+                
+                translation = response['choices'][0]['text'].strip()
+                return translation
+            except Exception as e:
+                print(f"Translation error: {e}")
+                # Fall back to mock translations
+        
+        # Mock translations as fallback
         translations = {
             "ฉันกินข้าวเช้าทุกวัน": "I eat breakfast every day.",
             "เมื่อวานฉันไปตลาด": "Yesterday I went to the market.",
