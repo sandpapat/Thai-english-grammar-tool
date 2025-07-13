@@ -1,19 +1,18 @@
 # Core Flask
 Flask==2.3.3
-
-# For production deployment
 gunicorn==21.2.0
 
-# For the actual models (when integrating real models)
-llama-cpp-python>=0.2.90  # For Typhoon Translate GGUF
-transformers>=4.35.0      # For XLM-RoBERTa and Typhoon Instruct
-torch>=2.1.0              # PyTorch for transformers
-safetensors>=0.4.0        # For loading model weights
-sentencepiece>=0.1.99     # For tokenization
-# accelerate>=0.24.1        # For model optimization
+# For GGUF models (Typhoon Translate) - following notebook 05
+llama-cpp-python
 
-# API integrations
-together                   # For Together AI API calls (latest stable)
+# For BERT and transformers models - NO VERSION PINS like notebooks
+transformers
+accelerate  
+safetensors
+huggingface_hub
+sentencepiece
+torch
 
-# Optional for development
-python-dotenv>=1.0.0
+# For API integration - following notebook 06
+together
+python-dotenv
