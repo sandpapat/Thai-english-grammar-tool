@@ -75,6 +75,7 @@ def predict_stream():
     
     def generate(text_input):
         try:
+            print(f"🏁 Starting pipeline generation for: '{text_input}'")
             
             # Progress tracking variables to store yielded progress
             yielded_updates = []
@@ -88,19 +89,35 @@ def predict_stream():
                     'message_thai': message_thai
                 }
                 yielded_updates.append(f"data: {json.dumps(update)}\n\n")
+                print(f"📊 Progress callback: Step {step} - {progress}% - {message}")
             
             # Run the full pipeline with progress callbacks
+            print("🔄 Running full pipeline...")
             result = model_manager.full_pipeline(text_input, progress_callback=progress_callback)
+            print(f"✅ Pipeline completed. Result keys: {list(result.keys()) if result else 'None'}")
             
             # Yield all the progress updates that were collected
-            for update in yielded_updates:
+            print(f"📤 Yielding {len(yielded_updates)} progress updates")
+            for i, update in enumerate(yielded_updates):
+                print(f"📨 Yielding update {i+1}/{len(yielded_updates)}")
                 yield update
             
             # Complete - send final result
-            yield f"data: {json.dumps({'complete': True, 'result': result})}\n\n"
+            completion_event = {'complete': True, 'result': result}
+            completion_json = json.dumps(completion_event)
+            completion_message = f"data: {completion_json}\n\n"
+            
+            print(f"🎉 Sending completion event (length: {len(completion_message)} chars)")
+            print(f"🔍 Completion preview: {completion_message[:200]}...")
+            
+            yield completion_message
+            print("✅ All events yielded successfully")
             
         except Exception as e:
-            yield f"data: {json.dumps({'error': f'An error occurred: {str(e)}'})}\n\n"
+            error_message = f"data: {json.dumps({'error': f'An error occurred: {str(e)}'})}\n\n"
+            print(f"❌ Pipeline error: {e}")
+            print(f"📤 Yielding error: {error_message}")
+            yield error_message
     
     return Response(generate(thai_text), mimetype='text/plain', headers={
         'Cache-Control': 'no-cache',

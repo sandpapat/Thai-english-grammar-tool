@@ -122,47 +122,115 @@
     document.getElementById('analyseForm').addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent normal form submission
         
+        console.log('🚀 Form submission started');
+        
         const formData = new FormData(this);
         const thai_text = formData.get('thai_text');
         
+        console.log('📝 Thai text:', thai_text);
+        
+        if (!thai_text || thai_text.trim() === '') {
+            console.error('❌ No Thai text provided');
+            alert('กรุณาใส่ข้อความภาษาไทย / Please enter Thai text');
+            return;
+        }
+        
+        // Verify DOM elements exist
+        const progressContainer = document.getElementById('progressContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        
+        if (!progressContainer) {
+            console.error('❌ Progress container not found');
+            return;
+        }
+        if (!resultsContainer) {
+            console.error('❌ Results container not found');
+            return;
+        }
+        
+        console.log('✅ DOM elements verified');
+        
         // Show progress, hide results
-        document.getElementById('progressContainer').classList.remove('d-none');
-        document.getElementById('resultsContainer').classList.add('d-none');
+        progressContainer.classList.remove('d-none');
+        resultsContainer.classList.add('d-none');
+        console.log('👁️ Progress shown, results hidden');
         
         // Disable form and reset progress
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         resetProgress();
+        console.log('🔒 Form disabled, progress reset');
+        
+        // Add timeout and abort controller for the request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            console.log('⏰ Request timeout reached (60 seconds)');
+            controller.abort();
+        }, 60000); // 60 second timeout
         
         // Start streaming request
+        console.log('🌐 Starting fetch request to /predict_stream');
         fetch('/predict_stream', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({thai_text: thai_text})
+            body: JSON.stringify({thai_text: thai_text}),
+            signal: controller.signal
         })
         .then(response => {
+            // Clear timeout since we got a response
+            clearTimeout(timeoutId);
+            console.log('📡 Response received:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
+            let eventCount = 0;
+            
+            console.log('🔄 Starting stream reading');
             
             function readStream() {
                 return reader.read().then(({ done, value }) => {
                     if (done) {
-                        console.log('Stream completed');
+                        console.log('✅ Stream completed - total events:', eventCount);
+                        // Add safety check - if no completion event was received
+                        if (eventCount > 0) {
+                            console.log('⚠️ Stream ended without completion event - checking final state');
+                            // Give a small delay to ensure any pending events are processed
+                            setTimeout(() => {
+                                const progressContainer = document.getElementById('progressContainer');
+                                const resultsContainer = document.getElementById('resultsContainer');
+                                if (progressContainer && !progressContainer.classList.contains('d-none')) {
+                                    console.log('🔄 Attempting manual completion check');
+                                    showError('Stream completed unexpectedly. Please try again.');
+                                    resetForm();
+                                }
+                            }, 1000);
+                        }
                         return;
                     }
                     
                     const chunk = decoder.decode(value);
+                    console.log('📦 Received chunk:', chunk.substring(0, 100) + (chunk.length > 100 ? '...' : ''));
+                    
                     const lines = chunk.split('\n');
                     
                     for (let line of lines) {
                         if (line.startsWith('data: ')) {
+                            eventCount++;
+                            console.log(`📨 Event ${eventCount}:`, line.substring(0, 150) + (line.length > 150 ? '...' : ''));
+                            
                             try {
                                 const data = JSON.parse(line.substring(6));
+                                console.log('📊 Parsed data:', data);
                                 handleProgressUpdate(data);
                             } catch (e) {
-                                console.error('Error parsing data:', e);
+                                console.error('❌ Error parsing event data:', e);
+                                console.error('🔍 Raw line:', line);
                             }
                         }
                     }
@@ -174,20 +242,55 @@
             return readStream();
         })
         .catch(error => {
-            console.error('Error:', error);
-            showError('Connection error occurred');
+            // Clear timeout on error
+            clearTimeout(timeoutId);
+            
+            console.error('❌ Fetch error:', error);
+            
+            if (error.name === 'AbortError') {
+                console.log('⏰ Request was aborted due to timeout');
+                // Offer fallback option for timeout
+                if (confirm('Request timed out. Would you like to try using the traditional method instead? (This will redirect to a new page with results)')) {
+                    fallbackToTraditionalSubmit(thai_text);
+                    return;
+                }
+                showError('Request timed out. Please try again.');
+            } else {
+                console.log('🔄 Offering fallback for connection error');
+                // Offer fallback option for other errors
+                if (confirm('Streaming failed. Would you like to try using the traditional method instead? (This will redirect to a new page with results)')) {
+                    fallbackToTraditionalSubmit(thai_text);
+                    return;
+                }
+                showError('Connection error: ' + error.message);
+            }
             resetForm();
         });
     });
     
     function handleProgressUpdate(data) {
+        console.log('🎯 Handling progress update:', data);
+        
         if (data.error) {
+            console.error('💥 Error received:', data.error);
             showError(data.error);
             resetForm();
             return;
         }
         
         if (data.complete) {
+            console.log('🎉 Completion event received!');
+            console.log('📋 Result data:', data.result);
+            
+            // Verify result has required fields
+            if (!data.result) {
+                console.error('❌ No result data in completion event');
+                showError('Invalid completion data received');
+                resetForm();
+                return;
+            }
+            
+            console.log('✅ Calling showResults with valid data');
             // Show results
             showResults(data.result);
             resetForm();
@@ -195,6 +298,7 @@
         }
         
         // Update progress
+        console.log(`⏳ Progress update - Step ${data.step}: ${data.progress}%`);
         updateProgress(data.step, data.progress, data.message, data.message_thai);
     }
     
@@ -228,11 +332,30 @@
     }
     
     function showResults(result) {
+        console.log('🎨 showResults called with:', result);
+        
+        // Verify resultsContainer exists
+        const resultsContainer = document.getElementById('resultsContainer');
+        const progressContainer = document.getElementById('progressContainer');
+        
+        if (!resultsContainer) {
+            console.error('❌ resultsContainer not found in DOM');
+            showError('Results container missing from page');
+            return;
+        }
+        
+        if (!progressContainer) {
+            console.error('❌ progressContainer not found in DOM');
+        }
+        
         // Process explanation sections
         let explanation_sections = {};
         const explanation = result.explanation;
         
+        console.log('🔍 Processing explanation:', typeof explanation, explanation);
+        
         if (typeof explanation === 'object' && explanation.parsed_sections) {
+            console.log('✅ Using parsed sections from explanation');
             explanation_sections = {
                 'section_1': {
                     'title': 'วิเคราะห์ Tense ที่ใช้',
@@ -248,15 +371,33 @@
                 }
             };
         } else {
+            console.log('⚠️ Using legacy explanation parsing');
             // Fallback to legacy parsing
             explanation_sections = parseLegacyExplanation(explanation);
         }
         
+        console.log('📝 Final explanation sections:', explanation_sections);
+        
         // Generate results HTML
+        console.log('🏗️ Generating results HTML');
         const resultsHTML = generateResultsHTML(result, explanation_sections);
-        document.getElementById('resultsContainer').innerHTML = resultsHTML;
-        document.getElementById('resultsContainer').classList.remove('d-none');
-        document.getElementById('progressContainer').classList.add('d-none');
+        
+        console.log('📄 Generated HTML length:', resultsHTML.length);
+        console.log('📄 HTML preview:', resultsHTML.substring(0, 200) + '...');
+        
+        // Update DOM
+        resultsContainer.innerHTML = resultsHTML;
+        console.log('✅ Results HTML inserted into container');
+        
+        resultsContainer.classList.remove('d-none');
+        console.log('👁️ Results container made visible');
+        
+        if (progressContainer) {
+            progressContainer.classList.add('d-none');
+            console.log('🚫 Progress container hidden');
+        }
+        
+        console.log('🎉 showResults completed successfully!');
     }
     
     function generateResultsHTML(result, explanation_sections) {
@@ -401,9 +542,31 @@
     }
     
     function showError(message) {
+        console.error('🚨 Showing error to user:', message);
         alert('Error: ' + message);
         document.getElementById('progressContainer').classList.add('d-none');
         resetForm();
+    }
+    
+    function fallbackToTraditionalSubmit(thai_text) {
+        console.log('🔄 Attempting fallback to traditional form submission');
+        
+        // Create a hidden form for traditional submission
+        const fallbackForm = document.createElement('form');
+        fallbackForm.method = 'POST';
+        fallbackForm.action = '/predict';
+        fallbackForm.style.display = 'none';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'thai_text';
+        input.value = thai_text;
+        
+        fallbackForm.appendChild(input);
+        document.body.appendChild(fallbackForm);
+        
+        console.log('📤 Submitting fallback form');
+        fallbackForm.submit();
     }
     
     function formatExplanationContent(content) {
