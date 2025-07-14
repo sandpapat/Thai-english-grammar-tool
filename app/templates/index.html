@@ -32,6 +32,35 @@
                         <div class="form-text">
                             Example: ฉันกินข้าวเช้าทุกวัน, เมื่อวานฉันไปตลาด, พรุ่งนี้ฉันจะไปเรียน
                         </div>
+                        
+                        <!-- Validation feedback -->
+                        <div id="validationFeedback" class="mt-2"></div>
+                        
+                        <!-- Text statistics -->
+                        <div id="textStats" class="mt-2 d-none">
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-123"></i> <span id="tokenCount">0</span>/500
+                                    </small>
+                                </div>
+                                <div class="col-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-translate"></i> <span id="thaiPercentage">0</span>% Thai
+                                    </small>
+                                </div>
+                                <div class="col-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-text-paragraph"></i> <span id="sentenceCount">0</span> sentences
+                                    </small>
+                                </div>
+                                <div class="col-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-speedometer2"></i> <span id="validationStatus">Ready</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="d-grid">
@@ -118,12 +147,131 @@
 
 {% block extra_js %}
 <script>
-    // Simple mock progress bar with form submission
+    let validationTimeout;
+    let isValidInput = false;
+    
+    // Real-time validation as user types
+    document.getElementById('thai_text').addEventListener('input', function() {
+        clearTimeout(validationTimeout);
+        const text = this.value.trim();
+        
+        if (text.length === 0) {
+            document.getElementById('textStats').classList.add('d-none');
+            document.getElementById('validationFeedback').innerHTML = '';
+            isValidInput = false;
+            return;
+        }
+        
+        // Show loading state
+        document.getElementById('textStats').classList.remove('d-none');
+        document.getElementById('validationStatus').textContent = 'Checking...';
+        
+        // Debounce validation requests
+        validationTimeout = setTimeout(() => {
+            validateInput(text);
+        }, 300);
+    });
+    
+    function validateInput(text) {
+        fetch('/validate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: text })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Validation error:', data.error);
+                return;
+            }
+            
+            updateValidationUI(data);
+        })
+        .catch(error => {
+            console.error('Validation request failed:', error);
+            document.getElementById('validationStatus').textContent = 'Error';
+        });
+    }
+    
+    function updateValidationUI(data) {
+        // Update text statistics
+        document.getElementById('tokenCount').textContent = data.token_count;
+        document.getElementById('thaiPercentage').textContent = Math.round(data.thai_percentage);
+        document.getElementById('sentenceCount').textContent = data.sentence_count;
+        
+        // Update token count color
+        const tokenElement = document.getElementById('tokenCount');
+        const tokenUsage = data.usage_percentage;
+        tokenElement.className = '';
+        if (tokenUsage >= 90) {
+            tokenElement.className = 'text-danger fw-bold';
+        } else if (tokenUsage >= 80) {
+            tokenElement.className = 'text-warning fw-bold';
+        } else {
+            tokenElement.className = 'text-success';
+        }
+        
+        // Update Thai percentage color
+        const thaiElement = document.getElementById('thaiPercentage');
+        thaiElement.className = '';
+        if (data.thai_percentage >= 80) {
+            thaiElement.className = 'text-success';
+        } else if (data.thai_percentage >= 60) {
+            thaiElement.className = 'text-warning';
+        } else {
+            thaiElement.className = 'text-danger';
+        }
+        
+        // Update validation status
+        const statusElement = document.getElementById('validationStatus');
+        isValidInput = data.is_valid;
+        
+        if (data.is_valid) {
+            statusElement.textContent = data.has_warnings ? 'Valid (warnings)' : 'Valid';
+            statusElement.className = data.has_warnings ? 'text-warning' : 'text-success';
+        } else {
+            statusElement.textContent = 'Invalid';
+            statusElement.className = 'text-danger';
+        }
+        
+        // Update submit button state
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = !data.is_valid;
+        
+        // Clear any previous validation messages
+        document.getElementById('validationFeedback').innerHTML = '';
+        
+        // Show warnings if any
+        if (data.has_warnings) {
+            showValidationWarnings();
+        }
+    }
+    
+    function showValidationWarnings() {
+        const warningHtml = `
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>คำเตือน:</strong> ตรวจพบปัญหาบางประการ แต่ยังสามารถดำเนินการต่อได้
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        document.getElementById('validationFeedback').innerHTML = warningHtml;
+    }
+    
+    // Enhanced form submission with validation
     document.getElementById('analyseForm').addEventListener('submit', function(e) {
         const thai_text = document.getElementById('thai_text').value.trim();
         
         if (!thai_text) {
             alert('กรุณาใส่ข้อความภาษาไทย / Please enter Thai text');
+            e.preventDefault();
+            return;
+        }
+        
+        if (!isValidInput) {
+            alert('กรุณาแก้ไขข้อผิดพลาดก่อนส่ง / Please fix validation errors before submitting');
             e.preventDefault();
             return;
         }

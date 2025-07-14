@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, flash, Response, jsonify
 import re
 import json
 from app.pipeline import ModelManager
+from app.validation import InputValidator
 
 def format_explanation_content(content):
     """Format explanation content for better readability"""
@@ -93,8 +94,13 @@ def format_explanation_content(content):
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
 app.secret_key = 'your-secret-key-here-change-in-production'
 
-# Initialize the model manager
+# Initialize the model manager and input validator
 model_manager = ModelManager()
+input_validator = InputValidator(
+    max_tokens=500,
+    min_thai_percentage=0.8,
+    enable_profanity_filter=True
+)
 
 @app.route('/')
 def index():
@@ -108,9 +114,18 @@ def predict():
         # Get Thai text from form
         thai_text = request.form.get('thai_text', '').strip()
         
-        if not thai_text:
-            flash('Please enter a Thai sentence.', 'error')
+        # Validate input
+        validation_result = input_validator.validate_input(thai_text)
+        
+        # Handle validation errors
+        if not validation_result['is_valid']:
+            for error in validation_result['errors']:
+                flash(error['message']['th'], 'error')
             return render_template('index.html')
+        
+        # Handle validation warnings
+        for warning in validation_result['warnings']:
+            flash(warning['message']['th'], 'warning')
         
         # Run the pipeline
         result = model_manager.full_pipeline(thai_text)
@@ -145,6 +160,22 @@ def predict():
         flash(f'An error occurred: {str(e)}', 'error')
         return render_template('index.html')
 
+
+@app.route('/validate', methods=['POST'])
+def validate_input():
+    """API endpoint for real-time input validation"""
+    try:
+        data = request.get_json()
+        if not data or 'text' not in data:
+            return jsonify({'error': 'No text provided'}), 400
+        
+        text = data['text']
+        validation_result = input_validator.get_validation_summary(text)
+        
+        return jsonify(validation_result)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/tenses')
 def tenses():
