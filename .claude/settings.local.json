@@ -11,7 +11,8 @@
       "WebFetch(domain:opentyphoon.ai)",
       "Bash(chmod:*)",
       "Bash(git add:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

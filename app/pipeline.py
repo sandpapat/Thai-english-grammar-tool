@@ -460,7 +460,14 @@ class TenseClassifier:
                 fine_mask = torch.zeros_like(fine_logits[0])
                 
                 # Set mask to 1 for valid fine codes, -inf for invalid ones
-                for i, fine_label in self.id2fine.items():
+                # Handle both dict and list formats for id2fine
+                if isinstance(self.id2fine, dict):
+                    fine_items = self.id2fine.items()
+                else:
+                    # If it's a list, convert to enumerate
+                    fine_items = enumerate(self.id2fine)
+                
+                for i, fine_label in fine_items:
                     if fine_label in valid_fine_codes:
                         fine_mask[i] = 0
                     else:
