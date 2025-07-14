@@ -55,6 +55,9 @@
                                 <p class="card-text fs-3 fw-bold text-success">
                                     {{ result.fine_label }}
                                 </p>
+                                <p class="text-muted">
+                                    <i class="bi bi-speedometer2"></i> Confidence: {{ "%.1f"|format(result.confidence * 100) }}%
+                                </p>
                             </div>
                         </div>
                     </div>

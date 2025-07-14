@@ -378,6 +378,15 @@ class TenseClassifier:
         self.id2coarse = {}
         self.id2fine = {}
         
+        # Coarse-to-fine mapping to ensure consistency
+        self.coarse_to_fine_mapping = {
+            'Present': ['HABIT', 'FACT', 'TABLE', 'SAYING', 'HEADLINE', 'PLAN', 
+                        'HAPPENING', 'NOWADAYS', 'SUREFUT', 'PROGRESS', 
+                        'JUSTFIN', 'RESULT', 'EXP', 'SINCEFOR'],
+            'Past': ['NORFIN', 'INTERRUPT', 'DOINGATSOMETIMEPAST', 'BEFOREPAST', 'DURATION'],
+            'Future': ['50PERC', 'PROMISE', 'RIGHTNOW', 'LONGFUTURE', 'PREDICT', 'WILLCONTINUEINFUTURE']
+        }
+        
         # Tense definitions for human-readable labels
         self.tense_definitions = TenseTagDefinitions()
         
@@ -440,14 +449,33 @@ class TenseClassifier:
                 
                 # Convert to probabilities
                 coarse_probs = F.softmax(coarse_logits, dim=1)
-                fine_probs = F.softmax(fine_logits, dim=1)
                 
-                # Get top predictions
+                # Get coarse prediction first
                 coarse_topk = torch.topk(coarse_probs, k=min(top_k, len(self.id2coarse)), dim=1)
-                fine_topk = torch.topk(fine_probs, k=min(top_k, len(self.id2fine)), dim=1)
+                coarse_pred = self.id2coarse[coarse_topk.indices[0][0].item()]
+                
+                # Constrain fine predictions based on coarse category
+                # Create a mask for valid fine codes
+                valid_fine_codes = self.coarse_to_fine_mapping.get(coarse_pred, [])
+                fine_mask = torch.zeros_like(fine_logits[0])
+                
+                # Set mask to 1 for valid fine codes, -inf for invalid ones
+                for i, fine_label in self.id2fine.items():
+                    if fine_label in valid_fine_codes:
+                        fine_mask[i] = 0
+                    else:
+                        fine_mask[i] = float('-inf')
+                
+                # Apply mask to fine logits
+                masked_fine_logits = fine_logits + fine_mask.unsqueeze(0)
+                
+                # Get probabilities from masked logits
+                fine_probs = F.softmax(masked_fine_logits, dim=1)
+                
+                # Get top predictions from constrained space
+                fine_topk = torch.topk(fine_probs, k=min(top_k, len(valid_fine_codes)), dim=1)
                 
                 # Format results with human-readable labels
-                coarse_pred = self.id2coarse[coarse_topk.indices[0][0].item()]
                 fine_code = self.id2fine[fine_topk.indices[0][0].item()]
                 fine_confidence = fine_topk.values[0][0].item()
                 
@@ -464,7 +492,8 @@ class TenseClassifier:
                         'coarse': [(self.id2coarse[idx.item()], prob.item()) 
                                  for idx, prob in zip(coarse_topk.indices[0], coarse_topk.values[0])],
                         'fine': [(self.id2fine[idx.item()], prob.item()) 
-                               for idx, prob in zip(fine_topk.indices[0], fine_topk.values[0])]
+                               for idx, prob in zip(fine_topk.indices[0], fine_topk.values[0]) 
+                               if self.id2fine[idx.item()] in valid_fine_codes]
                     }
                 }
             except Exception as e:
