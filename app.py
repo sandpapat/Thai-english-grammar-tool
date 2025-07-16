@@ -12,82 +12,118 @@ def format_explanation_content(content):
     # Clean up the raw content
     content = content.strip()
     
-    # Remove HTML tags
+    # Remove HTML tags first
     content = re.sub(r'<[^>]+>', '', content)
     
     # Fix broken bold patterns like "**Text•*" or "**Text*"
     content = re.sub(r'\*\*([^*]+?)[•\*]*\*+', r'**\1**', content)
     
     # Clean up scattered bullet symbols and newlines (but preserve actual bullet points)
-    # Remove standalone bullet symbols and asterisks on their own lines
     content = re.sub(r'\n\s*[•\*]\s*\n', '\n', content)
     content = re.sub(r'^[•\*]\s*$', '', content, flags=re.MULTILINE)
     
     # Fix patterns where content is broken across lines
-    # Join lines that end with "**Text" and start with bullet symbols
     content = re.sub(r'(\*\*[^*\n]+)\n\s*[•\*]\s*\n\s*\*', r'\1**', content)
     
     # Clean up multiple consecutive newlines
     content = re.sub(r'\n\s*\n\s*\n+', '\n\n', content)
     
+    # First pass: identify and mark special keywords for highlighting
+    # Common time markers and grammar keywords
+    keyword_patterns = [
+        (r'\b(yesterday|today|tomorrow|now|then)\b', 'time-marker'),
+        (r'\b(last week|last month|last year|next week|next month|next year)\b', 'time-marker'),
+        (r'\b(ago|before|after|since|until)\b', 'time-marker'),
+        (r'\b(always|usually|often|sometimes|never|rarely)\b', 'frequency-marker'),
+        (r'\b(every day|every week|every month|every year)\b', 'frequency-marker'),
+        (r'\b(Subject|Verb|Object|V1|V2|V3|Past Simple|Present Simple|Future Simple)\b', 'grammar-term'),
+        (r'\b(market|school|hospital|restaurant|office|home)\b', 'place-marker')
+    ]
+    
+    # Apply keyword highlighting
+    for pattern, css_class in keyword_patterns:
+        content = re.sub(pattern, rf'<span class="keyword-highlight {css_class}">\1</span>', content, flags=re.IGNORECASE)
+    
     # Process line by line for proper structure
     lines = content.split('\n')
     formatted_lines = []
+    in_paragraph = False
     
     for line in lines:
         line = line.strip()
         if not line:
+            if in_paragraph:
+                formatted_lines.append('</p>')
+                in_paragraph = False
             continue
-            
-        # Handle bold text first
-        line = re.sub(r'\*\*([^*]+)\*\*', r'<strong class="text-primary">\1</strong>', line)
         
-        # Check if it's a bullet point (starts with * followed by space and content)
+        # Handle bold text (but preserve highlighted keywords inside)
+        line = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', line)
+        
+        # Check if it's a bullet point
         if line.startswith('* ') and len(line) > 2:
-            # It's a bullet point - convert to list item
+            if in_paragraph:
+                formatted_lines.append('</p>')
+                in_paragraph = False
             bullet_content = line[2:].strip()
-            formatted_lines.append(f'<li class="mb-1">{bullet_content}</li>')
-        # Check if it's a structural header (ends with colon)
+            formatted_lines.append(f'<li class="thai-bullet mb-2">{bullet_content}</li>')
+        
+        # Check if it's a structural header
         elif (line.endswith(':') and 
-              (any(word in line for word in ['Continuous', 'Simple', 'Perfect', 'โครงสร้าง', 'ตัวอย่าง', 'วิธี', 'คำศัพท์', 'Got']) or
+              (any(word in line for word in ['โครงสร้าง', 'ตัวอย่าง', 'วิธี', 'คำศัพท์', 'Subject', 'Verb']) or
                line.count(' ') <= 3)):
-            formatted_lines.append(f'<h6 class="text-secondary mt-3 mb-2">{line}</h6>')
+            if in_paragraph:
+                formatted_lines.append('</p>')
+                in_paragraph = False
+            formatted_lines.append(f'<h6 class="grammar-header mt-3 mb-2">{line}</h6>')
+        
+        # Check if line starts with Thai example indicators
+        elif line.startswith('ตัวอย่าง:') or line.startswith('เช่น:'):
+            if in_paragraph:
+                formatted_lines.append('</p>')
+                in_paragraph = False
+            formatted_lines.append(f'<p class="example-text mb-2">{line}</p>')
+        
+        # Regular content line
         else:
-            # Regular content line
+            if not in_paragraph and not line.startswith('<'):
+                formatted_lines.append('<p class="explanation-paragraph mb-3">')
+                in_paragraph = True
+            
+            # Add line with proper spacing
+            if in_paragraph and len(formatted_lines) > 0 and not formatted_lines[-1].endswith('>'):
+                formatted_lines.append('<br>')
             formatted_lines.append(line)
     
+    # Close any open paragraph
+    if in_paragraph:
+        formatted_lines.append('</p>')
+    
     # Group consecutive list items into proper <ul> tags
-    final_lines = []
+    final_html = []
     in_list = False
     
     for line in formatted_lines:
         if line.startswith('<li'):
             if not in_list:
-                final_lines.append('<ul class="list-unstyled ps-3">')
+                final_html.append('<ul class="thai-list">')
                 in_list = True
-            final_lines.append('  ' + line)
+            final_html.append('  ' + line)
         else:
             if in_list:
-                final_lines.append('</ul>')
+                final_html.append('</ul>')
                 in_list = False
-            final_lines.append(line)
+            final_html.append(line)
     
     # Close any remaining list
     if in_list:
-        final_lines.append('</ul>')
+        final_html.append('</ul>')
     
-    # Join lines with proper spacing
-    result = '<br>\n'.join(final_lines) if final_lines else content
+    # Join all HTML elements
+    result = '\n'.join(final_html)
     
-    # Clean up the result - remove <br> tags around lists
-    result = re.sub(r'<br>\n(<ul)', r'\1', result)
-    result = re.sub(r'(</ul>)\n<br>', r'\1', result)
-    
-    # Wrap in a paragraph if it doesn't start with HTML
-    if result and not result.startswith('<'):
-        result = f'<p class="mb-3">{result}</p>'
-    elif result.startswith('<br>'):
-        result = f'<p class="mb-3">{result[4:]}</p>'  # Remove leading <br>
+    # Final cleanup - ensure no empty paragraphs
+    result = re.sub(r'<p[^>]*>\s*</p>', '', result)
     
     return result
 

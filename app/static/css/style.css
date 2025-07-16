@@ -115,6 +115,102 @@ footer {
     display: inline-block;
 }
 
+/* Keyword highlighting styles */
+.keyword-highlight {
+    display: inline-block;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.keyword-highlight.time-marker {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.keyword-highlight.frequency-marker {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+    border: 1px solid #e1bee7;
+}
+
+.keyword-highlight.grammar-term {
+    background-color: #e8f5e9;
+    color: #388e3c;
+    border: 1px solid #c8e6c9;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95em;
+}
+
+.keyword-highlight.place-marker {
+    background-color: #fff8e1;
+    color: #f57c00;
+    border: 1px solid #ffe0b2;
+}
+
+/* Thai bullet list styling */
+.thai-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0;
+}
+
+.thai-list .thai-bullet {
+    position: relative;
+    padding-left: 2rem;
+    line-height: 1.8;
+}
+
+.thai-list .thai-bullet::before {
+    content: "•";
+    position: absolute;
+    left: 0.5rem;
+    color: #0d6efd;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Grammar headers */
+.grammar-header {
+    color: #495057;
+    font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Example text styling */
+.example-text {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid #6c757d;
+    font-style: italic;
+    color: #495057;
+    margin: 1rem 0;
+}
+
+/* Explanation paragraphs */
+.explanation-paragraph {
+    text-align: justify;
+    line-height: 1.8;
+    color: #212529;
+}
+
+.explanation-paragraph strong {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+/* Section dividers */
+.explanation-content hr {
+    border: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #dee2e6, transparent);
+    margin: 2rem 0;
+}
+
 /* Performance metrics */
 .bi-circle-fill {
     animation: pulse 2s infinite;
