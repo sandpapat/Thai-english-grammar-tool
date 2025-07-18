@@ -1,103 +1,347 @@
 /* Custom styles for Thai-English Grammar Learning Tool */
 
-/* CSS Variables for theming */
+/* CSS Variables for theming - Modern Color Palette */
 :root {
-    /* Light theme colors */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8f9fa;
-    --bg-tertiary: #e9ecef;
-    --text-primary: #212529;
-    --text-secondary: #6c757d;
-    --text-muted: #adb5bd;
-    --border-color: #dee2e6;
-    --card-bg: #ffffff;
-    --card-shadow: rgba(0, 0, 0, 0.1);
-    --navbar-bg: #0d6efd;
+    /* Modern Typography */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-headings: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --line-height-base: 1.6;
+    --letter-spacing-base: -0.011em;
+    
+    /* Light theme colors - Modern Palette */
+    --bg-primary: #fafbfc;
+    --bg-secondary: #f7f9fc;
+    --bg-tertiary: #e8ecf3;
+    --text-primary: #1a2238;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
+    
+    /* Modern Card Styling */
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --card-border-radius: 16px;
+    
+    /* Modern Brand Colors */
+    --brand-primary: #3b82f6;
+    --brand-secondary: #8b5cf6;
+    --brand-accent: #06b6d4;
+    --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --navbar-text: #ffffff;
-    --input-bg: #ffffff;
-    --input-border: #ced4da;
-    --button-primary: #0d6efd;
-    --button-primary-hover: #0b5ed7;
-    --alert-bg: #f8f9fa;
-    --progress-bg: #e9ecef;
+    
+    /* Modern Form Elements */
+    --input-bg: rgba(255, 255, 255, 0.8);
+    --input-border: #e2e8f0;
+    --input-border-focus: #3b82f6;
+    --input-shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    
+    /* Modern Button Styles */
+    --button-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --button-primary-hover: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    --button-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+    
+    /* Modern Alerts & Progress */
+    --alert-bg: rgba(255, 255, 255, 0.9);
+    --progress-bg: #e2e8f0;
+    
+    /* Glassmorphism Effects */
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --glass-backdrop: blur(8px);
 }
 
-/* Dark theme colors */
+/* Dark theme colors - Modern Dark Mode */
 [data-theme="dark"] {
-    --bg-primary: #212529;
-    --bg-secondary: #343a40;
-    --bg-tertiary: #495057;
-    --text-primary: #ffffff;
-    --text-secondary: #adb5bd;
-    --text-muted: #6c757d;
-    --border-color: #495057;
-    --card-bg: #343a40;
-    --card-shadow: rgba(0, 0, 0, 0.3);
-    --navbar-bg: #1a1d20;
+    /* Dark Mode Modern Palette */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    
+    /* Modern Dark Cards */
+    --card-bg: rgba(30, 41, 59, 0.9);
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --card-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    
+    /* Dark Mode Navigation */
+    --navbar-bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     --navbar-text: #ffffff;
-    --input-bg: #495057;
-    --input-border: #6c757d;
-    --button-primary: #0d6efd;
-    --button-primary-hover: #0b5ed7;
-    --alert-bg: #343a40;
-    --progress-bg: #495057;
+    
+    /* Dark Mode Forms */
+    --input-bg: rgba(30, 41, 59, 0.8);
+    --input-border: #475569;
+    --input-border-focus: #3b82f6;
+    --input-shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    
+    /* Dark Mode Buttons */
+    --button-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --button-primary-hover: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    --button-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+    
+    /* Dark Mode Alerts */
+    --alert-bg: rgba(30, 41, 59, 0.9);
+    --progress-bg: #475569;
+    
+    /* Dark Mode Glassmorphism */
+    --glass-bg: rgba(30, 41, 59, 0.4);
+    --glass-border: rgba(248, 250, 252, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    --glass-backdrop: blur(12px);
 }
 
-/* Auto detect system preference */
+/* Auto detect system preference - Modern Dark Mode */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --bg-primary: #212529;
-        --bg-secondary: #343a40;
-        --bg-tertiary: #495057;
-        --text-primary: #ffffff;
-        --text-secondary: #adb5bd;
-        --text-muted: #6c757d;
-        --border-color: #495057;
-        --card-bg: #343a40;
-        --card-shadow: rgba(0, 0, 0, 0.3);
-        --navbar-bg: #1a1d20;
+        /* Mirror the dark theme variables */
+        --bg-primary: #0f172a;
+        --bg-secondary: #1e293b;
+        --bg-tertiary: #334155;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #334155;
+        --card-bg: rgba(30, 41, 59, 0.9);
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        --navbar-bg: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         --navbar-text: #ffffff;
-        --input-bg: #495057;
-        --input-border: #6c757d;
-        --button-primary: #0d6efd;
-        --button-primary-hover: #0b5ed7;
-        --alert-bg: #343a40;
-        --progress-bg: #495057;
+        --input-bg: rgba(30, 41, 59, 0.8);
+        --input-border: #475569;
+        --input-border-focus: #3b82f6;
+        --input-shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        --button-primary: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        --button-primary-hover: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        --button-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+        --alert-bg: rgba(30, 41, 59, 0.9);
+        --progress-bg: #475569;
+        --glass-bg: rgba(30, 41, 59, 0.4);
+        --glass-border: rgba(248, 250, 252, 0.1);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        --glass-backdrop: blur(12px);
     }
 }
 
-/* General */
+/* Modern Typography & Layout */
+* {
+    box-sizing: border-box;
+}
+
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: var(--bg-primary);
+    background: var(--bg-primary);
     color: var(--text-primary);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: var(--font-primary);
+    font-size: 16px;
+    line-height: var(--line-height-base);
+    letter-spacing: var(--letter-spacing-base);
+    transition: all 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 main {
     flex: 1;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
-/* Navigation */
+/* Modern Typography Scale */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headings);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3rem); }
+h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); }
+h3 { font-size: clamp(1.25rem, 3vw, 1.875rem); }
+h4 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(0.875rem, 1.5vw, 1.125rem); }
+
+p {
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.lead {
+    font-size: 1.125rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+/* Modern Background Pattern */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Modern Navigation */
 .navbar {
-    background-color: var(--navbar-bg) !important;
+    background: var(--navbar-bg) !important;
     color: var(--navbar-text) !important;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    padding: 1rem 0;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
-    font-weight: 600;
+    font-family: var(--font-headings);
+    font-weight: 700;
+    font-size: 1.5rem;
     color: var(--navbar-text) !important;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.05);
 }
 
 .navbar-nav .nav-link {
     color: var(--navbar-text) !important;
+    font-weight: 500;
+    margin: 0 0.5rem;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.navbar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+.navbar-nav .nav-link.active {
+    background: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
 }
 
 .navbar-toggler {
-    border-color: var(--navbar-text);
+    border: none;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.navbar-toggler:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Modern Card Styles */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    backdrop-filter: var(--glass-backdrop);
+    -webkit-backdrop-filter: var(--glass-backdrop);
+    color: var(--text-primary);
+}
+
+.card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Modern Forms */
+.form-control {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.form-control:focus {
+    border-color: var(--input-border-focus);
+    box-shadow: var(--input-shadow-focus);
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-label {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Modern Buttons */
+.btn-primary {
+    background: var(--button-primary);
+    border: none;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: var(--button-shadow);
+    text-transform: none;
+    letter-spacing: -0.01em;
+}
+
+.btn-primary:hover {
+    background: var(--button-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    border-radius: 14px;
 }
 
 /* Dark mode toggle button */

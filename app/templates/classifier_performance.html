@@ -12,16 +12,17 @@
         border-radius: 0 0 1rem 1rem;
     }
     .metric-card {
-        background: white;
+        background: var(--card-bg);
         border-radius: 12px;
         padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 12px var(--card-shadow);
         transition: transform 0.2s;
         height: 100%;
+        color: var(--text-primary);
     }
     .metric-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 20px var(--card-shadow);
     }
     .performance-badge {
         display: inline-block;
@@ -46,10 +47,38 @@
     }
     .confusion-table {
         font-size: 0.9rem;
+        color: var(--text-primary);
     }
     .confusion-table td {
         min-width: 80px;
         text-align: center;
+        border: 1px solid var(--border-color);
+        background: var(--card-bg);
+    }
+    .confusion-table th {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    .confusion-table .table-success-header {
+        background: #28a745 !important;
+        color: white !important;
+    }
+    .confusion-table .table-light-header {
+        background: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+    }
+    .confusion-matrix-excellent {
+        background: #28a745 !important;
+        color: white !important;
+    }
+    .confusion-matrix-warning {
+        background: #ffc107 !important;
+        color: #212529 !important;
+    }
+    .confusion-matrix-default {
+        background: var(--card-bg) !important;
+        color: var(--text-primary) !important;
     }
 </style>
 
@@ -162,25 +191,25 @@
 <!-- Confusion Matrix -->
 <section class="mb-5">
     <h3 class="mb-4">Confusion Matrix - Coarse Tense Classification</h3>
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <div class="card shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+        <div class="card-body" style="color: var(--text-primary);">
             <div class="table-responsive">
                 <table class="table table-bordered confusion-table">
-                    <thead class="table-success">
+                    <thead>
                         <tr>
-                            <th>Actual \ Predicted</th>
-                            <th>Past</th>
-                            <th>Present</th>
-                            <th>Future</th>
+                            <th class="table-success-header">Actual \ Predicted</th>
+                            <th class="table-success-header">Past</th>
+                            <th class="table-success-header">Present</th>
+                            <th class="table-success-header">Future</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% if performance.classifier.confusion_matrix %}
                             {% for actual, predictions in performance.classifier.confusion_matrix.items() %}
                             <tr>
-                                <th class="table-light">{{ actual }}</th>
+                                <th class="table-light-header">{{ actual }}</th>
                                 {% for pred_class in ['Past', 'Present', 'Future'] %}
-                                    <td class="{% if predictions[pred_class] > 95 %}bg-success text-white{% elif predictions[pred_class] > 0 %}bg-warning{% endif %}">
+                                    <td class="{% if predictions[pred_class] > 95 %}confusion-matrix-excellent{% elif predictions[pred_class] > 0 %}confusion-matrix-warning{% else %}confusion-matrix-default{% endif %}">
                                         {{ "%.2f"|format(predictions[pred_class]) }}%
                                     </td>
                                 {% endfor %}
@@ -202,13 +231,13 @@
     <h3 class="mb-4">Per-Class Performance Analysis</h3>
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm h-100" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
                         <i class="bi bi-trophy-fill"></i> Perfect Performance (F1 = 1.000)
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="color: var(--text-primary);">
                     {% if performance.classifier.top_performing_labels %}
                         <div class="list-group list-group-flush">
                             {% for label_data in performance.classifier.top_performing_labels %}
@@ -226,13 +255,13 @@
         </div>
         
         <div class="col-md-6">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm h-100" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0">
                         <i class="bi bi-exclamation-triangle-fill"></i> Challenging Classes
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="color: var(--text-primary);">
                     {% if performance.classifier.challenging_labels %}
                         <div class="list-group list-group-flush">
                             {% for label_data in performance.classifier.challenging_labels %}
@@ -305,11 +334,11 @@
     <h3 class="mb-4">Key Insights</h3>
     <div class="row g-4">
         <div class="col-md-6">
-            <div class="card border-success">
+            <div class="card border-success" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Classifier Strengths</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="color: var(--text-primary);">
                     <ul class="mb-0">
                         <li><strong>High Accuracy:</strong> 94.7% overall classification accuracy</li>
                         <li><strong>Perfect Classes:</strong> 6/24 classes with F1 = 1.000</li>
@@ -320,11 +349,11 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card border-warning">
+            <div class="card border-warning" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-warning">
                     <h5 class="mb-0"><i class="bi bi-target me-2"></i>Improvement Targets</h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="color: var(--text-primary);">
                     <ul class="mb-0">
                         <li><strong>NOWADAYS:</strong> F1 = 0.308 (lowest performing class)</li>
                         <li><strong>PROMISE:</strong> F1 = 0.600 (context-dependent challenges)</li>
