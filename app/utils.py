@@ -39,17 +39,24 @@ def format_explanation_content(content):
     # First pass: identify and mark special keywords for highlighting
     # Common time markers and grammar keywords
     keyword_patterns = [
+        # Time markers
         (r'\b(yesterday|today|tomorrow|now|then)\b', 'time-marker'),
         (r'\b(last week|last month|last year|next week|next month|next year)\b', 'time-marker'),
         (r'\b(ago|before|after|since|until)\b', 'time-marker'),
+        # Frequency markers
         (r'\b(always|usually|often|sometimes|never|rarely)\b', 'frequency-marker'),
         (r'\b(every day|every week|every month|every year)\b', 'frequency-marker'),
-        (r'\b(Subject|Verb|Object|V1|V2|V3|Past Simple|Present Simple|Future Simple)\b', 'grammar-term'),
-        (r'\b(market|school|hospital|restaurant|office|home)\b', 'place-marker')
+        # Grammar terms - more comprehensive patterns
+        (r'\b(Future Simple|Present Simple|Past Simple|Future Continuous|Present Continuous|Past Continuous|Future Perfect|Present Perfect|Past Perfect)\b', 'grammar-term'),
+        (r'\b(Subject|Verb|Object|V1|V2|V3|Tense)\b', 'grammar-term'),
+        (r'\b(will|would|shall|should|can|could|may|might|must)\b', 'modal-verb'),
+        # Place markers
+        (r'\b(market|school|hospital|restaurant|office|home|store)\b', 'place-marker')
     ]
     
-    # Apply keyword highlighting
+    # Apply keyword highlighting - be more careful with overlapping patterns
     for pattern, css_class in keyword_patterns:
+        # Only highlight if not already highlighted
         content = re.sub(pattern, rf'<span class="keyword-highlight {css_class}">\1</span>', content, flags=re.IGNORECASE)
     
     # Process line by line for proper structure
@@ -76,10 +83,10 @@ def format_explanation_content(content):
             bullet_content = line[2:].strip()
             formatted_lines.append(f'<li class="thai-bullet mb-2">{bullet_content}</li>')
         
-        # Check if it's a structural header
+        # Check if it's a structural header (Thai or English)
         elif (line.endswith(':') and 
-              (any(word in line for word in ['โครงสร้าง', 'ตัวอย่าง', 'วิธี', 'คำศัพท์', 'Subject', 'Verb']) or
-               line.count(' ') <= 3)):
+              (any(word in line for word in ['โครงสร้าง', 'ตัวอย่าง', 'วิธี', 'คำศัพท์', 'Subject', 'Verb', 'Future', 'Simple', 'วิธีจำง่าย']) or
+               line.count(' ') <= 4)):
             if in_paragraph:
                 formatted_lines.append('</p>')
                 in_paragraph = False
@@ -91,6 +98,13 @@ def format_explanation_content(content):
                 formatted_lines.append('</p>')
                 in_paragraph = False
             formatted_lines.append(f'<p class="example-text mb-2">{line}</p>')
+        
+        # Check if it's a standalone grammar term or definition
+        elif any(term in line for term in ['Future Simple', 'Future Continuous', 'Future Perfect']) and ':' in line:
+            if in_paragraph:
+                formatted_lines.append('</p>')
+                in_paragraph = False
+            formatted_lines.append(f'<div class="grammar-definition mb-3">{line}</div>')
         
         # Regular content line
         else:
