@@ -9,7 +9,7 @@ auth_bp = Blueprint('auth', __name__)
 def login():
     """Login page - only requires 5-digit pseudocode"""
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     
     if request.method == 'POST':
         pseudocode = request.form.get('pseudocode', '').strip()
@@ -35,7 +35,7 @@ def login():
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
-            return redirect(url_for('index'))
+            return redirect(url_for('main.index'))
         else:
             flash('Invalid code. Please check your 5-digit code and try again', 'error')
     
@@ -47,4 +47,4 @@ def logout():
     """Logout the current user"""
     logout_user()
     flash('You have been logged out', 'info')
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
