@@ -20,18 +20,28 @@ def create_app(config_name=None):
     """
     app = Flask(__name__, template_folder='templates', static_folder='static')
     
-    # Load configuration
-    if config_name == 'testing':
-        app.config.from_object('config.TestingConfig')
-    elif config_name == 'production':
-        app.config.from_object('config.ProductionConfig')
-    else:
-        app.config.from_object('config.DevelopmentConfig')
-    
-    # Override with environment variables if available
+    # Load configuration directly
     app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-in-production')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///pseudocodes.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    
+    # Configuration based on environment
+    if config_name == 'testing':
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['WTF_CSRF_ENABLED'] = False
+    elif config_name == 'production':
+        app.config['DEBUG'] = False
+        app.config['SESSION_COOKIE_SECURE'] = True
+        app.config['SESSION_COOKIE_HTTPONLY'] = True
+        app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    else:
+        app.config['DEBUG'] = True
+    
+    # Model configuration
+    app.config['MAX_TOKENS'] = 500
+    app.config['MIN_THAI_PERCENTAGE'] = 0.8
+    app.config['ENABLE_PROFANITY_FILTER'] = True
     
     # Initialize extensions
     db.init_app(app)
