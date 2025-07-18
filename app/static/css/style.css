@@ -2,9 +2,8 @@
 
 /* CSS Variables for theming - Modern Color Palette */
 :root {
-    /* Consistent Typography */
-    --font-english: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-thai: 'Sarabun', 'Thonburi', 'Ayuthaya', 'Silom', 'Krungthep', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Universal Typography - Prompt for Everything */
+    --font-universal: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --line-height-base: 1.6;
     --letter-spacing-base: -0.011em;
     
@@ -137,7 +136,7 @@ body {
     flex-direction: column;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: var(--font-english);
+    font-family: var(--font-universal);
     font-size: 16px;
     line-height: var(--line-height-base);
     letter-spacing: var(--letter-spacing-base);
@@ -154,7 +153,7 @@ main {
 
 /* Modern Typography Scale */
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-english);
+    font-family: var(--font-universal);
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.025em;
@@ -196,11 +195,11 @@ body::before {
     z-index: -1;
 }
 
-/* Thai Typography - Consistent Sarabun Font */
+/* Universal Font Application - Prompt for Everything */
 .thai-text, 
 [lang="th"],
 *[class*="thai"] {
-    font-family: var(--font-thai);
+    font-family: var(--font-universal);
     font-size: 1.1em;
     line-height: 1.7;
     letter-spacing: 0.02em;
@@ -209,65 +208,9 @@ body::before {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Thai Headings - Same Sarabun Font */
-h1[lang="th"], h2[lang="th"], h3[lang="th"], h4[lang="th"], h5[lang="th"], h6[lang="th"] {
-    font-family: var(--font-thai);
-    font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: 0.01em;
-}
-
-/* Thai Navigation Items */
-.navbar-nav .nav-link:lang(th),
-.navbar-nav .nav-link span[lang="th"] {
-    font-family: var(--font-thai);
-    font-weight: 500;
-}
-
-/* Thai Form Elements */
-textarea[placeholder*="พิมพ์"], 
-input[placeholder*="พิมพ์"],
-.form-control:lang(th),
-.form-control.thai-text {
-    font-family: var(--font-thai);
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-/* Thai Button Text */
-.btn:lang(th),
-.btn span[lang="th"] {
-    font-family: var(--font-thai);
-    font-weight: 500;
-}
-
-/* Thai Content in Cards */
-.card-body .thai-text,
-.card-body [lang="th"],
-.card-body span[lang="th"] {
-    font-family: var(--font-thai);
-    font-size: 1.05rem;
-    line-height: 1.8;
-}
-
-/* Thai Examples and Help Text */
-.form-text:lang(th),
-.text-muted:lang(th),
-.form-text span[lang="th"],
-.text-muted span[lang="th"] {
-    font-family: var(--font-thai);
-    font-size: 0.95rem;
-}
-
-/* Ensure all Thai content uses Sarabun */
-*:lang(th) {
-    font-family: var(--font-thai);
-}
-
-/* Thai text in specific components */
-.hero-title:lang(th),
-.hero-subtitle:lang(th) {
-    font-family: var(--font-thai);
+/* All elements use Prompt font */
+* {
+    font-family: var(--font-universal) !important;
 }
 
 /* Modern Navigation */
@@ -283,7 +226,7 @@ input[placeholder*="พิมพ์"],
 }
 
 .navbar-brand {
-    font-family: var(--font-english);
+    font-family: var(--font-universal);
     font-weight: 700;
     font-size: 1.5rem;
     color: var(--navbar-text) !important;
@@ -739,7 +682,7 @@ footer {
 
 /* Thai text specific */
 #thai_text {
-    font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+    font-family: var(--font-universal) !important;
 }
 
 /* Explanation sections */
@@ -809,7 +752,7 @@ footer {
     background-color: #e8f5e9;
     color: #388e3c;
     border: 1px solid #c8e6c9;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-universal) !important;
     font-size: 0.95em;
 }
 

@@ -7,12 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Flask-based web application for an MSc dissertation in Computer Science with Speech and Language Processing. The application provides a Thai-to-English NLP pipeline with tense classification and grammar explanation, featuring comprehensive performance evaluation across two distinct testing methodologies.
 
 **Latest Updates (2025-01-18):**
-- ✅ **Refactored Architecture**: Implemented application factory pattern with modular blueprint structure
-- ✅ **Mobile-First Design**: Complete responsive design with touch-friendly interfaces
-- ✅ **Full Accessibility**: WCAG 2.1 compliant with keyboard navigation and screen reader support
-- ✅ **Dark Mode**: Complete dark/light theme system with user preference persistence
-- ✅ **Route Fixes**: Fixed all endpoint routing issues for seamless navigation
-- ✅ **Enhanced UX**: Improved percentage display, form validation, and user feedback
+- ✅ **Modern UI Redesign**: Sleek glassmorphism effects, gradients, and contemporary aesthetics
+- ✅ **Rebranding**: Introduced "Thaislate" brand identity throughout the application
+- ✅ **Typography Standardization**: Unified font system using Prompt for all content
+- ✅ **Enhanced Profanity Filter**: Comprehensive Thai profanity detection with educational messaging
+- ✅ **About Us Page**: Bilingual content showcasing mission, technology, and team
+- ✅ **Dark Mode Fixes**: Improved contrast and readability in dark mode for all components
 
 ## Project Structure
 
@@ -28,16 +28,17 @@ Website/
 │   ├── utils.py                 # Utility functions (NEW)
 │   ├── data.py                  # Data management (NEW)
 │   ├── templates/               # HTML templates (ENHANCED)
-│   │   ├── base.html           # Base template with dark mode
-│   │   ├── index.html          # Homepage with accessibility
-│   │   ├── result.html         # Results page with fixed routing
-│   │   ├── tenses.html         # Tense explanations
+│   │   ├── base.html           # Base template with dark mode & Thaislate branding
+│   │   ├── index.html          # Homepage with modern hero section & glassmorphism
+│   │   ├── result.html         # Results page with proper Thai font support
+│   │   ├── tenses.html         # Tense explanations with Thai language attributes
+│   │   ├── about.html          # Bilingual About Us page (NEW)
 │   │   ├── performance.html    # Performance overview
-│   │   ├── classifier_performance.html # BERT results
+│   │   ├── classifier_performance.html # BERT results with dark mode fixes
 │   │   └── pipeline_performance.html   # Pipeline results
 │   └── static/                  # Static files (ENHANCED)
 │       └── css/
-│           └── style.css       # Mobile-first + dark mode CSS
+│           └── style.css       # Modern design with glassmorphism + Prompt font
 ├── data/                        # Data files and datasets
 │   ├── Confusion Matrix.csv
 │   ├── Per-label Report.csv
@@ -66,10 +67,11 @@ Website/
 
 2. **Web Application** (Refactored with Blueprint Architecture)
    - **Main Blueprint** (`app/routes.py`):
-     - Route `/`: Homepage with Thai text input form
+     - Route `/`: Homepage with modern hero section and glassmorphism cards
      - Route `/predict`: Process input through pipeline and display results
      - Route `/validate`: Real-time input validation API
-     - Route `/tenses`: Display tense usage explanations
+     - Route `/tenses`: Display tense usage explanations with Thai language support
+     - Route `/about`: Bilingual About Us page with team and technology info
      - Route `/performance`: Combined view of both evaluation approaches
      - Route `/classifier-performance`: BERT classifier isolated testing results
      - Route `/pipeline-performance`: Full pipeline end-to-end evaluation results
@@ -223,10 +225,17 @@ python -c "from app import create_app; app = create_app(); app.app_context().pus
 
 ## New Features Available
 
+### Modern Design & Branding
+- **Thaislate Brand Identity**: Complete rebranding with modern logo and consistent naming
+- **Glassmorphism Effects**: Contemporary UI design with transparency and blur effects
+- **Gradient Backgrounds**: Subtle background patterns enhancing visual appeal
+- **Modern Typography**: Universal Prompt font for consistent, readable text across all languages
+
 ### Dark Mode
 - Click the moon/sun icon in the navigation to toggle between light and dark themes
 - User preference is automatically saved and restored on future visits
 - System dark mode preference is automatically detected and applied
+- Improved contrast ratios for better readability in all components
 
 ### Enhanced Accessibility
 - Complete keyboard navigation support throughout the application
@@ -246,6 +255,11 @@ python -c "from app import create_app; app = create_app(); app.app_context().pus
 - Clean percentage display (whole numbers instead of decimals)
 - Fixed all navigation routing issues
 - Better error handling and user feedback
+
+### Content & Features
+- **Bilingual About Page**: Comprehensive English/Thai about page with team information
+- **Enhanced Profanity Filter**: Improved Thai profanity detection with educational messaging
+- **Language Support**: Proper Thai language attributes throughout the application
 
 ## Performance Page Color Coding
 - **Green Theme**: `classifier_performance.html` - Isolated BERT classifier testing
@@ -306,6 +320,30 @@ This color coding helps users immediately distinguish between the two evaluation
 - **Form Validation**: Improved validation with proper error states
 - **Navigation Improvements**: Fixed all broken navigation links
 - **Loading States**: Better loading indicators and user feedback
+
+## Typography and Font System
+
+### Font Standardization
+- **Universal Font**: All text uses Google Fonts "Prompt" for consistency
+- **Language Support**: Prompt font supports both English and Thai characters excellently
+- **Implementation**: CSS variables (`--font-universal`) ensure consistent font application
+- **Fallback System**: Graceful degradation with system fonts if Prompt fails to load
+
+### Font Application
+```css
+/* Universal Typography - Prompt for Everything */
+--font-universal: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+/* All elements use Prompt font */
+* {
+    font-family: var(--font-universal) !important;
+}
+```
+
+### Language Attributes
+- Thai text sections use `lang="th"` attributes for proper rendering
+- English sections use `lang="en"` attributes for accessibility
+- Proper language tagging improves screen reader support and search engine optimization
 
 ## File Organization Notes
 

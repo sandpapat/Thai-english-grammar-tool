@@ -20,7 +20,7 @@
                                 <h5 class="card-title">
                                     <i class="bi bi-chat-left-text"></i> Thai Input
                                 </h5>
-                                <p class="card-text fs-5">{{ result.input_thai }}</p>
+                                <p class="card-text fs-5" lang="th">{{ result.input_thai }}</p>
                             </div>
                         </div>
                     </div>
@@ -77,10 +77,10 @@
                     {% for section_key, section in explanation_sections.items() %}
                         <div class="mb-4">
                             <h5 class="text-primary">
-                                <i class="bi bi-bookmark"></i> {{ section.title }}
+                                <i class="bi bi-bookmark"></i> <span lang="th">{{ section.title }}</span>
                             </h5>
                             <div class="ps-3">
-                                <div class="explanation-content">{{ section.content|safe }}</div>
+                                <div class="explanation-content" lang="th">{{ section.content|safe }}</div>
                             </div>
                         </div>
                         {% if not loop.last %}
