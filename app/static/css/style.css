@@ -1,10 +1,79 @@
 /* Custom styles for Thai-English Grammar Learning Tool */
 
+/* CSS Variables for theming */
+:root {
+    /* Light theme colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+    --border-color: #dee2e6;
+    --card-bg: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+    --navbar-bg: #0d6efd;
+    --navbar-text: #ffffff;
+    --input-bg: #ffffff;
+    --input-border: #ced4da;
+    --button-primary: #0d6efd;
+    --button-primary-hover: #0b5ed7;
+    --alert-bg: #f8f9fa;
+    --progress-bg: #e9ecef;
+}
+
+/* Dark theme colors */
+[data-theme="dark"] {
+    --bg-primary: #212529;
+    --bg-secondary: #343a40;
+    --bg-tertiary: #495057;
+    --text-primary: #ffffff;
+    --text-secondary: #adb5bd;
+    --text-muted: #6c757d;
+    --border-color: #495057;
+    --card-bg: #343a40;
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --navbar-bg: #1a1d20;
+    --navbar-text: #ffffff;
+    --input-bg: #495057;
+    --input-border: #6c757d;
+    --button-primary: #0d6efd;
+    --button-primary-hover: #0b5ed7;
+    --alert-bg: #343a40;
+    --progress-bg: #495057;
+}
+
+/* Auto detect system preference */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg-primary: #212529;
+        --bg-secondary: #343a40;
+        --bg-tertiary: #495057;
+        --text-primary: #ffffff;
+        --text-secondary: #adb5bd;
+        --text-muted: #6c757d;
+        --border-color: #495057;
+        --card-bg: #343a40;
+        --card-shadow: rgba(0, 0, 0, 0.3);
+        --navbar-bg: #1a1d20;
+        --navbar-text: #ffffff;
+        --input-bg: #495057;
+        --input-border: #6c757d;
+        --button-primary: #0d6efd;
+        --button-primary-hover: #0b5ed7;
+        --alert-bg: #343a40;
+        --progress-bg: #495057;
+    }
+}
+
 /* General */
 body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 main {
@@ -12,33 +81,98 @@ main {
 }
 
 /* Navigation */
+.navbar {
+    background-color: var(--navbar-bg) !important;
+    color: var(--navbar-text) !important;
+    transition: background-color 0.3s ease;
+}
+
 .navbar-brand {
     font-weight: 600;
+    color: var(--navbar-text) !important;
+}
+
+.navbar-nav .nav-link {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-toggler {
+    border-color: var(--navbar-text);
+}
+
+/* Dark mode toggle button */
+#darkModeToggle {
+    color: var(--navbar-text) !important;
+    background: none !important;
+    border: none !important;
+    padding: 0.5rem !important;
+    font-size: 1.1rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+#darkModeToggle:hover {
+    color: var(--navbar-text) !important;
+    transform: scale(1.1);
+}
+
+#darkModeToggle:focus {
+    outline: 2px solid var(--navbar-text);
+    outline-offset: 2px;
 }
 
 /* Cards */
 .card {
-    transition: transform 0.2s;
+    transition: transform 0.2s, background-color 0.3s ease, border-color 0.3s ease;
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
 }
 
 .card:hover {
     transform: translateY(-2px);
 }
 
+.card-body {
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+}
+
 /* Form */
 #thai_text {
     font-size: 1.2rem;
     line-height: 1.8;
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+.form-control {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.form-control:focus {
+    background-color: var(--input-bg);
+    border-color: var(--button-primary);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
 }
 
 /* Results */
 .card-text.fs-3 {
     letter-spacing: 0.05em;
+    color: var(--text-primary);
 }
 
 /* Performance page */
 .progress {
-    background-color: #e9ecef;
+    background-color: var(--progress-bg);
 }
 
 /* Loading state */
@@ -271,11 +405,18 @@ body {
 /* Alert styling */
 .alert {
     border-radius: 0.5rem;
+    background-color: var(--alert-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 /* Footer */
 footer {
-    border-top: 1px solid #dee2e6;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-secondary);
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 /* Thai text specific */
@@ -527,7 +668,7 @@ footer {
 
 /* Better color contrast for text */
 .text-muted {
-    color: #6c757d !important;
+    color: var(--text-muted) !important;
 }
 
 /* Ensure sufficient contrast for links */
@@ -542,13 +683,53 @@ footer {
 
 /* Improve dropdown accessibility */
 .dropdown-menu {
-    border: 1px solid #dee2e6;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0.5rem 1rem var(--card-shadow);
+    background-color: var(--card-bg);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.dropdown-item:focus {
-    background-color: #e9ecef;
-    color: #212529;
+.dropdown-item {
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.dropdown-divider {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Buttons */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--button-primary);
+    border-color: var(--button-primary);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: var(--button-primary-hover);
+    border-color: var(--button-primary-hover);
+    color: #ffffff;
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
 }
 
 /* Form validation states */

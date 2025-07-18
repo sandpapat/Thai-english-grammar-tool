@@ -72,6 +72,20 @@
                     </li>
                 </ul>
                 
+                <!-- Dark Mode Toggle -->
+                <ul class="navbar-nav ms-2" role="menubar">
+                    <li class="nav-item" role="none">
+                        <button class="nav-link btn btn-link border-0 p-2" 
+                                id="darkModeToggle" 
+                                type="button" 
+                                role="menuitem"
+                                aria-label="Toggle dark mode"
+                                title="Toggle dark mode">
+                            <i class="bi bi-moon-fill" id="darkModeIcon" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                </ul>
+                
                 <!-- Login/Logout section -->
                 <ul class="navbar-nav ms-2" role="menubar">
                     {% if current_user.is_authenticated %}
@@ -139,6 +153,63 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        // Dark mode functionality
+        (function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            const body = document.body;
+            
+            // Check for saved theme preference or default to system preference
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            // Set initial theme
+            let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    body.setAttribute('data-theme', 'dark');
+                    darkModeIcon.className = 'bi bi-sun-fill';
+                    darkModeToggle.setAttribute('aria-label', 'Switch to light mode');
+                    darkModeToggle.setAttribute('title', 'Switch to light mode');
+                } else {
+                    body.setAttribute('data-theme', 'light');
+                    darkModeIcon.className = 'bi bi-moon-fill';
+                    darkModeToggle.setAttribute('aria-label', 'Switch to dark mode');
+                    darkModeToggle.setAttribute('title', 'Switch to dark mode');
+                }
+                currentTheme = theme;
+                localStorage.setItem('theme', theme);
+            }
+            
+            // Apply initial theme
+            setTheme(currentTheme);
+            
+            // Toggle theme on button click
+            darkModeToggle.addEventListener('click', function() {
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+            });
+            
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+            
+            // Keyboard accessibility
+            darkModeToggle.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    darkModeToggle.click();
+                }
+            });
+        })();
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

@@ -285,10 +285,11 @@
         
         // Update Thai percentage color
         const thaiElement = document.getElementById('thaiPercentage');
+        const thaiPercent = Math.round(data.thai_percentage);
         thaiElement.className = '';
-        if (data.thai_percentage >= 80) {
+        if (thaiPercent >= 80) {
             thaiElement.className = 'text-success';
-        } else if (data.thai_percentage >= 60) {
+        } else if (thaiPercent >= 60) {
             thaiElement.className = 'text-warning';
         } else {
             thaiElement.className = 'text-danger';
