@@ -47,14 +47,224 @@ main {
     height: 1rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .fs-3 {
-        font-size: 1.5rem !important;
+/* Mobile-first responsive design */
+/* Base styles for mobile */
+body {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Touch-friendly interactive elements */
+.btn {
+    min-height: 44px;
+    min-width: 44px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover, .btn:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Form elements */
+.form-control {
+    min-height: 44px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+#thai_text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.navbar-nav .nav-link {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin: 0 0.2rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Card improvements */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Progress bar enhancements */
+.progress {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Alert improvements */
+.alert {
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 1rem;
+}
+
+/* Responsive text sizing */
+.fs-3 {
+    font-size: 1.8rem;
+}
+
+/* Small screens (phones) */
+@media (max-width: 576px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem;
+    }
+    
+    .navbar-brand i {
+        display: none;
     }
     
     .card-body {
         padding: 1rem;
+    }
+    
+    .fs-3 {
+        font-size: 1.4rem !important;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    #thai_text {
+        font-size: 1rem;
+        min-height: 120px;
+    }
+    
+    /* Stack navigation items vertically on small screens */
+    .navbar-nav {
+        margin-top: 1rem;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.5rem 0;
+        margin: 0.2rem 0;
+    }
+    
+    /* Adjust information cards */
+    .col-md-4 {
+        margin-bottom: 1rem;
+    }
+    
+    .card h5 {
+        font-size: 1.1rem;
+    }
+    
+    .card-text {
+        font-size: 0.9rem;
+    }
+    
+    /* Text statistics responsive layout */
+    #textStats .col-3 {
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Progress container adjustments */
+    #progressContainer .card-body {
+        padding: 1rem;
+    }
+    
+    #progressIcon {
+        font-size: 2rem !important;
+    }
+    
+    /* Footer adjustments */
+    footer {
+        padding: 2rem 0;
+    }
+    
+    footer p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 577px) and (max-width: 768px) {
+    .fs-3 {
+        font-size: 1.6rem !important;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    #thai_text {
+        font-size: 1.1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+    }
+}
+
+/* Large screens (desktops) */
+@media (min-width: 769px) {
+    .fs-3 {
+        font-size: 2rem !important;
+    }
+    
+    .card-body {
+        padding: 2rem;
+    }
+    
+    #thai_text {
+        font-size: 1.2rem;
     }
 }
 
@@ -226,4 +436,142 @@ footer {
     100% {
         opacity: 1;
     }
+}
+
+/* Accessibility improvements */
+/* Focus indicators */
+.btn:focus,
+.form-control:focus,
+.nav-link:focus,
+.dropdown-item:focus,
+.navbar-brand:focus {
+    outline: 2px solid #fd7e14;
+    outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1000;
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: 6px;
+    outline: 2px solid #fd7e14;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn {
+        border-width: 2px;
+    }
+    
+    .card {
+        border: 2px solid #000;
+    }
+    
+    .form-control {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .btn,
+    .card,
+    .form-control,
+    .nav-link,
+    .progress-bar,
+    .alert {
+        transition: none;
+    }
+    
+    .bi-circle-fill {
+        animation: none;
+    }
+    
+    .btn:hover,
+    .card:hover {
+        transform: none;
+    }
+}
+
+/* Screen reader only text */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Keyboard navigation highlights */
+.nav-link:focus-visible,
+.dropdown-item:focus-visible {
+    background-color: rgba(255, 255, 255, 0.2);
+    outline: 2px solid #fd7e14;
+    outline-offset: 2px;
+}
+
+/* Better color contrast for text */
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Ensure sufficient contrast for links */
+.nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    color: #fff !important;
+}
+
+/* Improve dropdown accessibility */
+.dropdown-menu {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item:focus {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+/* Form validation states */
+.form-control:invalid {
+    border-color: #dc3545;
+}
+
+.form-control:valid {
+    border-color: #198754;
+}
+
+/* Progress bar accessibility */
+.progress-bar {
+    position: relative;
+}
+
+.progress-bar::after {
+    content: attr(aria-valuenow) '%';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: bold;
 }

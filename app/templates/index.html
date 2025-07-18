@@ -9,17 +9,17 @@
         <div class="card shadow">
             <div class="card-body">
                 <h1 class="card-title text-center mb-4">
-                    <i class="bi bi-chat-text"></i> Thai-English Grammar Learning Tool
+                    <i class="bi bi-chat-text" aria-hidden="true"></i> Thai-English Grammar Learning Tool
                 </h1>
                 
                 <p class="text-center text-muted mb-4">
                     Enter a Thai sentence to analyse its English translation and tense
                 </p>
 
-                <form method="POST" action="{{ url_for('predict') }}" id="analyseForm">
+                <form method="POST" action="{{ url_for('main.predict') }}" id="analyseForm" novalidate>
                     <div class="mb-4">
                         <label for="thai_text" class="form-label">
-                            <i class="bi bi-pencil-square"></i> Thai Sentence
+                            <i class="bi bi-pencil-square" aria-hidden="true"></i> Thai Sentence
                         </label>
                         <textarea 
                             class="form-control form-control-lg" 
@@ -29,35 +29,44 @@
                             placeholder="พิมพ์ประโยคภาษาไทยที่นี่..."
                             required
                             autofocus
+                            aria-describedby="thai-text-help thai-text-examples textStats"
+                            aria-invalid="false"
                         ></textarea>
-                        <div class="form-text">
+                        <div id="thai-text-help" class="form-text">
+                            Enter Thai text to analyze its English translation and grammatical tense
+                        </div>
+                        <div id="thai-text-examples" class="form-text">
                             Example: ฉันกินข้าวเช้าทุกวัน, เมื่อวานฉันไปตลาด, พรุ่งนี้ฉันจะไปเรียน
                         </div>
                         
                         <!-- Validation feedback -->
-                        <div id="validationFeedback" class="mt-2"></div>
+                        <div id="validationFeedback" class="mt-2" role="alert" aria-live="polite"></div>
                         
                         <!-- Text statistics -->
-                        <div id="textStats" class="mt-2 d-none">
+                        <div id="textStats" class="mt-2 d-none" aria-live="polite">
                             <div class="row text-center">
                                 <div class="col-3">
                                     <small class="text-muted">
-                                        <i class="bi bi-123"></i> <span id="tokenCount">0</span>/500
+                                        <i class="bi bi-123" aria-hidden="true"></i> 
+                                        <span id="tokenCount" aria-label="Token count">0</span>/500
                                     </small>
                                 </div>
                                 <div class="col-3">
                                     <small class="text-muted">
-                                        <i class="bi bi-translate"></i> <span id="thaiPercentage">0</span>% Thai
+                                        <i class="bi bi-translate" aria-hidden="true"></i> 
+                                        <span id="thaiPercentage" aria-label="Thai percentage">0</span>% Thai
                                     </small>
                                 </div>
                                 <div class="col-3">
                                     <small class="text-muted">
-                                        <i class="bi bi-text-paragraph"></i> <span id="sentenceCount">0</span> sentences
+                                        <i class="bi bi-text-paragraph" aria-hidden="true"></i> 
+                                        <span id="sentenceCount" aria-label="Sentence count">0</span> sentences
                                     </small>
                                 </div>
                                 <div class="col-3">
                                     <small class="text-muted">
-                                        <i class="bi bi-speedometer2"></i> <span id="validationStatus">Ready</span>
+                                        <i class="bi bi-speedometer2" aria-hidden="true"></i> 
+                                        <span id="validationStatus" aria-label="Validation status">Ready</span>
                                     </small>
                                 </div>
                             </div>
@@ -65,9 +74,13 @@
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                            <i class="bi bi-play-circle"></i> Analyse
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" 
+                                aria-describedby="submit-help">
+                            <i class="bi bi-play-circle" aria-hidden="true"></i> Analyse
                         </button>
+                        <div id="submit-help" class="visually-hidden">
+                            Submit Thai text for translation and grammatical analysis
+                        </div>
                     </div>
                 </form>
             </div>
@@ -108,10 +121,10 @@
 
         <!-- Information Cards -->
         <div class="row mt-4">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card h-100">
                     <div class="card-body text-center">
-                        <i class="bi bi-translate text-primary" style="font-size: 2rem;"></i>
+                        <i class="bi bi-translate text-primary" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">Translation</h5>
                         <p class="card-text small">
                             Thai to English using Typhoon Translate 4B
@@ -119,10 +132,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card h-100">
                     <div class="card-body text-center">
-                        <i class="bi bi-tags text-success" style="font-size: 2rem;"></i>
+                        <i class="bi bi-tags text-success" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">Classification</h5>
                         <p class="card-text small">
                             Tense detection using XLM-RoBERTa
@@ -130,14 +143,27 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="card h-100">
                     <div class="card-body text-center">
-                        <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;"></i>
+                        <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">Explanation</h5>
                         <p class="card-text small">
                             Grammar tips using Typhoon 2.1 Instruct
                         </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-keyboard text-info" style="font-size: 2rem;" aria-hidden="true"></i>
+                        <h5 class="card-title mt-2">Keyboard Shortcuts</h5>
+                        <div class="card-text small text-start">
+                            <p class="mb-1"><kbd>Alt + S</kbd> Focus input</p>
+                            <p class="mb-1"><kbd>Alt + Enter</kbd> Submit</p>
+                            <p class="mb-0"><kbd>Escape</kbd> Clear text</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -175,6 +201,7 @@
         if (text.length === 0) {
             document.getElementById('textStats').classList.add('d-none');
             document.getElementById('validationFeedback').innerHTML = '';
+            this.setAttribute('aria-invalid', 'false');
             isValidInput = false;
             return;
         }
@@ -187,6 +214,32 @@
         validationTimeout = setTimeout(() => {
             validateInput(text);
         }, 300);
+    });
+    
+    // Keyboard navigation support
+    document.addEventListener('keydown', function(e) {
+        // Alt + S to focus on textarea
+        if (e.altKey && e.key === 's') {
+            e.preventDefault();
+            document.getElementById('thai_text').focus();
+        }
+        
+        // Alt + Enter to submit form
+        if (e.altKey && e.key === 'Enter') {
+            e.preventDefault();
+            const form = document.getElementById('analyseForm');
+            if (isValidInput) {
+                form.submit();
+            }
+        }
+        
+        // Escape to clear textarea
+        if (e.key === 'Escape' && document.activeElement === document.getElementById('thai_text')) {
+            document.getElementById('thai_text').value = '';
+            document.getElementById('textStats').classList.add('d-none');
+            document.getElementById('validationFeedback').innerHTML = '';
+            isValidInput = false;
+        }
     });
     
     function validateInput(text) {
@@ -243,19 +296,23 @@
         
         // Update validation status
         const statusElement = document.getElementById('validationStatus');
+        const textArea = document.getElementById('thai_text');
         isValidInput = data.is_valid;
         
         if (data.is_valid) {
             statusElement.textContent = data.has_warnings ? 'Valid (warnings)' : 'Valid';
             statusElement.className = data.has_warnings ? 'text-warning' : 'text-success';
+            textArea.setAttribute('aria-invalid', 'false');
         } else {
             statusElement.textContent = 'Invalid';
             statusElement.className = 'text-danger';
+            textArea.setAttribute('aria-invalid', 'true');
         }
         
         // Update submit button state
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.disabled = !data.is_valid;
+        submitBtn.setAttribute('aria-disabled', !data.is_valid);
         
         // Clear any previous validation messages
         document.getElementById('validationFeedback').innerHTML = '';
