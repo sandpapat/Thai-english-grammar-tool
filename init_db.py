@@ -4,9 +4,18 @@ Database initialization script for adding pseudocodes
 Usage: python init_db.py
 """
 
-from app import app
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from app.models import db, Pseudocode
-import sys
+import os
+
+# Create a minimal Flask app just for database operations
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pseudocodes.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize the database with this app
+db.init_app(app)
 
 def add_pseudocode(pseudocode):
     """Add a single pseudocode to the database"""
