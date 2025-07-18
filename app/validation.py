@@ -167,32 +167,144 @@ class SentenceBoundaryDetector:
 
 
 class ProfanityFilter:
-    """Basic profanity detection and filtering"""
+    """Thai and English profanity detection and filtering"""
     
     def __init__(self):
-        # Basic profanity patterns (using placeholder approach)
-        # In production, this would be loaded from a secure configuration
+        # Thai profanity patterns with word boundaries for accuracy
+        # Using specific patterns to avoid false positives
         self.thai_profanity_patterns = [
-            # Add Thai profanity patterns here
-            # Using regex patterns for flexibility
-            r'ห[ีิ]*[ย]',  # Example pattern structure
+            # Strong profanity - exact matches
+            r'\bควย\b',
+            r'\bหี\b',
+            r'\bเย็ด\b',
+            r'\bแม่ง\b',
+            r'\bสัด\b',
+            r'\bไอ้เหี้ย\b',
+            r'\bไอ้สัส\b',
+            r'\bเงี่ยน\b',
+            r'\bชักว่าว\b',
+            r'\bตกเบ็ด\b',
+            r'\bเหี้ย\b',
+            r'\bควาย\b',
+            r'\bไอ้โง่\b',
+            r'\bอีโง่\b',
+            r'\bอีดอก\b',
+            r'\bไอ้หน้าหี\b',
+            r'\bสถุน\b',
+            r'\bปัญญาอ่อน\b',
+            r'\bเหลือขอ\b',
+            r'\bตอแหล\b',
+            r'\bตายซะ\b',
+            r'\bส้นตีน\b',
+            r'\bพ่อมึงตาย\b',
+            r'\bไอ้หมา\b',
+            r'\bชั่ว\b',
+            
+            # Additional common profanity patterns
+            r'\bไอ้\s*เหี้ย\b',
+            r'\bไอ้\s*ควาย\b',
+            r'\bไอ้\s*สัส\b',
+            r'\bไอ้\s*สัด\b',
+            r'\bไอ้\s*หมา\b',
+            r'\bอี\s*เหี้ย\b',
+            r'\bอี\s*ควาย\b',
+            r'\bอี\s*สัส\b',
+            r'\bอี\s*สัด\b',
+            r'\bอี\s*หมา\b',
+            r'\bกู\b',
+            r'\bมึง\b',
+            r'\bเอา\s*แม่\b',
+            r'\bเอา\s*พ่อ\b',
+            r'\bพ่อ\s*มึง\b',
+            r'\bแม่\s*มึง\b',
+            r'\bตาย\s*ซะ\b',
+            r'\bไป\s*ตาย\b',
+            r'\bเฮ้ย\b',
+            r'\bห[ีิ]*[ย](?![\u0E48-\u0E4B]?[าอ])',  # Avoid "หย่า" (divorce)
+            r'\bบ้า\b',
+            r'\bงี่เง่า\b',
+            r'\bโง่\s*ๆ\b',
+            r'\bเวร\b',
+            r'\bสัตว์\b',
+            r'\bชิบ\b',
+            r'\bชิบหาย\b',
+            r'\bแดก\b',
+            r'\bเขม่า\b',
+            r'\bปากแตง\b',
+            r'\bหน้าตัวเมีย\b',
+            r'\bหน้าด้าน\b',
+            r'\bหน้าโง่\b',
+            r'\bตูดใหญ่\b',
+            r'\bตูดแตก\b',
+        ]
+        
+        # Exceptions - legitimate words that might match patterns
+        self.thai_exceptions = [
+            r'\bหย่า\b',      # divorce
+            r'\bหยาก\b',     # difficult
+            r'\bหยาด\b',     # drop
+            r'\bหยิก\b',     # to pinch
+            r'\bหยิบ\b',     # to pick up
+            r'\bหยุด\b',     # to stop
+            r'\bหยึก\b',     # to grab
+            r'\bหยอก\b',     # to tease
+            r'\bหย่อน\b',    # to lower
+            r'\bหย่อม\b',    # a bunch
+            r'\bหยับ\b',     # to grab
+            r'\bหยาบ\b',     # rough
+            r'\bหยิม\b',     # to smile
+            r'\bหยิบยื่น\b', # to offer
+            r'\bหยุดยั้ง\b', # to stop/prevent
+            r'\bสัดส่วน\b',  # proportion
+            r'\bสัดมาก\b',   # very much
+            r'\bสัดเศร้า\b', # very sad
+            r'\bสัดว่า\b',   # very much that
+            r'\bสัตว์ป่า\b', # wild animals
+            r'\bสัตว์เลี้ยง\b', # pets
+            r'\bสัตว์น้ำ\b', # aquatic animals
+            r'\bการตาย\b',   # death/dying
+            r'\bคนตาย\b',    # dead person
+            r'\bใจเย็น\b',   # calm down
+            r'\bอาการเย็น\b', # cold symptoms
+            r'\bปัญญาธรรม\b', # wisdom
+            r'\bปัญญาไว\b',  # clever
         ]
         
         self.english_profanity_patterns = [
-            # Add English profanity patterns here
-            r'\b(damn|hell)\b',  # Example mild profanity
+            # Common English profanity
+            r'\b(shit|fuck|bitch|asshole|damn|hell)\b',
+            r'\b(crap|piss|dickhead|bastard)\b',
+            r'\b(whore|slut|prostitute)\b',
+            r'\b(idiot|moron|stupid)\b',
+            r'\b(retard|retarded)\b',
+            # Avoid educational/medical terms
+            r'\b(?!prostitution|sexually|medical|anatomy)(sex|sexual)\b',
         ]
     
     def contains_profanity(self, text: str) -> bool:
         """Check if text contains profanity"""
         text_lower = text.lower()
         
-        # Check Thai patterns
+        # First check for Thai exceptions (legitimate words)
+        for exception in self.thai_exceptions:
+            if re.search(exception, text_lower):
+                # If it's an exception, don't flag it as profanity
+                continue
+        
+        # Check Thai profanity patterns
         for pattern in self.thai_profanity_patterns:
             if re.search(pattern, text_lower):
-                return True
+                # Double-check against exceptions
+                is_exception = False
+                for exception in self.thai_exceptions:
+                    if re.search(exception, text_lower):
+                        is_exception = True
+                        break
+                
+                if not is_exception:
+                    return True
         
-        # Check English patterns
+        # Check English profanity patterns
         for pattern in self.english_profanity_patterns:
             if re.search(pattern, text_lower):
                 return True
@@ -210,10 +322,10 @@ class ProfanityFilter:
         }
     
     def _get_profanity_error(self) -> Dict[str, str]:
-        """Generate error message for profanity detection"""
+        """Generate gentle error message for profanity detection"""
         return {
-            'en': 'Invalid content detected. Please use appropriate language.',
-            'th': 'พบเนื้อหาที่ไม่เหมาะสม กรุณาใช้ภาษาที่เหมาะสม'
+            'en': 'Please use appropriate language for best translation results. Our AI models work better with respectful and clear Thai text.',
+            'th': 'กรุณาใช้ภาษาที่เหมาะสมเพื่อผลลัพธ์การแปลที่ดีที่สุด โมเดล AI ของเราทำงานได้ดีกว่าเมื่อใช้ข้อความภาษาไทยที่สุภาพและชัดเจน'
         }
 
 
