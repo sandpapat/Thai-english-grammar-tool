@@ -16,3 +16,7 @@ torch
 # For API integration - following notebook 06
 together
 python-dotenv
+
+# For authentication system
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.2

@@ -1,8 +1,12 @@
 from flask import Flask, render_template, request, flash, Response, jsonify
 import re
 import json
+import os
 from app.pipeline import ModelManager
 from app.validation import InputValidator
+from app.models import db, Pseudocode
+from app.auth import auth_bp
+from flask_login import LoginManager, login_required, current_user
 
 def format_explanation_content(content):
     """Format explanation content for better readability"""
@@ -128,7 +132,27 @@ def format_explanation_content(content):
     return result
 
 app = Flask(__name__, template_folder='app/templates', static_folder='app/static')
-app.secret_key = 'your-secret-key-here-change-in-production'
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-in-production')
+
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pseudocodes.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+db.init_app(app)
+
+# Initialize login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+login_manager.login_message = 'Please log in to access this page.'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Pseudocode.query.get(int(user_id))
+
+# Register authentication blueprint
+app.register_blueprint(auth_bp)
 
 # Initialize the model manager and input validator
 model_manager = ModelManager()
@@ -144,6 +168,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
+@login_required
 def predict():
     """Process Thai text through NLP pipeline"""
     try:
@@ -426,4 +451,8 @@ def parse_explanation(explanation_text):
     return sections
 
 if __name__ == '__main__':
+    # Create database tables if they don't exist
+    with app.app_context():
+        db.create_all()
+    
     app.run(host='0.0.0.0', port = 5000, debug = True)
