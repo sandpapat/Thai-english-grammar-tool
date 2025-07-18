@@ -104,6 +104,12 @@ def tenses():
     return render_template('tenses.html')
 
 
+@main_bp.route('/about')
+def about():
+    """Display about us page"""
+    return render_template('about.html')
+
+
 @main_bp.route('/performance')
 def performance():
     """Display model performance metrics"""

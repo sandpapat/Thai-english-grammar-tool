@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Thai-English Grammar Learning Tool{% endblock %}</title>
-    <meta name="description" content="{% block description %}Learn Thai-English grammar with AI-powered translation, tense classification, and explanation tools{% endblock %}">
+    <title>{% block title %}Thaislate: Thai-English Grammar Learning Tool{% endblock %}</title>
+    <meta name="description" content="{% block description %}Thaislate - Learn Thai-English grammar with AI-powered translation, tense classification, and explanation tools{% endblock %}">
     <meta name="keywords" content="Thai, English, grammar, learning, AI, translation, tense, classification"}
     
     <!-- Bootstrap CSS -->
@@ -25,8 +25,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary" role="navigation" aria-label="Main navigation">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}" aria-label="Home - Thai-English Grammar Learning Tool">
-                <i class="bi bi-translate" aria-hidden="true"></i> Thai-English Grammar Learning Tool
+            <a class="navbar-brand" href="{{ url_for('main.index') }}" aria-label="Home - Thaislate">
+                <i class="bi bi-translate" aria-hidden="true"></i> <strong>Thaislate</strong>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,13 @@
                            href="{{ url_for('main.tenses') }}" role="menuitem"
                            {% if request.endpoint == 'main.tenses' %}aria-current="page"{% endif %}>
                             <i class="bi bi-book" aria-hidden="true"></i> คู่มือ Tense
+                        </a>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" 
+                           href="{{ url_for('main.about') }}" role="menuitem"
+                           {% if request.endpoint == 'main.about' %}aria-current="page"{% endif %}>
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> About Us
                         </a>
                     </li>
                     <li class="nav-item dropdown" role="none">

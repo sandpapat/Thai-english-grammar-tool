@@ -1,0 +1,609 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Thaislate{% endblock %}
+
+{% block description %}Learn about Thaislate, our innovative Thai-English grammar learning tool powered by AI. Discover our mission, technology, and commitment to enhancing language education.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, var(--button-primary) 0%, #6f42c1 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+    }
+    
+    .language-toggle {
+        background: var(--card-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 50px;
+        padding: 0.5rem;
+        display: inline-flex;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px var(--card-shadow);
+    }
+    
+    .language-toggle button {
+        background: none;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+    
+    .language-toggle button.active {
+        background: var(--button-primary);
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    .about-section {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: var(--card-bg);
+        border-radius: 15px;
+        box-shadow: 0 8px 25px var(--card-shadow);
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .about-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px var(--card-shadow);
+    }
+    
+    .section-icon {
+        font-size: 3rem;
+        color: var(--button-primary);
+        margin-bottom: 1rem;
+    }
+    
+    .team-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 8px 25px var(--card-shadow);
+        transition: transform 0.3s ease;
+    }
+    
+    .team-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .contact-info {
+        background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .brand-highlight {
+        color: var(--button-primary);
+        font-weight: bold;
+    }
+    
+    .content-section {
+        display: none;
+    }
+    
+    .content-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--button-primary);
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-hero text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">About <span class="brand-highlight">Thaislate</span></h1>
+        <p class="lead">Bridging Thai and English through intelligent grammar learning</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Language Toggle -->
+    <div class="text-center">
+        <div class="language-toggle">
+            <button type="button" class="btn-en active" onclick="switchLanguage('en')">
+                <i class="bi bi-globe"></i> English
+            </button>
+            <button type="button" class="btn-th" onclick="switchLanguage('th')">
+                <i class="bi bi-translate"></i> ภาษาไทย
+            </button>
+        </div>
+    </div>
+
+    <!-- English Content -->
+    <div id="content-en" class="content-section active">
+        <!-- Mission Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-bullseye section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">Our Mission</h2>
+                    <p class="lead">We're developing an innovative educational tool that goes beyond simple translation – we're creating a bridge between Thai and English that helps learners truly understand the <em>why</em> behind grammar choices, not just the <em>what</em>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problem Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-exclamation-triangle section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">The Problem We're Solving</h2>
+                    <p>Thai English learners face unique challenges when mastering English grammar. Traditional translation tools provide answers but don't explain the reasoning behind grammatical structures. Our research found that learners need context-aware explanations that respect their Thai linguistic background while building confidence in English usage.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approach Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-lightbulb section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">Our Approach</h2>
+                    <p class="mb-3">Our tool combines cutting-edge language technology with educational best practices:</p>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="bi bi-cpu-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Smart Translation</h5>
+                            <p>Using advanced AI models (Typhoon 4B) optimized for Thai-English translation</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="bi bi-brain text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Grammar Intelligence</h5>
+                            <p>Hierarchical tense classification that identifies not just what tense to use, but why</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="bi bi-book-half text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Educational Explanations</h5>
+                            <p>Context-aware grammar explanations tailored specifically for Thai learners</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="bi bi-heart text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Cultural Sensitivity</h5>
+                            <p>Designed with Thai learning patterns and cultural context in mind</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Info Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-mortarboard section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">About the Project</h2>
+                    <p class="mb-3">This research is being conducted as part of an MSc Computer Science with Speech and Language Processing program at the University of Sheffield. The project represents months of research into Thai-English language learning patterns, advanced natural language processing, and educational technology design.</p>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number">Jun-Sep</span>
+                            <small class="text-muted">2025 Research Timeline</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">MSc</span>
+                            <small class="text-muted">Computer Science Program</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">AI</span>
+                            <small class="text-muted">Powered Technology</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Target Audience Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-people section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">Who We're Building For</h2>
+                    <p class="mb-3">Our tool is designed for Thai speakers at all levels of English proficiency who want to:</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Understand the reasoning behind English grammar choices</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Build confidence in their English usage</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Learn from culturally appropriate explanations</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Move beyond rote memorization to genuine understanding</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-gear section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">Our Technology</h2>
+                    <p class="mb-3">We use a hybrid pipeline approach that combines:</p>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-card">
+                                <i class="bi bi-translate text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h6>Translation Model</h6>
+                                <small>Typhoon-Translate 4B for high-quality Thai→English translation</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-card">
+                                <i class="bi bi-diagram-3 text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h6>Grammar Analysis</h6>
+                                <small>BERT-based hierarchical classification for tense identification</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-card">
+                                <i class="bi bi-chat-text text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h6>Educational Engine</h6>
+                                <small>Typhoon 2.1 Instruct for generating learner-friendly explanations</small>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted fst-italic">This isn't just about translation – it's about creating an intelligent tutoring system that adapts to how Thai speakers learn English.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-person-badge section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">Our Team</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="team-card">
+                                <i class="bi bi-person-circle text-primary mb-3" style="font-size: 3rem;"></i>
+                                <h5>Papatchol Thientong</h5>
+                                <p class="text-muted">Project Lead & Researcher</p>
+                                <small>MSc Computer Science Student<br>University of Sheffield</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="team-card">
+                                <i class="bi bi-person-workspace text-primary mb-3" style="font-size: 3rem;"></i>
+                                <h5>Ms. Varvara Papazoglou</h5>
+                                <p class="text-muted">Research Supervisor</p>
+                                <small>Department of Computer Science<br>University of Sheffield</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-envelope section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">Get in Touch</h2>
+                    <div class="contact-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-person-fill me-2"></i>Project Lead</h6>
+                                <p class="mb-2">Papatchol Thientong</p>
+                                <p class="mb-0"><i class="bi bi-envelope me-2"></i>pthientong1@sheffield.ac.uk</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-mortarboard me-2"></i>Research Supervisor</h6>
+                                <p class="mb-2">Ms. Varvara Papazoglou</p>
+                                <p class="mb-0"><i class="bi bi-envelope me-2"></i>v.papazoglou@sheffield.ac.uk</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thai Content -->
+    <div id="content-th" class="content-section">
+        <!-- Mission Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-bullseye section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">ภารกิจของเรา</h2>
+                    <p class="lead">เรากำลังพัฒนาเครื่องมือการศึกษาที่ก้าวข้ามการแปลภาษาธรรมดา เพื่อสร้างสะพานเชื่อมระหว่างภาษาไทยและอังกฤษ ช่วยให้ผู้เรียนเข้าใจ <em>เหตุผล</em> เบื้องหลังการเลือกใช้ไวยากรณ์อย่างแท้จริง ไม่ใช่แค่ <em>สิ่งที่</em> ควรใช้เท่านั้น</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problem Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-exclamation-triangle section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">ปัญหาที่เราแก้ไข</h2>
+                    <p>ผู้เรียนภาษาอังกฤษที่เป็นคนไทยเผชิญกับความท้าทายเฉพาะตัวในการเรียนรู้ไวยากรณ์ภาษาอังกฤษ เครื่องมือแปลภาษาแบบดั้งเดิมให้คำตอบแต่ไม่อธิบายเหตุผลเบื้องหลังโครงสร้างไวยากรณ์ งานวิจัยของเราพบว่าผู้เรียนต้องการคำอธิบายที่คำนึงถึงบริบท เคารพพื้นฐานภาษาไทยของพวกเขา พร้อมทั้งเสริมสร้างความมั่นใจในการใช้ภาษาอังกฤษ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approach Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-lightbulb section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">แนวทางของเรา</h2>
+                    <p class="mb-3">เครื่องมือของเราผสมผสานเทคโนโลยีภาษาขั้นสูงกับหลักการการศึกษาที่ดีที่สุด:</p>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <i class="bi bi-cpu-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>การแปลที่ชาญฉลาด</h5>
+                            <p>ใช้โมเดล AI ขั้นสูง (Typhoon 4B) ที่ปรับแต่งเพื่อการแปลไทย-อังกฤษ</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="bi bi-brain text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>ปัญญาไวยากรณ์</h5>
+                            <p>การจำแนก Tense แบบลำดับชั้นที่ระบุไม่เพียงแค่ว่า Tense ไหนที่ใช้ แต่ยังบอกเหตุผล</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="bi bi-book-half text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>คำอธิบายเชิงการศึกษา</h5>
+                            <p>คำอธิบายไวยากรณ์ที่คำนึงถึงบริบท ออกแบบเฉพาะสำหรับผู้เรียนไทย</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="bi bi-heart text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>ความไวทางวัฒนธรรม</h5>
+                            <p>ออกแบบโดยคำนึงถึงรูปแบบการเรียนรู้และบริบททางวัฒนธรรมของคนไทย</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Info Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-mortarboard section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">เกี่ยวกับโครงการ</h2>
+                    <p class="mb-3">การวิจัยนี้เป็นส่วนหนึ่งของหลักสูตรปริญญาโท สาขาวิทยาการคอมพิวเตอร์ (Speech and Language Processing) มหาวิทยาลัยเชฟฟิลด์ โครงการนี้เป็นผลจากการวิจัยหลายเดือนเกี่ยวกับรูปแบบการเรียนรู้ภาษาไทย-อังกฤษ การประมวลผลภาษาธรรมชาติขั้นสูง และการออกแบบเทคโนโลยีเพื่อการศึกษา</p>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-number">ม.ค.-ก.ย.</span>
+                            <small class="text-muted">2568 ช่วงเวลาวิจัย</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">MSc</span>
+                            <small class="text-muted">หลักสูตรวิทยาการคอมพิวเตอร์</small>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-number">AI</span>
+                            <small class="text-muted">เทคโนโลยีพลังงาน</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Target Audience Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-people section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">ใครคือกลุ่มเป้าหมายของเรา</h2>
+                    <p class="mb-3">เครื่องมือของเราออกแบบมาสำหรับผู้พูดภาษาไทยทุกระดับความสามารถภาษาอังกฤษที่ต้องการ:</p>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>เข้าใจเหตุผลเบื้องหลังการเลือกใช้ไวยากรณ์ภาษาอังกฤษ</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>เสริมสร้างความมั่นใจในการใช้ภาษาอังกฤษ</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>เรียนรู้จากคำอธิบายที่เหมาะสมกับวัฒนธรรม</li>
+                        <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>ก้าวข้ามการท่องจำไปสู่ความเข้าใจที่แท้จริง</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technology Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-gear section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">เทคโนโลยีของเรา</h2>
+                    <p class="mb-3">เราใช้แนวทางไปป์ไลน์แบบไฮบริดที่ประกอบด้วย:</p>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-card">
+                                <i class="bi bi-translate text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h6>โมเดลแปลภาษา</h6>
+                                <small>Typhoon-Translate 4B สำหรับการแปลไทย→อังกฤษคุณภาพสูง</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-card">
+                                <i class="bi bi-diagram-3 text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h6>การวิเคราะห์ไวยากรณ์</h6>
+                                <small>การจำแนกแบบลำดับชั้นด้วย BERT สำหรับการระบุ Tense</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="feature-card">
+                                <i class="bi bi-chat-text text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h6>เครื่องยนต์การศึกษา</h6>
+                                <small>Typhoon 2.1 Instruct สำหรับสร้างคำอธิบายที่เป็นมิตรกับผู้เรียน</small>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted fst-italic">นี่ไม่ใช่แค่การแปลภาษา แต่เป็นการสร้างระบบการสอนที่ชาญฉลาดซึ่งปรับตัวให้เข้ากับวิธีการเรียนรู้ภาษาอังกฤษของคนไทย</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-person-badge section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">ทีมของเรา</h2>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="team-card">
+                                <i class="bi bi-person-circle text-primary mb-3" style="font-size: 3rem;"></i>
+                                <h5>ปภัสชล เทียนทอง</h5>
+                                <p class="text-muted">หัวหน้าโครงการและนักวิจัย</p>
+                                <small>นักศึกษาปริญญาโท วิทยาการคอมพิวเตอร์<br>มหาวิทยาลัยเชฟฟิลด์</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="team-card">
+                                <i class="bi bi-person-workspace text-primary mb-3" style="font-size: 3rem;"></i>
+                                <h5>Ms. Varvara Papazoglou</h5>
+                                <p class="text-muted">อาจารย์ที่ปรึกษาการวิจัย</p>
+                                <small>ภาควิชาวิทยาการคอมพิวเตอร์<br>มหาวิทยาลัยเชฟฟิลด์</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="about-section">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <i class="bi bi-envelope section-icon"></i>
+                </div>
+                <div class="col-md-10">
+                    <h2 class="mb-3">ติดต่อเรา</h2>
+                    <div class="contact-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-person-fill me-2"></i>หัวหน้าโครงการ</h6>
+                                <p class="mb-2">ปภัสชล เทียนทอง</p>
+                                <p class="mb-0"><i class="bi bi-envelope me-2"></i>pthientong1@sheffield.ac.uk</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-mortarboard me-2"></i>อาจารย์ที่ปรึกษาการวิจัย</h6>
+                                <p class="mb-2">Ms. Varvara Papazoglou</p>
+                                <p class="mb-0"><i class="bi bi-envelope me-2"></i>v.papazoglou@sheffield.ac.uk</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function switchLanguage(lang) {
+        // Hide all content sections
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Show selected language content
+        document.getElementById('content-' + lang).classList.add('active');
+        
+        // Update button states
+        document.querySelectorAll('.language-toggle button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        if (lang === 'en') {
+            document.querySelector('.btn-en').classList.add('active');
+        } else {
+            document.querySelector('.btn-th').classList.add('active');
+        }
+        
+        // Save preference
+        localStorage.setItem('aboutPageLanguage', lang);
+    }
+    
+    // Load saved language preference
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('aboutPageLanguage') || 'en';
+        switchLanguage(savedLang);
+    });
+</script>
+{% endblock %}
