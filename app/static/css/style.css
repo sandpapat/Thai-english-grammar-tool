@@ -5,6 +5,8 @@
     /* Modern Typography */
     --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-headings: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-thai: 'Sarabun', 'Prompt', 'Thonburi', 'Ayuthaya', 'Silom', 'Krungthep', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-thai-headings: 'Prompt', 'Sarabun', 'Thonburi', 'Ayuthaya', 'Silom', 'Krungthep', -apple-system, BlinkMacSystemFont, sans-serif;
     --line-height-base: 1.6;
     --letter-spacing-base: -0.011em;
     
@@ -194,6 +196,72 @@ body::before {
         radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
+}
+
+/* Thai Typography */
+.thai-text, 
+[lang="th"],
+*[class*="thai"] {
+    font-family: var(--font-thai);
+    font-size: 1.1em;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+}
+
+.thai-heading,
+h1[lang="th"], h2[lang="th"], h3[lang="th"], h4[lang="th"], h5[lang="th"], h6[lang="th"] {
+    font-family: var(--font-thai-headings);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+}
+
+/* Thai Navigation Items */
+.navbar-nav .nav-link:lang(th) {
+    font-family: var(--font-thai);
+    font-weight: 500;
+}
+
+/* Thai Form Elements */
+textarea[placeholder*="พิมพ์"], 
+input[placeholder*="พิมพ์"],
+.form-control:lang(th) {
+    font-family: var(--font-thai);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Thai Button Text */
+.btn:lang(th) {
+    font-family: var(--font-thai);
+    font-weight: 500;
+}
+
+/* Thai Content in Cards */
+.card-body .thai-text,
+.card-body [lang="th"] {
+    font-family: var(--font-thai);
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+/* Thai Examples and Help Text */
+.form-text:lang(th),
+.text-muted:lang(th) {
+    font-family: var(--font-thai);
+    font-size: 0.95rem;
+}
+
+/* Auto-detect Thai characters */
+*:lang(th) {
+    font-family: var(--font-thai);
+}
+
+/* Improve Thai text rendering */
+.thai-text {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Modern Navigation */
