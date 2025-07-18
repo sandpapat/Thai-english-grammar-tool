@@ -6,35 +6,52 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Flask-based web application for an MSc dissertation in Computer Science with Speech and Language Processing. The application provides a Thai-to-English NLP pipeline with tense classification and grammar explanation, featuring comprehensive performance evaluation across two distinct testing methodologies.
 
+**Latest Updates (2025-01-18):**
+- ✅ **Refactored Architecture**: Implemented application factory pattern with modular blueprint structure
+- ✅ **Mobile-First Design**: Complete responsive design with touch-friendly interfaces
+- ✅ **Full Accessibility**: WCAG 2.1 compliant with keyboard navigation and screen reader support
+- ✅ **Dark Mode**: Complete dark/light theme system with user preference persistence
+- ✅ **Route Fixes**: Fixed all endpoint routing issues for seamless navigation
+- ✅ **Enhanced UX**: Improved percentage display, form validation, and user feedback
+
 ## Project Structure
 
 ```
 Website/
-├── app/                          # Main application code
+├── app/                          # Main application code (REFACTORED)
+│   ├── __init__.py              # Application factory pattern
+│   ├── routes.py                # Main blueprint routes
+│   ├── auth.py                  # Authentication blueprint
+│   ├── models.py                # Database models
 │   ├── pipeline.py              # NLP pipeline models
-│   ├── templates/               # HTML templates
-│   │   ├── base.html
-│   │   ├── index.html
-│   │   ├── result.html
-│   │   ├── tenses.html
-│   │   ├── performance.html
-│   │   ├── classifier_performance.html
-│   │   └── pipeline_performance.html
-│   └── static/                  # Static files (CSS, JS, images)
+│   ├── validation.py            # Input validation
+│   ├── utils.py                 # Utility functions (NEW)
+│   ├── data.py                  # Data management (NEW)
+│   ├── templates/               # HTML templates (ENHANCED)
+│   │   ├── base.html           # Base template with dark mode
+│   │   ├── index.html          # Homepage with accessibility
+│   │   ├── result.html         # Results page with fixed routing
+│   │   ├── tenses.html         # Tense explanations
+│   │   ├── performance.html    # Performance overview
+│   │   ├── classifier_performance.html # BERT results
+│   │   └── pipeline_performance.html   # Pipeline results
+│   └── static/                  # Static files (ENHANCED)
 │       └── css/
-│           └── style.css
+│           └── style.css       # Mobile-first + dark mode CSS
 ├── data/                        # Data files and datasets
 │   ├── Confusion Matrix.csv
 │   ├── Per-label Report.csv
 │   └── tags.csv
 ├── docs/                        # Documentation
-│   ├── CLAUDE.md               # Original project documentation
+│   ├── CLAUDE.md               # This file (UPDATED)
 │   ├── model_evaluation_analysis.md
 │   ├── BERT Classification score.docx
 │   └── model_performance_showcase.html
-├── config/                      # Configuration files (future use)
-├── app.py                       # Main Flask application
-└── requirements.txt             # Python dependencies
+├── config.py                    # Configuration classes (NEW)
+├── gunicorn_config.py          # Production server config (NEW)
+├── deployment_guide.md         # Deployment instructions (NEW)
+├── app.py                       # Main Flask application (SIMPLIFIED)
+└── requirements.txt             # Python dependencies (UPDATED)
 ```
 
 ## Architecture
@@ -47,13 +64,21 @@ Website/
    - `GrammarExplainer`: Grammar explanation using Typhoon 2.1 4B Instruct (Transformers)
    - `ModelManager`: Coordinates all models with graceful error handling
 
-2. **Web Application** (`app.py`)
-   - Route `/`: Homepage with Thai text input form
-   - Route `/predict`: Process input through pipeline and display results
-   - Route `/tenses`: Display tense usage explanations
-   - Route `/performance`: Combined view of both evaluation approaches
-   - Route `/classifier-performance`: BERT classifier isolated testing results
-   - Route `/pipeline-performance`: Full pipeline end-to-end evaluation results
+2. **Web Application** (Refactored with Blueprint Architecture)
+   - **Main Blueprint** (`app/routes.py`):
+     - Route `/`: Homepage with Thai text input form
+     - Route `/predict`: Process input through pipeline and display results
+     - Route `/validate`: Real-time input validation API
+     - Route `/tenses`: Display tense usage explanations
+     - Route `/performance`: Combined view of both evaluation approaches
+     - Route `/classifier-performance`: BERT classifier isolated testing results
+     - Route `/pipeline-performance`: Full pipeline end-to-end evaluation results
+   - **Authentication Blueprint** (`app/auth.py`):
+     - Route `/login`: User authentication with 5-digit pseudocode
+     - Route `/logout`: User logout functionality
+   - **Application Factory** (`app/__init__.py`):
+     - Configurable Flask app creation
+     - Blueprint registration and extension initialization
 
 3. **Data Flow**
    - Input: Thai sentence → Translation → Tense Classification → Grammar Explanation
@@ -137,9 +162,16 @@ python app.py
 # Run Flask with specific port
 flask run --port 5000
 
-# Run in production mode
+# Run in production mode with Gunicorn
+gunicorn -c gunicorn_config.py app:app
+
+# Run with environment configuration
 export FLASK_ENV=production
+export SECRET_KEY=your-secret-key-here
 python app.py
+
+# Create database tables
+python -c "from app import create_app; app = create_app(); app.app_context().push(); from app.models import db; db.create_all()"
 ```
 
 ## Model Integration Notes
@@ -174,15 +206,46 @@ python app.py
 
 ## Important Considerations
 
-- The application expects a `Hybrid4BSystem` class with `full_pipeline(thai_text)` method
-- Bootstrap 5 is used for styling via CDN with dropdown navigation components
-- Flash messages provide user feedback for errors
+- The application uses Flask Blueprint architecture with `main` and `auth` blueprints
+- All routes are now prefixed with blueprint names (e.g., `main.index`, `auth.login`)
+- Bootstrap 5 is used for styling via CDN with enhanced dark mode support
+- Dark mode toggle is available in the navigation bar for all users
+- CSS variables enable seamless theme switching with proper color contrast
+- Flash messages provide user feedback with improved accessibility
 - All file paths should be absolute, not relative
-- The explanation sections are parsed using regex pattern matching
+- The explanation sections are parsed using regex pattern matching in `app/utils.py`
 - Performance pages use distinct color themes (green for classifier, blue for pipeline)
 - Navigation dropdown requires Bootstrap JavaScript for proper functionality
 - Evaluation data should be interpreted in context of the dual testing approach
 - The 20% performance gap between isolated and pipeline testing is expected and documented
+- Real-time validation provides immediate feedback as users type Thai text
+- Keyboard shortcuts enhance accessibility: Alt+S (focus), Alt+Enter (submit), Escape (clear)
+
+## New Features Available
+
+### Dark Mode
+- Click the moon/sun icon in the navigation to toggle between light and dark themes
+- User preference is automatically saved and restored on future visits
+- System dark mode preference is automatically detected and applied
+
+### Enhanced Accessibility
+- Complete keyboard navigation support throughout the application
+- Screen reader friendly with proper ARIA labels and semantic HTML
+- Skip-to-content link for keyboard users
+- High contrast support and reduced motion preferences respected
+
+### Mobile Optimization
+- Touch-friendly interface with 44px minimum touch targets
+- Responsive design that works seamlessly on all device sizes
+- Optimized typography and spacing for mobile devices
+- Progressive enhancement with smooth animations and transitions
+
+### Improved User Experience
+- Real-time validation with live feedback
+- Enhanced progress indicators during processing
+- Clean percentage display (whole numbers instead of decimals)
+- Fixed all navigation routing issues
+- Better error handling and user feedback
 
 ## Performance Page Color Coding
 - **Green Theme**: `classifier_performance.html` - Isolated BERT classifier testing
@@ -190,6 +253,59 @@ python app.py
 - **Mixed Theme**: `performance.html` - Combined view of both approaches
 
 This color coding helps users immediately distinguish between the two evaluation methodologies.
+
+## Recent Improvements (2025-01-18)
+
+### 1. **Refactored Architecture**
+- **Application Factory Pattern**: Implemented `create_app()` function for better configuration management
+- **Blueprint Structure**: Separated routes into logical blueprints (`main`, `auth`)
+- **Modular Design**: Split large functions into focused utility modules
+- **Configuration Management**: Added `config.py` for environment-specific settings
+
+### 2. **Enhanced Mobile Experience**
+- **Mobile-First CSS**: Responsive design starting from mobile screens
+- **Touch-Friendly**: 44px minimum touch targets for all interactive elements
+- **Progressive Enhancement**: Improved visual feedback and animations
+- **Responsive Typography**: Dynamic font scaling across all device sizes
+- **Optimized Navigation**: Collapsible menu with improved mobile interactions
+
+### 3. **Comprehensive Accessibility**
+- **WCAG 2.1 Compliance**: Full accessibility support with proper ARIA labels
+- **Keyboard Navigation**: Complete keyboard support with custom shortcuts:
+  - `Alt + S`: Focus on text input
+  - `Alt + Enter`: Submit form
+  - `Escape`: Clear text input
+- **Screen Reader Support**: Semantic HTML and proper landmarks
+- **Skip Navigation**: Skip-to-content link for keyboard users
+- **Focus Management**: Visible focus indicators and logical tab order
+
+### 4. **Dark Mode Implementation**
+- **Complete Theme System**: CSS variables for seamless theme switching
+- **User Preference Persistence**: localStorage saves theme choice
+- **System Integration**: Automatic detection of system dark mode preference
+- **Smooth Transitions**: All theme changes have smooth animations
+- **Accessibility**: Proper color contrast ratios in both themes
+- **Toggle Interface**: Moon/sun icon toggle in navigation bar
+
+### 5. **Code Quality Improvements**
+- **Utility Functions**: Extracted `format_explanation_content()` to `app/utils.py`
+- **Data Management**: Centralized performance data in `app/data.py`
+- **Error Handling**: Improved error messages and validation feedback
+- **Route Fixes**: Fixed all endpoint routing issues (main.index, main.performance, etc.)
+- **Percentage Display**: Clean integer display for Thai percentage validation
+
+### 6. **Deployment Readiness**
+- **Production Configuration**: Added `gunicorn_config.py` for production deployment
+- **Deployment Guide**: Complete Google Cloud VM deployment instructions
+- **Version Compatibility**: Fixed Flask/Werkzeug version compatibility issues
+- **Environment Variables**: Proper configuration through environment variables
+
+### 7. **User Experience Enhancements**
+- **Real-time Validation**: Live feedback as user types Thai text
+- **Progress Indicators**: Enhanced progress animations during processing
+- **Form Validation**: Improved validation with proper error states
+- **Navigation Improvements**: Fixed all broken navigation links
+- **Loading States**: Better loading indicators and user feedback
 
 ## File Organization Notes
 
