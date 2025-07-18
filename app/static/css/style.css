@@ -2,11 +2,9 @@
 
 /* CSS Variables for theming - Modern Color Palette */
 :root {
-    /* Modern Typography */
-    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-headings: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --font-thai: 'Sarabun', 'Prompt', 'Thonburi', 'Ayuthaya', 'Silom', 'Krungthep', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-thai-headings: 'Prompt', 'Sarabun', 'Thonburi', 'Ayuthaya', 'Silom', 'Krungthep', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* Consistent Typography */
+    --font-english: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-thai: 'Sarabun', 'Thonburi', 'Ayuthaya', 'Silom', 'Krungthep', -apple-system, BlinkMacSystemFont, sans-serif;
     --line-height-base: 1.6;
     --letter-spacing-base: -0.011em;
     
@@ -139,7 +137,7 @@ body {
     flex-direction: column;
     background: var(--bg-primary);
     color: var(--text-primary);
-    font-family: var(--font-primary);
+    font-family: var(--font-english);
     font-size: 16px;
     line-height: var(--line-height-base);
     letter-spacing: var(--letter-spacing-base);
@@ -156,7 +154,7 @@ main {
 
 /* Modern Typography Scale */
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-headings);
+    font-family: var(--font-english);
     font-weight: 600;
     line-height: 1.2;
     letter-spacing: -0.025em;
@@ -198,7 +196,7 @@ body::before {
     z-index: -1;
 }
 
-/* Thai Typography */
+/* Thai Typography - Consistent Sarabun Font */
 .thai-text, 
 [lang="th"],
 *[class*="thai"] {
@@ -206,18 +204,22 @@ body::before {
     font-size: 1.1em;
     line-height: 1.7;
     letter-spacing: 0.02em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.thai-heading,
+/* Thai Headings - Same Sarabun Font */
 h1[lang="th"], h2[lang="th"], h3[lang="th"], h4[lang="th"], h5[lang="th"], h6[lang="th"] {
-    font-family: var(--font-thai-headings);
-    font-weight: 500;
+    font-family: var(--font-thai);
+    font-weight: 600;
     line-height: 1.4;
     letter-spacing: 0.01em;
 }
 
 /* Thai Navigation Items */
-.navbar-nav .nav-link:lang(th) {
+.navbar-nav .nav-link:lang(th),
+.navbar-nav .nav-link span[lang="th"] {
     font-family: var(--font-thai);
     font-weight: 500;
 }
@@ -225,21 +227,24 @@ h1[lang="th"], h2[lang="th"], h3[lang="th"], h4[lang="th"], h5[lang="th"], h6[la
 /* Thai Form Elements */
 textarea[placeholder*="พิมพ์"], 
 input[placeholder*="พิมพ์"],
-.form-control:lang(th) {
+.form-control:lang(th),
+.form-control.thai-text {
     font-family: var(--font-thai);
     font-size: 1.1rem;
     line-height: 1.6;
 }
 
 /* Thai Button Text */
-.btn:lang(th) {
+.btn:lang(th),
+.btn span[lang="th"] {
     font-family: var(--font-thai);
     font-weight: 500;
 }
 
 /* Thai Content in Cards */
 .card-body .thai-text,
-.card-body [lang="th"] {
+.card-body [lang="th"],
+.card-body span[lang="th"] {
     font-family: var(--font-thai);
     font-size: 1.05rem;
     line-height: 1.8;
@@ -247,21 +252,22 @@ input[placeholder*="พิมพ์"],
 
 /* Thai Examples and Help Text */
 .form-text:lang(th),
-.text-muted:lang(th) {
+.text-muted:lang(th),
+.form-text span[lang="th"],
+.text-muted span[lang="th"] {
     font-family: var(--font-thai);
     font-size: 0.95rem;
 }
 
-/* Auto-detect Thai characters */
+/* Ensure all Thai content uses Sarabun */
 *:lang(th) {
     font-family: var(--font-thai);
 }
 
-/* Improve Thai text rendering */
-.thai-text {
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+/* Thai text in specific components */
+.hero-title:lang(th),
+.hero-subtitle:lang(th) {
+    font-family: var(--font-thai);
 }
 
 /* Modern Navigation */
@@ -277,7 +283,7 @@ input[placeholder*="พิมพ์"],
 }
 
 .navbar-brand {
-    font-family: var(--font-headings);
+    font-family: var(--font-english);
     font-weight: 700;
     font-size: 1.5rem;
     color: var(--navbar-text) !important;
