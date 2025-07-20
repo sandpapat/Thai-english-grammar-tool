@@ -49,7 +49,7 @@ def predict():
             flash(warning['message']['th'], 'warning')
         
         # Run the pipeline with user ID for performance logging
-        user_id = current_user.id if current_user.is_authenticated else None
+        user_id = current_user.id if current_user and current_user.is_authenticated else None
         result = model_manager.full_pipeline(thai_text, user_id=user_id)
         
         # Handle the new explanation format
@@ -124,7 +124,7 @@ def predict_stream():
             
             try:
                 # Get user ID for performance logging
-                user_id = current_user.id if current_user.is_authenticated else None
+                user_id = current_user.id if current_user and current_user.is_authenticated else None
                 
                 # Manual pipeline execution with real-time SSE streaming
                 # This replicates model_manager.full_pipeline() but with real-time yields
