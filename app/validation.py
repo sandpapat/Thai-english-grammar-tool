@@ -433,6 +433,9 @@ class InputValidator:
         return {
             'is_valid': result['is_valid'],
             'has_warnings': len(result['warnings']) > 0,
+            'has_errors': len(result['errors']) > 0,
+            'errors': result['errors'],
+            'warnings': result['warnings'],
             'token_count': result['text_stats']['token_count'],
             'token_limit': self.token_counter.max_tokens,
             'usage_percentage': (result['text_stats']['token_count'] / self.token_counter.max_tokens) * 100,

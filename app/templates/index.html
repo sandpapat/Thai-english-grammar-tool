@@ -473,14 +473,6 @@
                     <!-- Modern Statistics -->
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <div class="stat-number">94.7%</div>
-                            <div class="stat-label">Accuracy</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">24</div>
-                            <div class="stat-label">Tense Classes</div>
-                        </div>
-                        <div class="stat-item">
                             <div class="stat-number">AI</div>
                             <div class="stat-label">Powered</div>
                         </div>
@@ -746,21 +738,60 @@
         // Clear any previous validation messages
         document.getElementById('validationFeedback').innerHTML = '';
         
+        // Show errors if any (including profanity)
+        if (data.has_errors && data.errors) {
+            showValidationErrors(data.errors);
+        }
+        
         // Show warnings if any
-        if (data.has_warnings) {
-            showValidationWarnings();
+        if (data.has_warnings && data.warnings) {
+            showValidationWarnings(data.warnings);
         }
     }
     
-    function showValidationWarnings() {
-        const warningHtml = `
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i>
-                <strong>คำเตือน:</strong> ตรวจพบปัญหาบางประการ แต่ยังสามารถดำเนินการต่อได้
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        document.getElementById('validationFeedback').innerHTML = warningHtml;
+    function showValidationErrors(errors) {
+        const errorMessages = errors.map(error => {
+            const message = error.message;
+            if (error.type === 'inappropriate_content') {
+                // Special handling for profanity with educational message
+                return `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-octagon"></i>
+                        <strong>ข้อความไม่เหมาะสม:</strong><br>
+                        <span class="text-muted">${message.th}</span><br>
+                        <small class="text-muted mt-1 d-block">${message.en}</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            } else {
+                // Other types of errors
+                return `
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-x-circle"></i>
+                        <strong>ข้อผิดพลาด:</strong> ${message.th || message.en || message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            }
+        }).join('');
+        
+        document.getElementById('validationFeedback').innerHTML = errorMessages;
+    }
+    
+    function showValidationWarnings(warnings) {
+        const warningMessages = warnings.map(warning => {
+            const message = warning.message;
+            return `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>คำเตือน:</strong> ${message.th}<br>
+                    <small class="text-muted">${message.en}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById('validationFeedback').innerHTML += warningMessages;
     }
     
     // Real-time SSE form submission with progress tracking

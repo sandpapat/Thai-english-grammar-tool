@@ -1,6 +1,7 @@
 """
 Main application routes
 """
+import time
 from flask import Blueprint, render_template, request, flash, jsonify
 from flask_login import login_required, current_user
 from .pipeline import ModelManager
@@ -14,7 +15,7 @@ main_bp = Blueprint('main', __name__)
 # Initialize the model manager and input validator
 model_manager = ModelManager()
 input_validator = InputValidator(
-    max_tokens=500,
+    max_tokens=100,
     min_thai_percentage=0.8,
     enable_profanity_filter=True
 )
@@ -47,8 +48,9 @@ def predict():
         for warning in validation_result['warnings']:
             flash(warning['message']['th'], 'warning')
         
-        # Run the pipeline
-        result = model_manager.full_pipeline(thai_text)
+        # Run the pipeline with user ID for performance logging
+        user_id = current_user.id if current_user.is_authenticated else None
+        result = model_manager.full_pipeline(thai_text, user_id=user_id)
         
         # Handle the new explanation format
         explanation = result.get('explanation', '')
@@ -121,10 +123,20 @@ def predict_stream():
             yield f"data: {json.dumps(initial_data)}\n\n"
             
             try:
+                # Get user ID for performance logging
+                user_id = current_user.id if current_user.is_authenticated else None
+                
                 # Manual pipeline execution with real-time SSE streaming
                 # This replicates model_manager.full_pipeline() but with real-time yields
                 
                 result = {"input_thai": thai_text}
+                
+                # Initialize timing variables for performance logging
+                translation_time = None
+                classification_time = None
+                explanation_time = None
+                success = True
+                error_stage = None
                 
                 # Step 1: Translation  
                 progress_data = {
@@ -137,7 +149,9 @@ def predict_stream():
                 
                 if model_manager.translator:
                     try:
+                        start_time = time.time()
                         result["translation"] = model_manager.translator.translate(thai_text)
+                        translation_time = time.time() - start_time
                         progress_data = {
                             'stage': 1,
                             'progress': 10,
@@ -146,9 +160,14 @@ def predict_stream():
                         }
                         yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
+                        translation_time = time.time() - start_time if 'start_time' in locals() else 0
                         result["translation"] = f"Translation failed: {str(e)}"
+                        success = False
+                        error_stage = "translation"
                 else:
                     result["translation"] = "Translation service unavailable"
+                    success = False
+                    error_stage = "translation"
                 
                 # Step 2: Tense Classification
                 progress_data = {
@@ -159,9 +178,12 @@ def predict_stream():
                 }
                 yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                if model_manager.classifier and "translation" in result:
+                if model_manager.classifier and "translation" in result and success:
                     try:
+                        start_time = time.time()
                         classification_result = model_manager.classifier.classify(result["translation"])
+                        classification_time = time.time() - start_time
+                        
                         result["coarse_label"] = classification_result["coarse_label"]
                         result["fine_label"] = classification_result["fine_label"]
                         result["fine_code"] = classification_result["fine_code"]
@@ -176,17 +198,23 @@ def predict_stream():
                         }
                         yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
+                        classification_time = time.time() - start_time if 'start_time' in locals() else 0
                         result["coarse_label"] = "ERROR"
                         result["fine_label"] = f"Classification failed: {str(e)}"
                         result["fine_code"] = "ERROR"
                         result["confidence"] = 0.0
                         result["all_predictions"] = {}
+                        success = False
+                        error_stage = "classification"
                 else:
                     result["coarse_label"] = "UNKNOWN"
                     result["fine_label"] = "Classification service unavailable"
                     result["fine_code"] = "UNKNOWN"
                     result["confidence"] = 0.0
                     result["all_predictions"] = {}
+                    if success:  # Only mark as failed if it wasn't already failed
+                        success = False
+                        error_stage = "classification"
                 
                 # Step 3: Grammar Explanation (This takes ~16-17 seconds!)
                 progress_data = {
@@ -197,10 +225,12 @@ def predict_stream():
                 }
                 yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                if model_manager.explainer:
+                if model_manager.explainer and success:
                     try:
                         # This is the long-running call (6-7 seconds)
+                        start_time = time.time()
                         result["explanation"] = model_manager.explainer.explain(result)
+                        explanation_time = time.time() - start_time
                         
                         # Only show 100% AFTER the explanation is actually generated
                         progress_data = {
@@ -211,7 +241,10 @@ def predict_stream():
                         }
                         yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
+                        explanation_time = time.time() - start_time if 'start_time' in locals() else 0
                         result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation generation failed: {str(e)}"
+                        success = False
+                        error_stage = "explanation"
                         
                         # Show completion even on error
                         progress_data = {
@@ -223,6 +256,9 @@ def predict_stream():
                         yield f"data: {json.dumps(progress_data)}\n\n"
                 else:
                     result["explanation"] = "[SECTION 1: Context Cues]\nExplanation service unavailable"
+                    if success:  # Only mark as failed if it wasn't already failed
+                        success = False
+                        error_stage = "explanation"
                     
                     # Show completion for unavailable service
                     progress_data = {
@@ -232,6 +268,23 @@ def predict_stream():
                         'message_thai': 'คำอธิบายไม่พร้อมใช้งาน'
                     }
                     yield f"data: {json.dumps(progress_data)}\n\n"
+                
+                # Log performance
+                try:
+                    from .models import SystemPerformance
+                    input_length = len(thai_text)
+                    SystemPerformance.log_performance(
+                        user_id=user_id,
+                        input_length=input_length,
+                        translation_time=translation_time,
+                        classification_time=classification_time,
+                        explanation_time=explanation_time,
+                        success=success,
+                        error_stage=error_stage
+                    )
+                except Exception as e:
+                    # Don't let performance logging break the pipeline
+                    print(f"Performance logging failed: {e}")
                 
                 # Handle the explanation format (same as original predict route)
                 if result:
@@ -334,3 +387,15 @@ def pipeline_performance():
     """Display full pipeline evaluation results"""
     performance_data = get_performance_data(pipeline_mode=True)
     return render_template('pipeline_performance.html', performance=performance_data)
+
+
+@main_bp.route('/system-performance')
+def system_performance():
+    """Display real-time system performance metrics"""
+    try:
+        from .models import SystemPerformance
+        performance_stats = SystemPerformance.get_performance_stats()
+        return render_template('system_performance.html', stats=performance_stats)
+    except Exception as e:
+        flash(f'Error loading performance data: {str(e)}', 'error')
+        return render_template('system_performance.html', stats=None)

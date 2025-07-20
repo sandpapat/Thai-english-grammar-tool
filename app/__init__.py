@@ -39,7 +39,7 @@ def create_app(config_name=None):
         app.config['DEBUG'] = True
     
     # Model configuration
-    app.config['MAX_TOKENS'] = 500
+    app.config['MAX_TOKENS'] = 100
     app.config['MIN_THAI_PERCENTAGE'] = 0.8
     app.config['ENABLE_PROFANITY_FILTER'] = True
     

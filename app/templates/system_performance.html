@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}System Performance - Thaislate{% endblock %}
+
+{% block content %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        color: white;
+        padding: 3rem 0;
+        margin: -2rem -12px 3rem -12px;
+        border-radius: 0 0 1rem 1rem;
+    }
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.2s;
+        height: 100%;
+        border-left: 4px solid #6c5ce7;
+    }
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #6c5ce7;
+        line-height: 1;
+    }
+    .metric-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    .timing-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid #e9ecef;
+    }
+    .timing-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2d3748;
+    }
+    .timing-label {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    .performance-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .excellent { background-color: #d4edda; color: #155724; }
+    .good { background-color: #cce5ff; color: #004085; }
+    .moderate { background-color: #fff3cd; color: #856404; }
+    .warning { background-color: #f8d7da; color: #721c24; }
+    .section-header {
+        border-bottom: 2px solid #6c5ce7;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+        color: #2d3748;
+    }
+    .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: #666;
+    }
+    .icon-large {
+        font-size: 2rem;
+        color: #6c5ce7;
+        margin-bottom: 1rem;
+    }
+    
+    /* Dark mode adjustments */
+    [data-theme="dark"] .metric-card {
+        background: #2d3748;
+        border-left-color: #a29bfe;
+        color: #e2e8f0;
+    }
+    [data-theme="dark"] .metric-value {
+        color: #a29bfe;
+    }
+    [data-theme="dark"] .timing-card {
+        background: #4a5568;
+        border-color: #2d3748;
+        color: #e2e8f0;
+    }
+    [data-theme="dark"] .timing-value {
+        color: #e2e8f0;
+    }
+    [data-theme="dark"] .section-header {
+        color: #e2e8f0;
+        border-bottom-color: #a29bfe;
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                    System Performance
+                </h1>
+                <p class="lead mb-0">
+                    Real-time performance metrics and usage statistics for the Thaislate NLP pipeline
+                </p>
+            </div>
+            <div class="col-lg-4 text-end">
+                <div class="d-none d-lg-block">
+                    <i class="bi bi-graph-up icon-large"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if stats %}
+<!-- Usage Statistics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="section-header">
+            <i class="bi bi-bar-chart-fill me-2"></i>Usage Statistics
+        </h2>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3 mb-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ stats.total_requests }}</div>
+            <div class="metric-label">Total Requests</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ stats.success_rate }}%</div>
+            <div class="metric-label">Success Rate</div>
+            {% if stats.success_rate >= 95 %}
+                <span class="performance-badge excellent mt-2">Excellent</span>
+            {% elif stats.success_rate >= 85 %}
+                <span class="performance-badge good mt-2">Good</span>
+            {% elif stats.success_rate >= 70 %}
+                <span class="performance-badge moderate mt-2">Moderate</span>
+            {% else %}
+                <span class="performance-badge warning mt-2">Needs Attention</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ stats.unique_users }}</div>
+            <div class="metric-label">Unique Users</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ stats.recent_requests_24h }}</div>
+            <div class="metric-label">Requests (24h)</div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Metrics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="section-header">
+            <i class="bi bi-stopwatch-fill me-2"></i>Average Response Times
+        </h2>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-3 mb-3">
+        <div class="timing-card">
+            <div class="timing-value">{{ "%.3f"|format(stats.avg_translation_time) }}s</div>
+            <div class="timing-label">Translation</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="timing-card">
+            <div class="timing-value">{{ "%.3f"|format(stats.avg_classification_time) }}s</div>
+            <div class="timing-label">Classification</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="timing-card">
+            <div class="timing-value">{{ "%.3f"|format(stats.avg_explanation_time) }}s</div>
+            <div class="timing-label">Explanation</div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="timing-card">
+            <div class="timing-value">{{ "%.3f"|format(stats.avg_total_time) }}s</div>
+            <div class="timing-label">Total Pipeline</div>
+        </div>
+    </div>
+</div>
+
+<!-- Input Analysis -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="section-header">
+            <i class="bi bi-file-text-fill me-2"></i>Input Analysis
+        </h2>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-6 mb-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ "%.1f"|format(stats.avg_input_length) }}</div>
+            <div class="metric-label">Average Input Length (characters)</div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="metric-card">
+            <div class="metric-value">{{ stats.successful_requests }}</div>
+            <div class="metric-label">Successful Requests</div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Insights -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="section-header">
+            <i class="bi bi-lightbulb-fill me-2"></i>Performance Insights
+        </h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-translate text-primary me-2"></i>Translation
+                </h5>
+                <p class="card-text">
+                    {% if stats.avg_translation_time < 1.0 %}
+                        <span class="performance-badge excellent">Fast</span>
+                        Translation is performing excellently with sub-second response times.
+                    {% elif stats.avg_translation_time < 3.0 %}
+                        <span class="performance-badge good">Good</span>
+                        Translation performance is within acceptable ranges.
+                    {% else %}
+                        <span class="performance-badge moderate">Slow</span>
+                        Translation may benefit from optimization or hardware upgrades.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-cpu text-success me-2"></i>Classification
+                </h5>
+                <p class="card-text">
+                    {% if stats.avg_classification_time < 0.5 %}
+                        <span class="performance-badge excellent">Fast</span>
+                        BERT classification is highly optimized.
+                    {% elif stats.avg_classification_time < 2.0 %}
+                        <span class="performance-badge good">Good</span>
+                        Classification performance is satisfactory.
+                    {% else %}
+                        <span class="performance-badge moderate">Slow</span>
+                        Consider GPU acceleration for better performance.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-chat-quote text-info me-2"></i>Explanation
+                </h5>
+                <p class="card-text">
+                    {% if stats.avg_explanation_time < 5.0 %}
+                        <span class="performance-badge excellent">Fast</span>
+                        Grammar explanations are generated quickly.
+                    {% elif stats.avg_explanation_time < 15.0 %}
+                        <span class="performance-badge good">Good</span>
+                        Explanation generation is within normal ranges.
+                    {% else %}
+                        <span class="performance-badge moderate">Slow</span>
+                        LLM inference may need optimization.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- No Data Available -->
+<div class="no-data">
+    <i class="bi bi-database-x icon-large"></i>
+    <h3>No Performance Data Available</h3>
+    <p class="text-muted">
+        System performance data will appear here once users start using the application.
+        <br>Make sure the database is properly configured and the SystemPerformance model is created.
+    </p>
+</div>
+{% endif %}
+
+<script>
+// Auto-refresh every 30 seconds
+setTimeout(function() {
+    location.reload();
+}, 30000);
+</script>
+
+{% endblock %}

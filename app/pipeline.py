@@ -884,9 +884,16 @@ class ModelManager:
         except Exception as e:
             print(f"✗ Explanation model failed to load: {e}")
     
-    def full_pipeline(self, thai_text, progress_callback=None):
-        """Run full NLP pipeline on Thai text with optional progress callbacks"""
+    def full_pipeline(self, thai_text, progress_callback=None, user_id=None, log_performance=True):
+        """Run full NLP pipeline on Thai text with optional progress callbacks and performance logging"""
         result = {"input_thai": thai_text}
+        
+        # Initialize timing variables
+        translation_time = None
+        classification_time = None
+        explanation_time = None
+        success = True
+        error_stage = None
         
         # Step 1: Translation
         if progress_callback:
@@ -894,48 +901,90 @@ class ModelManager:
         
         if self.translator:
             try:
+                start_time = time.time()
                 result["translation"] = self.translator.translate(thai_text)
+                translation_time = time.time() - start_time
             except Exception as e:
+                translation_time = time.time() - start_time if 'start_time' in locals() else 0
                 result["translation"] = f"Translation failed: {str(e)}"
+                success = False
+                error_stage = "translation"
         else:
             result["translation"] = "Translation service unavailable"
+            success = False
+            error_stage = "translation"
         
         # Step 2: Tense Classification
         if progress_callback:
             progress_callback(2, 66, "Classifying tense...", "กำลังจำแนกกาล...")
         
-        if self.classifier and "translation" in result:
+        if self.classifier and "translation" in result and success:
             try:
+                start_time = time.time()
                 classification_result = self.classifier.classify(result["translation"])
+                classification_time = time.time() - start_time
+                
                 result["coarse_label"] = classification_result["coarse_label"]
                 result["fine_label"] = classification_result["fine_label"]
                 result["fine_code"] = classification_result["fine_code"]
                 result["confidence"] = classification_result["confidence"]
                 result["all_predictions"] = classification_result["all_predictions"]
             except Exception as e:
+                classification_time = time.time() - start_time if 'start_time' in locals() else 0
                 result["coarse_label"] = "ERROR"
                 result["fine_label"] = f"Classification failed: {str(e)}"
                 result["fine_code"] = "ERROR"
                 result["confidence"] = 0.0
                 result["all_predictions"] = {}
+                success = False
+                error_stage = "classification"
         else:
             result["coarse_label"] = "UNKNOWN"
             result["fine_label"] = "Classification service unavailable"
             result["fine_code"] = "UNKNOWN"
             result["confidence"] = 0.0
             result["all_predictions"] = {}
+            if success:  # Only mark as failed if it wasn't already failed
+                success = False
+                error_stage = "classification"
         
         # Step 3: Grammar Explanation
         if progress_callback:
             progress_callback(3, 100, "Generating explanation...", "กำลังสร้างคำอธิบาย...")
         
-        if self.explainer:
+        if self.explainer and success:
             try:
+                start_time = time.time()
                 result["explanation"] = self.explainer.explain(result)
+                explanation_time = time.time() - start_time
             except Exception as e:
+                explanation_time = time.time() - start_time if 'start_time' in locals() else 0
                 result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation generation failed: {str(e)}"
+                success = False
+                error_stage = "explanation"
         else:
             result["explanation"] = "[SECTION 1: Context Cues]\nExplanation service unavailable"
+            if success:  # Only mark as failed if it wasn't already failed
+                success = False
+                error_stage = "explanation"
+        
+        # Log performance if enabled
+        if log_performance:
+            try:
+                from .models import SystemPerformance
+                input_length = len(thai_text)
+                SystemPerformance.log_performance(
+                    user_id=user_id,
+                    input_length=input_length,
+                    translation_time=translation_time,
+                    classification_time=classification_time,
+                    explanation_time=explanation_time,
+                    success=success,
+                    error_stage=error_stage
+                )
+            except Exception as e:
+                # Don't let performance logging break the pipeline
+                print(f"Performance logging failed: {e}")
         
         return result
 

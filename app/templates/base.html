@@ -61,12 +61,17 @@
                         </a>
                     </li>
                     <li class="nav-item dropdown" role="none">
-                        <a class="nav-link dropdown-toggle {% if request.endpoint in ['main.performance', 'main.classifier_performance', 'main.pipeline_performance'] %}active{% endif %}" 
+                        <a class="nav-link dropdown-toggle {% if request.endpoint in ['main.performance', 'main.classifier_performance', 'main.pipeline_performance', 'main.system_performance'] %}active{% endif %}" 
                            href="#" role="menuitem" data-bs-toggle="dropdown" aria-expanded="false"
                            aria-haspopup="true" id="performanceDropdown">
                             <i class="bi bi-speedometer2" aria-hidden="true"></i> Performance
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="performanceDropdown" role="menu">
+                            <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.system_performance' %}active{% endif %}" 
+                                href="{{ url_for('main.system_performance') }}" role="menuitem">
+                                <i class="bi bi-graph-up me-2" aria-hidden="true"></i>System Performance
+                            </a></li>
+                            <li role="none"><hr class="dropdown-divider"></li>
                             <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.classifier_performance' %}active{% endif %}" 
                                 href="{{ url_for('main.classifier_performance') }}" role="menuitem">
                                 <i class="bi bi-cpu me-2" aria-hidden="true"></i>BERT Classifier
