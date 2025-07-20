@@ -2,6 +2,49 @@
 
 {% block title %}Results - Thai-English Grammar Learning Tool{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Star Rating Styles */
+    .rating-stars {
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    .rating-star {
+        color: #ddd;
+        transition: color 0.2s ease;
+        margin-right: 0.25rem;
+    }
+    
+    .rating-star:hover,
+    .rating-star.active {
+        color: #ffc107;
+    }
+    
+    .rating-star.active {
+        color: #ffc107 !important;
+    }
+    
+    .rating-stars:hover .rating-star {
+        color: #ddd;
+    }
+    
+    .rating-stars:hover .rating-star:hover,
+    .rating-stars:hover .rating-star:hover ~ .rating-star {
+        color: #ffc107;
+    }
+    
+    /* Reverse the hover effect for stars after hovered star */
+    .rating-stars .rating-star:hover ~ .rating-star {
+        color: #ddd !important;
+    }
+    
+    #ratingCard {
+        border-left: 4px solid #ffc107;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
@@ -93,6 +136,79 @@
             </div>
         </div>
 
+        <!-- Rating Interface (Proficient Users Only) -->
+        {% if current_user.is_authenticated and current_user.is_proficient() %}
+        <div class="card shadow mb-4" id="ratingCard">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">
+                    <i class="bi bi-star"></i> Rate This Analysis
+                    <small class="text-muted ms-2">(Proficient User Feature)</small>
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    Your feedback helps improve our system. Please rate the quality of the translation and overall analysis.
+                </p>
+                
+                <form id="ratingForm">
+                    <input type="hidden" id="inputThai" value="{{ result.input_thai }}">
+                    <input type="hidden" id="translationText" value="{{ result.translation }}">
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Translation Quality</label>
+                            <div class="rating-stars mb-2" data-rating="translation">
+                                <i class="bi bi-star rating-star" data-value="1"></i>
+                                <i class="bi bi-star rating-star" data-value="2"></i>
+                                <i class="bi bi-star rating-star" data-value="3"></i>
+                                <i class="bi bi-star rating-star" data-value="4"></i>
+                                <i class="bi bi-star rating-star" data-value="5"></i>
+                            </div>
+                            <small class="text-muted">Rate how accurate the English translation is</small>
+                            <input type="hidden" id="translationRating" name="translation_rating" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Overall Quality</label>
+                            <div class="rating-stars mb-2" data-rating="overall">
+                                <i class="bi bi-star rating-star" data-value="1"></i>
+                                <i class="bi bi-star rating-star" data-value="2"></i>
+                                <i class="bi bi-star rating-star" data-value="3"></i>
+                                <i class="bi bi-star rating-star" data-value="4"></i>
+                                <i class="bi bi-star rating-star" data-value="5"></i>
+                            </div>
+                            <small class="text-muted">Rate the overall analysis quality</small>
+                            <input type="hidden" id="overallRating" name="overall_quality_rating" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="comments" class="form-label fw-bold">Additional Comments (Optional)</label>
+                        <textarea class="form-control" id="comments" name="comments" rows="3" 
+                                  placeholder="Share any specific feedback about the translation or analysis..."></textarea>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-warning" id="submitRating" disabled>
+                            <i class="bi bi-send"></i> Submit Rating
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary ms-2" id="toggleRating">
+                            <i class="bi bi-eye-slash"></i> Hide Rating
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="ratingSuccess" class="alert alert-success mt-3 d-none">
+                    <i class="bi bi-check-circle"></i> Thank you for your feedback! Your rating has been submitted successfully.
+                </div>
+                
+                <div id="ratingError" class="alert alert-danger mt-3 d-none">
+                    <i class="bi bi-exclamation-triangle"></i> There was an error submitting your rating. Please try again.
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Action Buttons -->
         <div class="text-center">
             <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
@@ -104,4 +220,180 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{% if current_user.is_authenticated and current_user.is_proficient() %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let translationRating = 0;
+    let overallRating = 0;
+    
+    // Star rating functionality
+    document.querySelectorAll('.rating-stars').forEach(function(ratingGroup) {
+        const stars = ratingGroup.querySelectorAll('.rating-star');
+        const ratingType = ratingGroup.getAttribute('data-rating');
+        
+        stars.forEach(function(star, index) {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-value'));
+                
+                // Update the visual state
+                stars.forEach(function(s, i) {
+                    if (i < rating) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+                
+                // Store the rating
+                if (ratingType === 'translation') {
+                    translationRating = rating;
+                    document.getElementById('translationRating').value = rating;
+                } else if (ratingType === 'overall') {
+                    overallRating = rating;
+                    document.getElementById('overallRating').value = rating;
+                }
+                
+                // Enable submit button if both ratings are provided
+                updateSubmitButton();
+            });
+            
+            // Hover effects
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.getAttribute('data-value'));
+                stars.forEach(function(s, i) {
+                    if (i < rating) {
+                        s.style.color = '#ffc107';
+                    } else {
+                        s.style.color = '#ddd';
+                    }
+                });
+            });
+        });
+        
+        // Reset on mouse leave
+        ratingGroup.addEventListener('mouseleave', function() {
+            const currentRating = ratingType === 'translation' ? translationRating : overallRating;
+            stars.forEach(function(s, i) {
+                if (i < currentRating) {
+                    s.style.color = '#ffc107';
+                    s.classList.add('active');
+                } else {
+                    s.style.color = '#ddd';
+                    s.classList.remove('active');
+                }
+            });
+        });
+    });
+    
+    function updateSubmitButton() {
+        const submitBtn = document.getElementById('submitRating');
+        if (translationRating > 0 && overallRating > 0) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    }
+    
+    // Form submission
+    document.getElementById('ratingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (translationRating === 0 || overallRating === 0) {
+            alert('Please provide ratings for both translation quality and overall quality.');
+            return;
+        }
+        
+        const formData = {
+            input_thai: document.getElementById('inputThai').value,
+            translation_text: document.getElementById('translationText').value,
+            translation_rating: translationRating,
+            overall_quality_rating: overallRating,
+            comments: document.getElementById('comments').value.trim()
+        };
+        
+        // Submit the rating
+        submitRating(formData);
+    });
+    
+    function submitRating(data) {
+        const submitBtn = document.getElementById('submitRating');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+        
+        fetch("{{ url_for('main.submit_rating') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                document.getElementById('ratingSuccess').classList.remove('d-none');
+                document.getElementById('ratingError').classList.add('d-none');
+                
+                // Hide the form
+                document.getElementById('ratingForm').style.display = 'none';
+                
+                // Update toggle button
+                const toggleBtn = document.getElementById('toggleRating');
+                toggleBtn.innerHTML = '<i class="bi bi-eye"></i> Show Rating Form';
+                toggleBtn.onclick = function() {
+                    const form = document.getElementById('ratingForm');
+                    const success = document.getElementById('ratingSuccess');
+                    if (form.style.display === 'none') {
+                        form.style.display = 'block';
+                        success.classList.add('d-none');
+                        this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Rating';
+                    } else {
+                        form.style.display = 'none';
+                        success.classList.remove('d-none');
+                        this.innerHTML = '<i class="bi bi-eye"></i> Show Rating Form';
+                    }
+                };
+            } else {
+                // Show error message
+                document.getElementById('ratingError').classList.remove('d-none');
+                document.getElementById('ratingSuccess').classList.add('d-none');
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting rating:', error);
+            document.getElementById('ratingError').classList.remove('d-none');
+            document.getElementById('ratingSuccess').classList.add('d-none');
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    }
+    
+    // Toggle rating visibility
+    document.getElementById('toggleRating').addEventListener('click', function() {
+        const card = document.getElementById('ratingCard');
+        const form = document.getElementById('ratingForm');
+        
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Rating';
+        } else {
+            form.style.display = 'none';
+            this.innerHTML = '<i class="bi bi-eye"></i> Show Rating';
+        }
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

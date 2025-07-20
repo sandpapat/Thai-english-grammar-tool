@@ -109,11 +109,17 @@
                         <li class="nav-item dropdown" role="none">
                             <a class="nav-link dropdown-toggle" href="#" role="menuitem" data-bs-toggle="dropdown" 
                                aria-expanded="false" aria-haspopup="true" id="userDropdown">
-                                <i class="bi bi-person-circle" aria-hidden="true"></i> Logged In
+                                <i class="bi bi-person-circle" aria-hidden="true"></i> 
+                                Welcome {{ current_user.pseudocode }}! 
+                                {% if current_user.is_proficient() %}
+                                    <span class="badge bg-warning text-dark ms-1">Proficient</span>
+                                {% else %}
+                                    <span class="badge bg-secondary ms-1">Normal</span>
+                                {% endif %}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" role="menu">
                                 <li role="none"><span class="dropdown-item-text text-muted">
-                                    <small>Session Active</small>
+                                    <small>{{ current_user.get_user_type_display() }} User</small>
                                 </span></li>
                                 <li role="none"><hr class="dropdown-divider"></li>
                                 <li role="none"><a class="dropdown-item" href="{{ url_for('auth.logout') }}" role="menuitem">

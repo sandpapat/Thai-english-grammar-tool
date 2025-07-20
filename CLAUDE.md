@@ -7,6 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This is a Flask-based web application for an MSc dissertation in Computer Science with Speech and Language Processing. The application provides a Thai-to-English NLP pipeline with tense classification and grammar explanation, featuring comprehensive performance evaluation across two distinct testing methodologies.
 
 **Latest Updates (2025-01-20):**
+- ✅ **User Type System**: Implemented Normal vs Proficient user types with differential capabilities
+- ✅ **Rating System**: Proficient users can rate translation quality and overall analysis performance
+- ✅ **Enhanced Navigation**: User type badges and pseudocode display in navigation bar
 - ✅ **Performance Monitoring System**: Real-time system performance tracking with privacy-compliant data collection
 - ✅ **Status Bar Elimination**: Removed complex SSE progress system, replaced with smart countdown timer
 - ✅ **Performance-Based UX**: Countdown timer uses actual response time data for accurate estimates
@@ -190,6 +193,61 @@ CREATE TABLE system_performance (
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
+
+## User Type System
+
+### Overview
+The application supports two distinct user types with differential capabilities for research purposes:
+
+### User Types
+- **Normal Users**: Pseudocodes 00001-89999, standard access to all features
+- **Proficient Users**: Pseudocodes 90000-99999, additional rating capabilities
+
+### Navigation Enhancement
+- **Display Format**: "Welcome [PSEUDOCODE]! (Normal/Proficient)"
+- **Color-Coded Badges**: Gray for Normal, Yellow for Proficient users
+- **User Type Information**: Displayed in navigation dropdown
+
+### Rating System (Proficient Users Only)
+- **Location**: Bottom of results page (`result.html`)
+- **Components**:
+  - 5-star rating for Translation Quality
+  - 5-star rating for Overall Quality
+  - Optional comments field
+  - Hide/show toggle functionality
+- **Submission**: AJAX-based with real-time validation
+
+### Database Models
+```sql
+-- Enhanced Pseudocode model
+ALTER TABLE pseudocodes ADD COLUMN user_type TEXT DEFAULT 'normal';
+
+-- New Rating model
+CREATE TABLE ratings (
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    input_thai TEXT NOT NULL,
+    translation_text TEXT NOT NULL,
+    translation_rating INTEGER NOT NULL,  -- 1-5 scale
+    overall_quality_rating INTEGER NOT NULL,  -- 1-5 scale
+    comments TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES pseudocodes (id)
+);
+```
+
+### API Endpoints
+- **`/api/submit-rating`** (POST): Submit rating data (proficient users only)
+- **Authentication**: Required, validates user type
+- **Validation**: Ratings must be 1-5, proper error handling
+
+### Test Users Available
+- **Normal**: 12345, 67890
+- **Proficient**: 90001, 91234
+
+### Migration
+- **Script**: `migrate_user_types.py` for database schema updates
+- **Automatic Detection**: Pseudocodes starting with "9" are proficient type
 
 ## Development Commands
 

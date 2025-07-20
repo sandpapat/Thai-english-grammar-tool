@@ -1,9 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import func
+from sqlalchemy import func, Enum
+import enum
 
 db = SQLAlchemy()
+
+class UserType(enum.Enum):
+    """User type enumeration"""
+    NORMAL = 'normal'
+    PROFICIENT = 'proficient'
 
 class Pseudocode(UserMixin, db.Model):
     """Anonymous user model using only 5-digit pseudocodes"""
@@ -11,12 +17,21 @@ class Pseudocode(UserMixin, db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     pseudocode = db.Column(db.String(5), unique=True, nullable=False, index=True)
+    user_type = db.Column(Enum(UserType), default=UserType.NORMAL, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, default=None)
     is_active = db.Column(db.Boolean, default=True)
     
     def __repr__(self):
-        return f'<Pseudocode {self.pseudocode}>'
+        return f'<Pseudocode {self.pseudocode} ({self.user_type.value})>'
+    
+    def is_proficient(self):
+        """Check if user is proficient type"""
+        return self.user_type == UserType.PROFICIENT
+    
+    def get_user_type_display(self):
+        """Get user type for display purposes"""
+        return self.user_type.value.capitalize()
     
     def get_id(self):
         """Required for Flask-Login"""
@@ -36,7 +51,7 @@ class Pseudocode(UserMixin, db.Model):
         return user
     
     @staticmethod
-    def create_pseudocode(pseudocode):
+    def create_pseudocode(pseudocode, user_type=UserType.NORMAL):
         """Create a new pseudocode entry"""
         if len(pseudocode) != 5 or not pseudocode.isdigit():
             raise ValueError("Pseudocode must be exactly 5 digits")
@@ -46,7 +61,12 @@ class Pseudocode(UserMixin, db.Model):
         if existing:
             raise ValueError("Pseudocode already exists")
         
-        new_user = Pseudocode(pseudocode=pseudocode)
+        # Auto-determine user type based on pseudocode range (for demo purposes)
+        # Proficient users: pseudocodes starting with 9 (90000-99999)
+        if pseudocode.startswith('9'):
+            user_type = UserType.PROFICIENT
+        
+        new_user = Pseudocode(pseudocode=pseudocode, user_type=user_type)
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -140,4 +160,87 @@ class SystemPerformance(db.Model):
             'avg_input_length': round(avg_stats.avg_input_length or 0, 1),
             'recent_requests_24h': recent_requests,
             'unique_users': unique_users
+        }
+
+
+class Rating(db.Model):
+    """User rating model for proficient users to rate translation and overall quality"""
+    __tablename__ = 'ratings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('pseudocodes.id'), nullable=False, index=True)
+    input_thai = db.Column(db.Text, nullable=False)  # Original Thai text
+    translation_text = db.Column(db.Text, nullable=False)  # Translation that was rated
+    translation_rating = db.Column(db.Integer, nullable=False)  # 1-5 scale
+    overall_quality_rating = db.Column(db.Integer, nullable=False)  # 1-5 scale
+    comments = db.Column(db.Text, nullable=True)  # Optional user comments
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    # Relationship
+    user = db.relationship('Pseudocode', backref=db.backref('ratings', lazy=True))
+    
+    def __repr__(self):
+        return f'<Rating {self.id}: T:{self.translation_rating}/5 O:{self.overall_quality_rating}/5>'
+    
+    @staticmethod
+    def create_rating(user_id, input_thai, translation_text, translation_rating, overall_quality_rating, comments=None):
+        """Create a new rating entry"""
+        # Validate ratings are in 1-5 range
+        if not (1 <= translation_rating <= 5) or not (1 <= overall_quality_rating <= 5):
+            raise ValueError("Ratings must be between 1 and 5")
+        
+        # Verify user is proficient
+        user = Pseudocode.query.get(user_id)
+        if not user or not user.is_proficient():
+            raise ValueError("Only proficient users can submit ratings")
+        
+        rating = Rating(
+            user_id=user_id,
+            input_thai=input_thai,
+            translation_text=translation_text,
+            translation_rating=translation_rating,
+            overall_quality_rating=overall_quality_rating,
+            comments=comments
+        )
+        
+        db.session.add(rating)
+        db.session.commit()
+        return rating
+    
+    @staticmethod
+    def get_rating_stats():
+        """Get aggregate rating statistics"""
+        total_ratings = Rating.query.count()
+        
+        if total_ratings == 0:
+            return {
+                'total_ratings': 0,
+                'avg_translation_rating': 0,
+                'avg_overall_rating': 0,
+                'rating_distribution': {}
+            }
+        
+        # Average ratings
+        avg_stats = db.session.query(
+            func.avg(Rating.translation_rating).label('avg_translation'),
+            func.avg(Rating.overall_quality_rating).label('avg_overall')
+        ).first()
+        
+        # Rating distribution
+        translation_dist = db.session.query(
+            Rating.translation_rating,
+            func.count(Rating.translation_rating)
+        ).group_by(Rating.translation_rating).all()
+        
+        overall_dist = db.session.query(
+            Rating.overall_quality_rating,
+            func.count(Rating.overall_quality_rating)
+        ).group_by(Rating.overall_quality_rating).all()
+        
+        return {
+            'total_ratings': total_ratings,
+            'avg_translation_rating': round(avg_stats.avg_translation or 0, 2),
+            'avg_overall_rating': round(avg_stats.avg_overall or 0, 2),
+            'translation_distribution': {str(rating): count for rating, count in translation_dist},
+            'overall_distribution': {str(rating): count for rating, count in overall_dist}
         }

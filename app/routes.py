@@ -193,3 +193,74 @@ def system_performance():
     except Exception as e:
         flash(f'Error loading performance data: {str(e)}', 'error')
         return render_template('system_performance.html', stats=None)
+
+
+@main_bp.route('/api/submit-rating', methods=['POST'])
+@login_required
+def submit_rating():
+    """Submit a rating for proficient users"""
+    try:
+        # Check if user is proficient
+        if not current_user.is_proficient():
+            return jsonify({
+                'success': False,
+                'error': 'Only proficient users can submit ratings'
+            }), 403
+        
+        # Get JSON data from request
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            }), 400
+        
+        # Validate required fields
+        required_fields = ['input_thai', 'translation_text', 'translation_rating', 'overall_quality_rating']
+        for field in required_fields:
+            if field not in data or data[field] is None:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        # Validate rating values
+        translation_rating = int(data['translation_rating'])
+        overall_rating = int(data['overall_quality_rating'])
+        
+        if not (1 <= translation_rating <= 5) or not (1 <= overall_rating <= 5):
+            return jsonify({
+                'success': False,
+                'error': 'Ratings must be between 1 and 5'
+            }), 400
+        
+        # Create the rating
+        from .models import Rating, db
+        
+        rating = Rating.create_rating(
+            user_id=current_user.id,
+            input_thai=data['input_thai'],
+            translation_text=data['translation_text'],
+            translation_rating=translation_rating,
+            overall_quality_rating=overall_rating,
+            comments=data.get('comments', '').strip() or None
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Rating submitted successfully',
+            'rating_id': rating.id
+        })
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'An error occurred while submitting your rating'
+        }), 500
