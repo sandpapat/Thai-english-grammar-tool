@@ -46,8 +46,15 @@ def format_explanation_content(content):
     content = re.sub(r'([ก-๙])([A-Za-z])', r'\1 \2', content)
     content = re.sub(r'([A-Za-z])([ก-๙])', r'\1 \2', content)
     
-    # Normalize whitespace
-    content = re.sub(r'\s+', ' ', content)
+    # Normalize whitespace but preserve line breaks
+    # Only collapse multiple spaces on the same line
+    lines = content.split('\n')
+    normalized_lines = []
+    for line in lines:
+        # Normalize spaces within each line but preserve the line structure
+        normalized_line = re.sub(r'[ \t]+', ' ', line)
+        normalized_lines.append(normalized_line)
+    content = '\n'.join(normalized_lines)
     
     # Define patterns in order of priority (most specific first)
     keyword_patterns = [
@@ -92,9 +99,16 @@ def format_explanation_content(content):
     
     content = highlighted_content
     
-    # Add proper spacing around highlighted elements
-    content = re.sub(r'(<span class="keyword-highlight[^"]*">[^<]+</span>)', r' \1 ', content)
-    content = re.sub(r'\s+', ' ', content)  # Normalize whitespace again
+    # Add proper spacing around highlighted elements (but preserve line structure)
+    lines = content.split('\n')
+    spaced_lines = []
+    for line in lines:
+        # Add spacing around highlights within each line
+        line = re.sub(r'(<span class="keyword-highlight[^"]*">[^<]+</span>)', r' \1 ', line)
+        # Clean up excessive spaces but preserve line structure
+        line = re.sub(r' +', ' ', line)
+        spaced_lines.append(line)
+    content = '\n'.join(spaced_lines)
     
     # Process line by line for proper structure
     lines = content.split('\n')
@@ -154,8 +168,21 @@ def format_explanation_content(content):
                 in_paragraph = True
             
             # Add line with proper spacing
-            if in_paragraph and len(formatted_lines) > 0 and not formatted_lines[-1].endswith('>'):
-                formatted_lines.append('<br>')
+            # Check if this should start a new paragraph (e.g., if it's after some gap or looks like a new topic)
+            if in_paragraph and len(formatted_lines) > 0:
+                last_line = formatted_lines[-1] if formatted_lines else ""
+                # If the previous line ended a paragraph or this line seems like a new thought
+                if not last_line.endswith('>'):
+                    # Check if this line starts a new topic (common Thai patterns)
+                    if (line.startswith('การ') or line.startswith('เมื่อ') or line.startswith('นอกจาก') or
+                        line.startswith('ดังนั้น') or line.startswith('ในการ') or line.startswith('สำหรับ') or
+                        line.startswith('However') or line.startswith('Moreover') or line.startswith('Additionally')):
+                        # Start a new paragraph for new topics
+                        formatted_lines.append('</p>')
+                        formatted_lines.append('<p class="explanation-paragraph mb-3">')
+                    else:
+                        # Continue current paragraph with line break
+                        formatted_lines.append('<br>')
             formatted_lines.append(line)
     
     # Close any open paragraph
