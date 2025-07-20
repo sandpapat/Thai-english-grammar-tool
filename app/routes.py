@@ -121,19 +121,23 @@ def predict_stream():
             yield f"data: {json.dumps(initial_data)}\n\n"
             
             try:
+                # Manual pipeline execution with real-time SSE streaming
+                # This replicates model_manager.full_pipeline() but with real-time yields
+                
+                result = {"input_thai": thai_text}
+                
                 # Step 1: Translation
                 progress_data = {
                     'stage': 1,
                     'progress': 10,
-                    'message': 'Starting translation...',
-                    'message_thai': 'เริ่มการแปล...'
+                    'message': 'Translating...',
+                    'message_thai': 'กำลังแปล...'
                 }
                 yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                # Call translator
                 if model_manager.translator:
                     try:
-                        translation = model_manager.translator.translate(thai_text)
+                        result["translation"] = model_manager.translator.translate(thai_text)
                         progress_data = {
                             'stage': 1,
                             'progress': 33,
@@ -142,22 +146,28 @@ def predict_stream():
                         }
                         yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
-                        translation = f"Translation failed: {str(e)}"
+                        result["translation"] = f"Translation failed: {str(e)}"
                 else:
-                    translation = "Translation service unavailable"
+                    result["translation"] = "Translation service unavailable"
                 
-                # Step 2: Classification  
+                # Step 2: Tense Classification
                 progress_data = {
                     'stage': 2,
                     'progress': 50,
-                    'message': 'Analyzing tense...',
-                    'message_thai': 'กำลังวิเคราะห์กาล...'
+                    'message': 'Classifying tense...',
+                    'message_thai': 'กำลังจำแนกกาล...'
                 }
                 yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                if model_manager.classifier and translation:
+                if model_manager.classifier and "translation" in result:
                     try:
-                        classification_result = model_manager.classifier.classify(translation)
+                        classification_result = model_manager.classifier.classify(result["translation"])
+                        result["coarse_label"] = classification_result["coarse_label"]
+                        result["fine_label"] = classification_result["fine_label"]
+                        result["fine_code"] = classification_result["fine_code"]
+                        result["confidence"] = classification_result["confidence"]
+                        result["all_predictions"] = classification_result["all_predictions"]
+                        
                         progress_data = {
                             'stage': 2,
                             'progress': 66,
@@ -166,23 +176,19 @@ def predict_stream():
                         }
                         yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
-                        classification_result = {
-                            "coarse_label": "ERROR",
-                            "fine_label": f"Classification failed: {str(e)}",
-                            "fine_code": "ERROR",
-                            "confidence": 0.0,
-                            "all_predictions": {}
-                        }
+                        result["coarse_label"] = "ERROR"
+                        result["fine_label"] = f"Classification failed: {str(e)}"
+                        result["fine_code"] = "ERROR"
+                        result["confidence"] = 0.0
+                        result["all_predictions"] = {}
                 else:
-                    classification_result = {
-                        "coarse_label": "UNKNOWN",
-                        "fine_label": "Classification service unavailable",
-                        "fine_code": "UNKNOWN",
-                        "confidence": 0.0,
-                        "all_predictions": {}
-                    }
+                    result["coarse_label"] = "UNKNOWN"
+                    result["fine_label"] = "Classification service unavailable"
+                    result["fine_code"] = "UNKNOWN"
+                    result["confidence"] = 0.0
+                    result["all_predictions"] = {}
                 
-                # Step 3: Explanation
+                # Step 3: Grammar Explanation
                 progress_data = {
                     'stage': 3,
                     'progress': 80,
@@ -191,20 +197,16 @@ def predict_stream():
                 }
                 yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                # Build result object
-                result = {
-                    "input_thai": thai_text,
-                    "translation": translation,
-                    "coarse_label": classification_result["coarse_label"],
-                    "fine_label": classification_result["fine_label"],
-                    "fine_code": classification_result["fine_code"],
-                    "confidence": classification_result["confidence"],
-                    "all_predictions": classification_result["all_predictions"]
-                }
-                
                 if model_manager.explainer:
                     try:
                         result["explanation"] = model_manager.explainer.explain(result)
+                        progress_data = {
+                            'stage': 3,
+                            'progress': 100,
+                            'message': 'Explanation complete',
+                            'message_thai': 'คำอธิบายเสร็จสิ้น'
+                        }
+                        yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
                         result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation generation failed: {str(e)}"
                 else:
