@@ -986,16 +986,19 @@
         console.log('Handling completion with result:', result);
         console.log('Explanation sections:', explanation_sections);
         
-        // Hide progress
-        document.getElementById('progressSection').classList.add('d-none');
+        // Show completion message with smooth transition
+        const progressMessageEn = document.getElementById('progressMessageEn');
+        const progressMessageTh = document.getElementById('progressMessageTh');
+        const progressSection = document.getElementById('progressSection');
         
-        // Re-enable form
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="bi bi-play-circle me-2" aria-hidden="true"></i> Analyze with AI';
+        progressMessageEn.textContent = 'Redirecting to results...';
+        progressMessageTh.textContent = 'กำลังนำไปยังผลลัพธ์...';
         
-        // For now, let's redirect to the results by submitting the original form
-        // This maintains compatibility with the existing result.html template
+        // Add fade transition
+        progressSection.style.transition = 'opacity 0.3s ease';
+        progressSection.style.opacity = '0.7';
+        
+        // Prepare form for immediate submission
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = "{{ url_for('main.predict') }}";
@@ -1007,7 +1010,11 @@
         form.appendChild(input);
         
         document.body.appendChild(form);
-        form.submit();
+        
+        // Submit with minimal delay for smoother UX
+        setTimeout(() => {
+            form.submit();
+        }, 100); // Further reduced to 100ms
     }
 </script>
 {% endif %}
