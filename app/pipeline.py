@@ -884,7 +884,7 @@ class ModelManager:
         except Exception as e:
             print(f"✗ Explanation model failed to load: {e}")
     
-    def full_pipeline(self, thai_text, progress_callback=None, user_id=None, log_performance=True):
+    def full_pipeline(self, thai_text, progress_callback=None, user_id=None, log_performance=True, performance_callback=None):
         """Run full NLP pipeline on Thai text with optional progress callbacks and performance logging"""
         result = {"input_thai": thai_text}
         
@@ -968,12 +968,11 @@ class ModelManager:
                 success = False
                 error_stage = "explanation"
         
-        # Log performance if enabled
-        if log_performance:
+        # Log performance if enabled (using callback approach to avoid context issues)
+        if log_performance and performance_callback:
             try:
-                from .models import SystemPerformance
                 input_length = len(thai_text)
-                SystemPerformance.log_performance(
+                performance_callback(
                     user_id=user_id,
                     input_length=input_length,
                     translation_time=translation_time,
