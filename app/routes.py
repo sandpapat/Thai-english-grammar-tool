@@ -120,50 +120,51 @@ def predict_stream():
             }
             yield f"data: {json.dumps(initial_data)}\n\n"
             
-            # Create a generator that yields progress updates
-            def progress_generator():
-                """Generator that yields progress updates from the pipeline"""
-                
+            try:
                 # Step 1: Translation
-                yield {
+                progress_data = {
                     'stage': 1,
                     'progress': 10,
                     'message': 'Starting translation...',
                     'message_thai': 'เริ่มการแปล...'
                 }
+                yield f"data: {json.dumps(progress_data)}\n\n"
                 
                 # Call translator
                 if model_manager.translator:
                     try:
                         translation = model_manager.translator.translate(thai_text)
-                        yield {
+                        progress_data = {
                             'stage': 1,
                             'progress': 33,
                             'message': 'Translation complete',
                             'message_thai': 'การแปลเสร็จสิ้น'
                         }
+                        yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
                         translation = f"Translation failed: {str(e)}"
                 else:
                     translation = "Translation service unavailable"
                 
                 # Step 2: Classification  
-                yield {
+                progress_data = {
                     'stage': 2,
                     'progress': 50,
                     'message': 'Analyzing tense...',
                     'message_thai': 'กำลังวิเคราะห์กาล...'
                 }
+                yield f"data: {json.dumps(progress_data)}\n\n"
                 
                 if model_manager.classifier and translation:
                     try:
                         classification_result = model_manager.classifier.classify(translation)
-                        yield {
+                        progress_data = {
                             'stage': 2,
                             'progress': 66,
                             'message': 'Tense classification complete',
                             'message_thai': 'การจำแนกกาลเสร็จสิ้น'
                         }
+                        yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
                         classification_result = {
                             "coarse_label": "ERROR",
@@ -182,12 +183,13 @@ def predict_stream():
                     }
                 
                 # Step 3: Explanation
-                yield {
+                progress_data = {
                     'stage': 3,
                     'progress': 80,
                     'message': 'Generating explanation...',
                     'message_thai': 'กำลังสร้างคำอธิบาย...'
                 }
+                yield f"data: {json.dumps(progress_data)}\n\n"
                 
                 # Build result object
                 result = {
@@ -207,25 +209,6 @@ def predict_stream():
                         result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation generation failed: {str(e)}"
                 else:
                     result["explanation"] = "[SECTION 1: Context Cues]\nExplanation service unavailable"
-                
-                yield {
-                    'stage': 3,
-                    'progress': 100,
-                    'message': 'Complete!',
-                    'message_thai': 'เสร็จสิ้น!',
-                    'result': result
-                }
-            
-            # Run the pipeline and stream progress
-            try:
-                result = None
-                for progress_update in progress_generator():
-                    # Stream the progress update
-                    yield f"data: {json.dumps(progress_update)}\n\n"
-                    
-                    # Store the final result when available
-                    if 'result' in progress_update:
-                        result = progress_update['result']
                 
                 # Handle the explanation format (same as original predict route)
                 if result:
@@ -268,7 +251,11 @@ def predict_stream():
                 }
                 yield f"data: {json.dumps(error_data)}\n\n"
         
-        return Response(generate_progress(), mimetype='text/event-stream')
+        response = Response(generate_progress(), mimetype='text/event-stream')
+        response.headers['Cache-Control'] = 'no-cache'
+        response.headers['Connection'] = 'keep-alive'
+        response.headers['X-Accel-Buffering'] = 'no'  # Disable Nginx buffering
+        return response
         
     except Exception as e:
         def error_stream():
