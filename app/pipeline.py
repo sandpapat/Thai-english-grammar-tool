@@ -968,8 +968,8 @@ class ModelManager:
                 success = False
                 error_stage = "explanation"
         
-        # Log performance if enabled (using callback approach to avoid context issues)
-        if log_performance and performance_callback:
+        # Log performance if enabled and callback is provided
+        if log_performance and performance_callback and callable(performance_callback):
             try:
                 input_length = len(thai_text)
                 performance_callback(

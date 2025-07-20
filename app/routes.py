@@ -48,27 +48,13 @@ def predict():
         for warning in validation_result['warnings']:
             flash(warning['message']['th'], 'warning')
         
-        # Define asynchronous performance logging callback
+        # Simple synchronous performance logging (fast database insert)
         def log_performance_data(**kwargs):
-            import threading
-            from flask import current_app
-            
-            # Capture the current app context
-            app = current_app._get_current_object()
-            
-            def log_async():
-                try:
-                    # Push the application context in the background thread
-                    with app.app_context():
-                        from .models import SystemPerformance
-                        SystemPerformance.log_performance(**kwargs)
-                except Exception as e:
-                    print(f"Async performance logging failed: {e}")
-            
-            # Run logging in background thread to avoid blocking response
-            thread = threading.Thread(target=log_async)
-            thread.daemon = True
-            thread.start()
+            try:
+                from .models import SystemPerformance
+                SystemPerformance.log_performance(**kwargs)
+            except Exception as e:
+                print(f"Performance logging failed: {e}")
         
         # Run the pipeline with user ID for performance logging
         user_id = current_user.id if current_user and current_user.is_authenticated else None
@@ -295,34 +281,21 @@ def predict_stream():
                     }
                     yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                # Log performance asynchronously to avoid blocking SSE stream
-                import threading
-                from flask import current_app
-                
-                # Capture the current app context
-                app = current_app._get_current_object()
-                
-                def log_performance_async():
-                    try:
-                        # Push the application context in the background thread
-                        with app.app_context():
-                            from .models import SystemPerformance
-                            input_length = len(thai_text)
-                            SystemPerformance.log_performance(
-                                user_id=user_id,
-                                input_length=input_length,
-                                translation_time=translation_time,
-                                classification_time=classification_time,
-                                explanation_time=explanation_time,
-                                success=success,
-                                error_stage=error_stage
-                            )
-                    except Exception as e:
-                        print(f"Async performance logging failed: {e}")
-                
-                log_thread = threading.Thread(target=log_performance_async)
-                log_thread.daemon = True
-                log_thread.start()
+                # Log performance synchronously (should be fast)
+                try:
+                    from .models import SystemPerformance
+                    input_length = len(thai_text)
+                    SystemPerformance.log_performance(
+                        user_id=user_id,
+                        input_length=input_length,
+                        translation_time=translation_time,
+                        classification_time=classification_time,
+                        explanation_time=explanation_time,
+                        success=success,
+                        error_stage=error_stage
+                    )
+                except Exception as e:
+                    print(f"Performance logging failed: {e}")
                 
                 # Handle the explanation format (same as original predict route)
                 if result:
