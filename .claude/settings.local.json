@@ -12,7 +12,8 @@
       "Bash(chmod:*)",
       "Bash(git add:*)",
       "Bash(pip install:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

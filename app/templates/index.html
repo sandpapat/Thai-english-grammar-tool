@@ -189,141 +189,49 @@
         color: var(--button-primary);
     }
     
-    .progress {
-        background-color: var(--bg-secondary);
-        border-radius: 8px;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    /* Loading Section */
+    .loading-container {
+        padding: 2rem;
+        border-radius: 16px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: var(--glass-backdrop);
+        box-shadow: var(--glass-shadow);
     }
     
-    .progress-bar {
-        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
-        border-radius: 8px;
-        transition: width 0.3s ease;
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
     }
     
-    /* Stage Indicators */
-    .stage-indicators {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 1rem;
-        gap: 1rem;
+    #countdownContainer .badge {
+        font-size: 1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
-    .stage-indicator {
-        flex: 1;
-        text-align: center;
-        padding: 0.75rem;
-        border-radius: 12px;
-        background: var(--bg-secondary);
-        border: 2px solid var(--border-color);
-        transition: all 0.3s ease;
-        opacity: 0.6;
-    }
-    
-    .stage-indicator.active {
-        opacity: 1;
-        border-color: var(--button-primary);
-        background: var(--card-bg);
-        transform: scale(1.05);
-        box-shadow: 0 4px 15px var(--card-shadow);
-    }
-    
-    .stage-indicator.completed {
-        opacity: 1;
-        border-color: #28a745;
-        background: var(--card-bg);
-    }
-    
-    .stage-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-        filter: grayscale(1);
-        transition: filter 0.3s ease;
-    }
-    
-    .stage-indicator.active .stage-icon,
-    .stage-indicator.completed .stage-icon {
-        filter: grayscale(0);
-    }
-    
-    .stage-label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 0.25rem;
-    }
-    
-    .stage-status {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .stage-indicator.active .stage-status {
-        color: var(--button-primary);
-    }
-    
-    .stage-indicator.completed .stage-status {
-        color: #28a745;
+    #countdownTime {
+        font-weight: 700;
+        font-size: 1.1em;
     }
     
     /* Responsive Design */
     @media (max-width: 768px) {
-        .stage-indicators {
-            flex-direction: column;
-            gap: 0.5rem;
+        .loading-container {
+            padding: 1.5rem;
         }
         
-        .stage-indicator {
-            display: flex;
-            align-items: center;
-            text-align: left;
-            padding: 0.5rem;
-        }
-        
-        .stage-icon {
-            font-size: 1.25rem;
-            margin-right: 0.75rem;
-            margin-bottom: 0;
-        }
-        
-        .stage-details {
-            flex: 1;
-        }
-        
-        .progress-container {
-            padding: 1rem;
+        #countdownContainer .badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
         }
     }
     
     /* Dark Mode Specific Adjustments */
-    [data-theme="dark"] .progress {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    [data-theme="dark"] .stage-indicator {
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-    
-    [data-theme="dark"] .stage-indicator.active {
-        border-color: var(--button-primary);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-    }
-    
-    [data-theme="dark"] .stage-indicator.completed {
-        border-color: #28a745;
-    }
-    
-    /* Animation for progress bar */
-    @keyframes pulse {
-        0% { opacity: 0.6; }
-        50% { opacity: 1; }
-        100% { opacity: 0.6; }
-    }
-    
-    .stage-indicator.active {
-        animation: pulse 2s infinite;
+    [data-theme="dark"] .loading-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
     }
 </style>
 {% endblock %}
@@ -418,55 +326,22 @@
                         </div>
                     </div>
                     
-                    <!-- Real-time Progress Bar (Hidden by default) -->
-                    <div id="progressSection" class="mt-4 d-none" aria-live="polite">
-                        <div class="progress-container">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div id="progressMessage" class="progress-text">
-                                    <span id="progressMessageEn">Ready to start...</span>
-                                    <small class="text-muted d-block">
-                                        <span lang="th" id="progressMessageTh">พร้อมเริ่มต้น...</span>
-                                    </small>
-                                </div>
-                                <div class="progress-percentage">
-                                    <span id="progressPercent">0</span>%
+                    <!-- Loading Indicator (Hidden by default) -->
+                    <div id="loadingSection" class="mt-4 d-none text-center" aria-live="polite">
+                        <div class="loading-container">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div id="loadingMessage">
+                                <h5 id="loadingMessageEn">Processing your text...</h5>
+                                <p class="text-muted mb-2" lang="th" id="loadingMessageTh">กำลังประมวลผลข้อความของคุณ...</p>
+                                <div id="countdownContainer" class="mt-3">
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span id="countdownTime">~8</span> seconds remaining
+                                    </span>
                                 </div>
                             </div>
-                            
-                            <!-- Bootstrap Progress Bar -->
-                            <div class="progress mb-3" style="height: 8px;">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                     id="progressBar"
-                                     role="progressbar" 
-                                     style="width: 0%" 
-                                     aria-valuenow="0" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100"
-                                     aria-label="Processing progress">
-                                </div>
-                            </div>
-                            
-                            <!-- Stage Indicators -->
-                            <div class="stage-indicators">
-                                <div class="stage-indicator" id="stage1">
-                                    <div class="stage-icon">🔤</div>
-                                    <div class="stage-label">Translation</div>
-                                    <div class="stage-status" id="stage1Status">pending</div>
-                                </div>
-                                <div class="stage-indicator" id="stage2">
-                                    <div class="stage-icon">🏷️</div>
-                                    <div class="stage-label">Classification</div>
-                                    <div class="stage-status" id="stage2Status">pending</div>
-                                </div>
-                                <div class="stage-indicator" id="stage3">
-                                    <div class="stage-icon">💡</div>
-                                    <div class="stage-label">Explanation</div>
-                                    <div class="stage-status" id="stage3Status">pending</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Warning/Error Display -->
-                            <div id="progressWarnings" class="mt-2 d-none"></div>
                         </div>
                     </div>
                     
@@ -485,38 +360,6 @@
             </div>
         </div>
 
-        <!-- Progress Bar Container -->
-        <div id="progressContainer" class="d-none mt-4">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title text-center mb-3">
-                        <i class="bi bi-gear-fill"></i> Processing Analysis
-                    </h5>
-                    
-                    <div class="progress mb-3" style="height: 25px;">
-                        <div id="progressBar" 
-                             class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
-                             role="progressbar" 
-                             style="width: 0%"
-                             aria-valuenow="0" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100">
-                        </div>
-                    </div>
-                    
-                    <div class="text-center">
-                        <div id="progressIcon" style="font-size: 3rem;" class="mb-2">🔄</div>
-                        <h6 id="progressText" class="mb-1">Starting analysis...</h6>
-                        <p id="progressTextThai" class="text-muted small mb-0">เริ่มการวิเคราะห์...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Results Container -->
-        <div id="resultsContainer" class="d-none mt-4">
-            <!-- Results will be dynamically inserted here -->
-        </div>
 
         <!-- Information Cards -->
         <div class="row mt-4">
@@ -810,242 +653,103 @@
             return;
         }
         
-        // Start real-time processing with SSE
-        startRealTimeProcessing(thai_text);
+        // Start processing with countdown timer
+        startProcessingWithCountdown(thai_text);
     });
     
-    function startRealTimeProcessing(thai_text) {
-        console.log('Starting real-time processing for text:', thai_text);
+    async function startProcessingWithCountdown(thai_text) {
+        console.log('Starting processing with countdown for text:', thai_text);
         
         // Get UI elements
-        const progressSection = document.getElementById('progressSection');
+        const loadingSection = document.getElementById('loadingSection');
         const submitBtn = document.getElementById('submitBtn');
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
-        const progressMessageEn = document.getElementById('progressMessageEn');
-        const progressMessageTh = document.getElementById('progressMessageTh');
-        const progressWarnings = document.getElementById('progressWarnings');
+        const countdownTime = document.getElementById('countdownTime');
         
-        // Show progress section and disable form
-        console.log('Showing progress section and disabling form');
-        progressSection.classList.remove('d-none');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing...';
+        try {
+            // Fetch estimated time from API
+            const response = await fetch("{{ url_for('main.get_average_response_time') }}");
+            const data = await response.json();
+            
+            // Calculate estimated time based on input length
+            const baseTime = data.average_time || 8.0;
+            const avgLength = data.average_input_length || 50;
+            const inputLength = thai_text.length;
+            
+            // Adjust time based on input length (longer text = more time)
+            const lengthFactor = Math.max(0.5, Math.min(2.0, inputLength / avgLength));
+            let estimatedTime = Math.round(baseTime * lengthFactor);
+            
+            // Show loading section and disable form
+            loadingSection.classList.remove('d-none');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Processing...';
+            
+            // Start countdown
+            startCountdown(estimatedTime);
+            
+            // Submit form directly to predict route
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('main.predict') }}";
+            form.style.display = 'none';
+            
+            const input = document.createElement('input');
+            input.name = 'thai_text';
+            input.value = thai_text;
+            form.appendChild(input);
+            
+            document.body.appendChild(form);
+            form.submit();
+            
+        } catch (error) {
+            console.error('Error starting processing:', error);
+            handleProcessingError('Failed to start processing: ' + error.message);
+        }
+    }
+    
+    function startCountdown(seconds) {
+        const countdownTime = document.getElementById('countdownTime');
+        const loadingMessageEn = document.getElementById('loadingMessageEn');
+        const loadingMessageTh = document.getElementById('loadingMessageTh');
         
-        // Reset progress
-        resetProgress();
+        let timeLeft = seconds;
         
-        // Create form data
-        const formData = new FormData();
-        formData.append('thai_text', thai_text);
-        
-        // Start SSE connection to the stream endpoint
-        fetch("{{ url_for('main.predict_stream') }}", {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const updateCountdown = () => {
+            countdownTime.textContent = `~${timeLeft}`;
+            
+            if (timeLeft <= 0) {
+                loadingMessageEn.textContent = 'Taking longer than expected...';
+                loadingMessageTh.textContent = 'ใช้เวลานานกว่าที่คาดไว้...';
+                countdownTime.textContent = '...';
+                return;
             }
             
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            
-            function readStream() {
-                return reader.read().then(({ done, value }) => {
-                    if (done) {
-                        console.log('SSE stream completed');
-                        return;
-                    }
-                    
-                    // Decode the chunk and add to buffer
-                    buffer += decoder.decode(value, { stream: true });
-                    
-                    // Process complete messages
-                    const lines = buffer.split('\n');
-                    buffer = lines.pop(); // Keep incomplete line in buffer
-                    
-                    for (const line of lines) {
-                        if (line.trim().startsWith('data: ')) {
-                            try {
-                                const jsonStr = line.trim().slice(6);
-                                if (jsonStr) {
-                                    const data = JSON.parse(jsonStr);
-                                    console.log('SSE data received:', data);
-                                    handleProgressUpdate(data);
-                                }
-                            } catch (e) {
-                                console.error('Error parsing SSE data:', e, 'Line:', line);
-                            }
-                        }
-                    }
-                    
-                    return readStream();
-                });
-            }
-            
-            return readStream();
-        })
-        .catch(error => {
-            console.error('SSE connection error:', error);
-            handleError('Connection failed: ' + error.message);
-        });
+            timeLeft--;
+        };
+        
+        // Update immediately and then every second
+        updateCountdown();
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        
+        // Clear interval after estimated time + buffer
+        setTimeout(() => {
+            clearInterval(countdownInterval);
+        }, (seconds + 5) * 1000);
     }
     
-    function handleProgressUpdate(data) {
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
-        const progressMessageEn = document.getElementById('progressMessageEn');
-        const progressMessageTh = document.getElementById('progressMessageTh');
-        const progressWarnings = document.getElementById('progressWarnings');
-        
-        // Handle errors
-        if (data.error) {
-            handleError(data.error);
-            return;
-        }
-        
-        // Update progress bar
-        if (data.progress !== undefined) {
-            progressBar.style.width = data.progress + '%';
-            progressBar.setAttribute('aria-valuenow', data.progress);
-            progressPercent.textContent = Math.round(data.progress);
-        }
-        
-        // Update messages
-        if (data.message) {
-            progressMessageEn.textContent = data.message;
-        }
-        if (data.message_thai) {
-            progressMessageTh.textContent = data.message_thai;
-        }
-        
-        // Update stage indicators
-        if (data.stage) {
-            updateStageIndicator(data.stage);
-        }
-        
-        // Show warnings
-        if (data.warnings && data.warnings.length > 0) {
-            showProgressWarnings(data.warnings);
-        }
-        
-        // Handle completion
-        if (data.complete && data.result && data.explanation_sections) {
-            console.log('Processing complete, handling results:', data);
-            handleCompletion(data.result, data.explanation_sections);
-        }
-    }
-    
-    function updateStageIndicator(currentStage) {
-        for (let i = 1; i <= 3; i++) {
-            const stageElement = document.getElementById(`stage${i}`);
-            const statusElement = document.getElementById(`stage${i}Status`);
-            
-            if (i < currentStage) {
-                stageElement.classList.add('completed');
-                statusElement.textContent = 'completed';
-            } else if (i === currentStage) {
-                stageElement.classList.add('active');
-                statusElement.textContent = 'active';
-            } else {
-                stageElement.classList.remove('completed', 'active');
-                statusElement.textContent = 'pending';
-            }
-        }
-    }
-    
-    function showProgressWarnings(warnings) {
-        const progressWarnings = document.getElementById('progressWarnings');
-        if (warnings.length > 0) {
-            const warningHtml = warnings.map(warning => 
-                `<div class="alert alert-warning alert-sm">${warning}</div>`
-            ).join('');
-            progressWarnings.innerHTML = warningHtml;
-            progressWarnings.classList.remove('d-none');
-        }
-    }
-    
-    function resetProgress() {
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
-        const progressMessageEn = document.getElementById('progressMessageEn');
-        const progressMessageTh = document.getElementById('progressMessageTh');
-        const progressWarnings = document.getElementById('progressWarnings');
-        
-        progressBar.style.width = '0%';
-        progressBar.setAttribute('aria-valuenow', '0');
-        progressPercent.textContent = '0';
-        progressMessageEn.textContent = 'Starting...';
-        progressMessageTh.textContent = 'เริ่มต้น...';
-        progressWarnings.classList.add('d-none');
-        
-        // Reset stage indicators
-        for (let i = 1; i <= 3; i++) {
-            const stageElement = document.getElementById(`stage${i}`);
-            const statusElement = document.getElementById(`stage${i}Status`);
-            stageElement.classList.remove('completed', 'active');
-            statusElement.textContent = 'pending';
-        }
-    }
-    
-    function handleError(errorMessage) {
+    function handleProcessingError(errorMessage) {
         const submitBtn = document.getElementById('submitBtn');
-        const progressMessageEn = document.getElementById('progressMessageEn');
-        const progressMessageTh = document.getElementById('progressMessageTh');
-        
-        // Show error state
-        progressMessageEn.textContent = 'Error occurred';
-        progressMessageTh.textContent = 'เกิดข้อผิดพลาด';
+        const loadingSection = document.getElementById('loadingSection');
         
         // Re-enable form
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i class="bi bi-play-circle me-2" aria-hidden="true"></i> Analyze with AI';
         
+        // Hide loading section
+        loadingSection.classList.add('d-none');
+        
         // Show error message
         alert(errorMessage);
-        
-        // Hide progress after delay
-        setTimeout(() => {
-            document.getElementById('progressSection').classList.add('d-none');
-        }, 3000);
-    }
-    
-    function handleCompletion(result, explanation_sections) {
-        console.log('Handling completion with result:', result);
-        console.log('Explanation sections:', explanation_sections);
-        
-        // Show completion message with smooth transition
-        const progressMessageEn = document.getElementById('progressMessageEn');
-        const progressMessageTh = document.getElementById('progressMessageTh');
-        const progressSection = document.getElementById('progressSection');
-        
-        progressMessageEn.textContent = 'Redirecting to results...';
-        progressMessageTh.textContent = 'กำลังนำไปยังผลลัพธ์...';
-        
-        // Add fade transition
-        progressSection.style.transition = 'opacity 0.3s ease';
-        progressSection.style.opacity = '0.7';
-        
-        // Prepare form for immediate submission
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = "{{ url_for('main.predict') }}";
-        form.style.display = 'none';
-        
-        const input = document.createElement('input');
-        input.name = 'thai_text';
-        input.value = result.input_thai;
-        form.appendChild(input);
-        
-        document.body.appendChild(form);
-        
-        // Submit with minimal delay for smoother UX
-        setTimeout(() => {
-            form.submit();
-        }, 100); // Further reduced to 100ms
     }
 </script>
 {% endif %}
