@@ -164,6 +164,167 @@
         color: var(--text-muted);
         margin-top: 0.25rem;
     }
+
+    /* Real-time Progress Bar Styling */
+    .progress-container {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px var(--card-shadow);
+        transition: all 0.3s ease;
+    }
+    
+    .progress-text {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .progress-percentage {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--button-primary);
+    }
+    
+    .progress {
+        background-color: var(--bg-secondary);
+        border-radius: 8px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .progress-bar {
+        background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+        border-radius: 8px;
+        transition: width 0.3s ease;
+    }
+    
+    /* Stage Indicators */
+    .stage-indicators {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        gap: 1rem;
+    }
+    
+    .stage-indicator {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: 12px;
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-color);
+        transition: all 0.3s ease;
+        opacity: 0.6;
+    }
+    
+    .stage-indicator.active {
+        opacity: 1;
+        border-color: var(--button-primary);
+        background: var(--card-bg);
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px var(--card-shadow);
+    }
+    
+    .stage-indicator.completed {
+        opacity: 1;
+        border-color: #28a745;
+        background: var(--card-bg);
+    }
+    
+    .stage-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        filter: grayscale(1);
+        transition: filter 0.3s ease;
+    }
+    
+    .stage-indicator.active .stage-icon,
+    .stage-indicator.completed .stage-icon {
+        filter: grayscale(0);
+    }
+    
+    .stage-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+    
+    .stage-status {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .stage-indicator.active .stage-status {
+        color: var(--button-primary);
+    }
+    
+    .stage-indicator.completed .stage-status {
+        color: #28a745;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .stage-indicators {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .stage-indicator {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            padding: 0.5rem;
+        }
+        
+        .stage-icon {
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+            margin-bottom: 0;
+        }
+        
+        .stage-details {
+            flex: 1;
+        }
+        
+        .progress-container {
+            padding: 1rem;
+        }
+    }
+    
+    /* Dark Mode Specific Adjustments */
+    [data-theme="dark"] .progress {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    [data-theme="dark"] .stage-indicator {
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    [data-theme="dark"] .stage-indicator.active {
+        border-color: var(--button-primary);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    [data-theme="dark"] .stage-indicator.completed {
+        border-color: #28a745;
+    }
+    
+    /* Animation for progress bar */
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+    
+    .stage-indicator.active {
+        animation: pulse 2s infinite;
+    }
 </style>
 {% endblock %}
 
@@ -209,15 +370,9 @@
                             lang="th"
                             required
                             autofocus
-                            aria-describedby="thai-text-help thai-text-examples textStats"
+                            aria-describedby="textStats"
                             aria-invalid="false"
                         ></textarea>
-                        <div id="thai-text-help" class="form-text">
-                            Enter Thai text to analyze its English translation and grammatical tense
-                        </div>
-                        <div id="thai-text-examples" class="form-text">
-                            Example: <span lang="th" class="thai-text">ฉันกินข้าวเช้าทุกวัน, เมื่อวานฉันไปตลาด, พรุ่งนี้ฉันจะไปเรียน</span>
-                        </div>
                         
                         <!-- Validation feedback -->
                         <div id="validationFeedback" class="mt-2" role="alert" aria-live="polite"></div>
@@ -228,7 +383,7 @@
                                 <div class="col-3">
                                     <small class="text-muted">
                                         <i class="bi bi-123" aria-hidden="true"></i> 
-                                        <span id="tokenCount" aria-label="Token count">0</span>/500
+                                        <span id="tokenCount" aria-label="Token count">0</span>/<span id="tokenLimit">100</span>
                                     </small>
                                 </div>
                                 <div class="col-3">
@@ -260,6 +415,58 @@
                         </button>
                         <div id="submit-help" class="visually-hidden">
                             Submit Thai text for translation and grammatical analysis
+                        </div>
+                    </div>
+                    
+                    <!-- Real-time Progress Bar (Hidden by default) -->
+                    <div id="progressSection" class="mt-4 d-none" aria-live="polite">
+                        <div class="progress-container">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div id="progressMessage" class="progress-text">
+                                    <span id="progressMessageEn">Ready to start...</span>
+                                    <small class="text-muted d-block">
+                                        <span lang="th" id="progressMessageTh">พร้อมเริ่มต้น...</span>
+                                    </small>
+                                </div>
+                                <div class="progress-percentage">
+                                    <span id="progressPercent">0</span>%
+                                </div>
+                            </div>
+                            
+                            <!-- Bootstrap Progress Bar -->
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     id="progressBar"
+                                     role="progressbar" 
+                                     style="width: 0%" 
+                                     aria-valuenow="0" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100"
+                                     aria-label="Processing progress">
+                                </div>
+                            </div>
+                            
+                            <!-- Stage Indicators -->
+                            <div class="stage-indicators">
+                                <div class="stage-indicator" id="stage1">
+                                    <div class="stage-icon">🔤</div>
+                                    <div class="stage-label">Translation</div>
+                                    <div class="stage-status" id="stage1Status">pending</div>
+                                </div>
+                                <div class="stage-indicator" id="stage2">
+                                    <div class="stage-icon">🏷️</div>
+                                    <div class="stage-label">Classification</div>
+                                    <div class="stage-status" id="stage2Status">pending</div>
+                                </div>
+                                <div class="stage-indicator" id="stage3">
+                                    <div class="stage-icon">💡</div>
+                                    <div class="stage-label">Explanation</div>
+                                    <div class="stage-status" id="stage3Status">pending</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Warning/Error Display -->
+                            <div id="progressWarnings" class="mt-2 d-none"></div>
                         </div>
                     </div>
                     
@@ -488,6 +695,7 @@
     function updateValidationUI(data) {
         // Update text statistics
         document.getElementById('tokenCount').textContent = data.token_count;
+        document.getElementById('tokenLimit').textContent = data.token_limit;
         document.getElementById('thaiPercentage').textContent = Math.round(data.thai_percentage);
         document.getElementById('sentenceCount').textContent = data.sentence_count;
         
@@ -555,87 +763,240 @@
         document.getElementById('validationFeedback').innerHTML = warningHtml;
     }
     
-    // Enhanced form submission with validation
+    // Real-time SSE form submission with progress tracking
     document.getElementById('analyseForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Always prevent default form submission
+        
         const thai_text = document.getElementById('thai_text').value.trim();
         
         if (!thai_text) {
             alert('กรุณาใส่ข้อความภาษาไทย / Please enter Thai text');
-            e.preventDefault();
             return;
         }
         
         if (!isValidInput) {
             alert('กรุณาแก้ไขข้อผิดพลาดก่อนส่ง / Please fix validation errors before submitting');
-            e.preventDefault();
             return;
         }
         
-        // Show progress bar and disable form
-        const progressContainer = document.getElementById('progressContainer');
+        // Start real-time processing with SSE
+        startRealTimeProcessing(thai_text);
+    });
+    
+    function startRealTimeProcessing(thai_text) {
+        // Get UI elements
+        const progressSection = document.getElementById('progressSection');
         const submitBtn = document.getElementById('submitBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressMessageEn = document.getElementById('progressMessageEn');
+        const progressMessageTh = document.getElementById('progressMessageTh');
+        const progressWarnings = document.getElementById('progressWarnings');
         
-        progressContainer.classList.remove('d-none');
+        // Show progress section and disable form
+        progressSection.classList.remove('d-none');
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Processing...';
         
-        // Start mock progress animation
-        startMockProgress();
+        // Reset progress
+        resetProgress();
         
-        // Let the form submit normally - don't prevent it
-        // The progress bar will show during the actual processing
-    });
+        // Create form data
+        const formData = new FormData();
+        formData.append('thai_text', thai_text);
+        
+        // Start SSE connection to the stream endpoint
+        fetch("{{ url_for('main.predict_stream') }}", {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            
+            function readStream() {
+                return reader.read().then(({ done, value }) => {
+                    if (done) {
+                        return;
+                    }
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                handleProgressUpdate(data);
+                            } catch (e) {
+                                console.error('Error parsing SSE data:', e);
+                            }
+                        }
+                    }
+                    
+                    return readStream();
+                });
+            }
+            
+            return readStream();
+        })
+        .catch(error => {
+            console.error('SSE connection error:', error);
+            handleError('Connection failed: ' + error.message);
+        });
+    }
     
-    function startMockProgress() {
+    function handleProgressUpdate(data) {
         const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const progressTextThai = document.getElementById('progressTextThai');
-        const progressIcon = document.getElementById('progressIcon');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressMessageEn = document.getElementById('progressMessageEn');
+        const progressMessageTh = document.getElementById('progressMessageTh');
+        const progressWarnings = document.getElementById('progressWarnings');
         
-        let currentStep = 1;
-        let currentProgress = 0;
-        
-        const steps = [
-            {step: 1, duration: 1500, endProgress: 33, message: "Translating...", messageThai: "กำลังแปล...", icon: "🔤"},
-            {step: 2, duration: 1500, endProgress: 66, message: "Classifying tense...", messageThai: "กำลังจำแนกกาล...", icon: "🏷️"},
-            {step: 3, duration: 6500, endProgress: 100, message: "Generating explanation...", messageThai: "กำลังสร้างคำอธิบาย...", icon: "💡"}
-        ];
-        
-        function animateStep(stepIndex) {
-            if (stepIndex >= steps.length) return;
-            
-            const step = steps[stepIndex];
-            const startProgress = stepIndex === 0 ? 0 : steps[stepIndex - 1].endProgress;
-            const progressIncrement = (step.endProgress - startProgress) / (step.duration / 50);
-            
-            // Update step info
-            progressText.textContent = step.message;
-            progressTextThai.textContent = step.messageThai;
-            progressIcon.textContent = step.icon;
-            
-            const progressInterval = setInterval(() => {
-                currentProgress += progressIncrement;
-                
-                if (currentProgress >= step.endProgress) {
-                    currentProgress = step.endProgress;
-                    progressBar.style.width = currentProgress + '%';
-                    progressBar.setAttribute('aria-valuenow', currentProgress);
-                    
-                    clearInterval(progressInterval);
-                    
-                    // Move to next step after a brief pause
-                    setTimeout(() => {
-                        animateStep(stepIndex + 1);
-                    }, 200);
-                } else {
-                    progressBar.style.width = currentProgress + '%';
-                    progressBar.setAttribute('aria-valuenow', currentProgress);
-                }
-            }, 50);
+        // Handle errors
+        if (data.error) {
+            handleError(data.error);
+            return;
         }
         
-        // Start the animation
-        animateStep(0);
+        // Update progress bar
+        if (data.progress !== undefined) {
+            progressBar.style.width = data.progress + '%';
+            progressBar.setAttribute('aria-valuenow', data.progress);
+            progressPercent.textContent = Math.round(data.progress);
+        }
+        
+        // Update messages
+        if (data.message) {
+            progressMessageEn.textContent = data.message;
+        }
+        if (data.message_thai) {
+            progressMessageTh.textContent = data.message_thai;
+        }
+        
+        // Update stage indicators
+        if (data.stage) {
+            updateStageIndicator(data.stage);
+        }
+        
+        // Show warnings
+        if (data.warnings && data.warnings.length > 0) {
+            showProgressWarnings(data.warnings);
+        }
+        
+        // Handle completion
+        if (data.complete && data.result && data.explanation_sections) {
+            handleCompletion(data.result, data.explanation_sections);
+        }
+    }
+    
+    function updateStageIndicator(currentStage) {
+        for (let i = 1; i <= 3; i++) {
+            const stageElement = document.getElementById(`stage${i}`);
+            const statusElement = document.getElementById(`stage${i}Status`);
+            
+            if (i < currentStage) {
+                stageElement.classList.add('completed');
+                statusElement.textContent = 'completed';
+            } else if (i === currentStage) {
+                stageElement.classList.add('active');
+                statusElement.textContent = 'active';
+            } else {
+                stageElement.classList.remove('completed', 'active');
+                statusElement.textContent = 'pending';
+            }
+        }
+    }
+    
+    function showProgressWarnings(warnings) {
+        const progressWarnings = document.getElementById('progressWarnings');
+        if (warnings.length > 0) {
+            const warningHtml = warnings.map(warning => 
+                `<div class="alert alert-warning alert-sm">${warning}</div>`
+            ).join('');
+            progressWarnings.innerHTML = warningHtml;
+            progressWarnings.classList.remove('d-none');
+        }
+    }
+    
+    function resetProgress() {
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressMessageEn = document.getElementById('progressMessageEn');
+        const progressMessageTh = document.getElementById('progressMessageTh');
+        const progressWarnings = document.getElementById('progressWarnings');
+        
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', '0');
+        progressPercent.textContent = '0';
+        progressMessageEn.textContent = 'Starting...';
+        progressMessageTh.textContent = 'เริ่มต้น...';
+        progressWarnings.classList.add('d-none');
+        
+        // Reset stage indicators
+        for (let i = 1; i <= 3; i++) {
+            const stageElement = document.getElementById(`stage${i}`);
+            const statusElement = document.getElementById(`stage${i}Status`);
+            stageElement.classList.remove('completed', 'active');
+            statusElement.textContent = 'pending';
+        }
+    }
+    
+    function handleError(errorMessage) {
+        const submitBtn = document.getElementById('submitBtn');
+        const progressMessageEn = document.getElementById('progressMessageEn');
+        const progressMessageTh = document.getElementById('progressMessageTh');
+        
+        // Show error state
+        progressMessageEn.textContent = 'Error occurred';
+        progressMessageTh.textContent = 'เกิดข้อผิดพลาด';
+        
+        // Re-enable form
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="bi bi-play-circle me-2" aria-hidden="true"></i> Analyze with AI';
+        
+        // Show error message
+        alert(errorMessage);
+        
+        // Hide progress after delay
+        setTimeout(() => {
+            document.getElementById('progressSection').classList.add('d-none');
+        }, 3000);
+    }
+    
+    function handleCompletion(result, explanation_sections) {
+        // Create result HTML similar to result.html template
+        const resultHtml = createResultHTML(result, explanation_sections);
+        
+        // Replace the form with results
+        document.getElementById('hero-section').innerHTML = resultHtml;
+        
+        // Hide progress
+        document.getElementById('progressSection').classList.add('d-none');
+    }
+    
+    function createResultHTML(result, explanation_sections) {
+        // This would create the result display similar to result.html
+        // For now, let's redirect to a results page with the data
+        // We'll need to modify this based on how you want to display results
+        
+        // Temporary solution: redirect with result data
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ url_for('main.predict') }}";
+        form.style.display = 'none';
+        
+        const input = document.createElement('input');
+        input.name = 'thai_text';
+        input.value = result.input_thai;
+        form.appendChild(input);
+        
+        document.body.appendChild(form);
+        form.submit();
     }
 </script>
 {% endif %}

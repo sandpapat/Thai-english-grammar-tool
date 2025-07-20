@@ -81,6 +81,201 @@ def predict():
         return render_template('index.html')
 
 
+@main_bp.route('/predict-stream', methods=['POST'])
+@login_required
+def predict_stream():
+    """Process Thai text through NLP pipeline with real-time progress updates via SSE"""
+    import json
+    from flask import Response
+    
+    try:
+        # Get Thai text from form
+        thai_text = request.form.get('thai_text', '').strip()
+        
+        # Validate input
+        validation_result = input_validator.validate_input(thai_text)
+        
+        # Handle validation errors
+        if not validation_result['is_valid']:
+            def error_stream():
+                error_message = validation_result['errors'][0]['message']['th'] if validation_result['errors'] else 'Invalid input'
+                yield f"data: {json.dumps({'error': error_message})}\n\n"
+            return Response(error_stream(), mimetype='text/event-stream')
+        
+        # Handle validation warnings
+        warning_messages = []
+        for warning in validation_result['warnings']:
+            warning_messages.append(warning['message']['th'])
+        
+        def generate_progress():
+            """Generator function to stream progress updates"""
+            
+            # Send initial progress with any warnings
+            initial_data = {
+                'stage': 0, 
+                'progress': 5, 
+                'message': 'Starting pipeline...', 
+                'message_thai': 'เริ่มต้นการประมวลผล...',
+                'warnings': warning_messages
+            }
+            yield f"data: {json.dumps(initial_data)}\n\n"
+            
+            # Create a generator that yields progress updates
+            def progress_generator():
+                """Generator that yields progress updates from the pipeline"""
+                
+                # Step 1: Translation
+                yield {
+                    'stage': 1,
+                    'progress': 10,
+                    'message': 'Starting translation...',
+                    'message_thai': 'เริ่มการแปล...'
+                }
+                
+                # Call translator
+                if model_manager.translator:
+                    try:
+                        translation = model_manager.translator.translate(thai_text)
+                        yield {
+                            'stage': 1,
+                            'progress': 33,
+                            'message': 'Translation complete',
+                            'message_thai': 'การแปลเสร็จสิ้น'
+                        }
+                    except Exception as e:
+                        translation = f"Translation failed: {str(e)}"
+                else:
+                    translation = "Translation service unavailable"
+                
+                # Step 2: Classification  
+                yield {
+                    'stage': 2,
+                    'progress': 50,
+                    'message': 'Analyzing tense...',
+                    'message_thai': 'กำลังวิเคราะห์กาล...'
+                }
+                
+                if model_manager.classifier and translation:
+                    try:
+                        classification_result = model_manager.classifier.classify(translation)
+                        yield {
+                            'stage': 2,
+                            'progress': 66,
+                            'message': 'Tense classification complete',
+                            'message_thai': 'การจำแนกกาลเสร็จสิ้น'
+                        }
+                    except Exception as e:
+                        classification_result = {
+                            "coarse_label": "ERROR",
+                            "fine_label": f"Classification failed: {str(e)}",
+                            "fine_code": "ERROR",
+                            "confidence": 0.0,
+                            "all_predictions": {}
+                        }
+                else:
+                    classification_result = {
+                        "coarse_label": "UNKNOWN",
+                        "fine_label": "Classification service unavailable",
+                        "fine_code": "UNKNOWN",
+                        "confidence": 0.0,
+                        "all_predictions": {}
+                    }
+                
+                # Step 3: Explanation
+                yield {
+                    'stage': 3,
+                    'progress': 80,
+                    'message': 'Generating explanation...',
+                    'message_thai': 'กำลังสร้างคำอธิบาย...'
+                }
+                
+                # Build result object
+                result = {
+                    "input_thai": thai_text,
+                    "translation": translation,
+                    "coarse_label": classification_result["coarse_label"],
+                    "fine_label": classification_result["fine_label"],
+                    "fine_code": classification_result["fine_code"],
+                    "confidence": classification_result["confidence"],
+                    "all_predictions": classification_result["all_predictions"]
+                }
+                
+                if model_manager.explainer:
+                    try:
+                        result["explanation"] = model_manager.explainer.explain(result)
+                    except Exception as e:
+                        result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation generation failed: {str(e)}"
+                else:
+                    result["explanation"] = "[SECTION 1: Context Cues]\nExplanation service unavailable"
+                
+                yield {
+                    'stage': 3,
+                    'progress': 100,
+                    'message': 'Complete!',
+                    'message_thai': 'เสร็จสิ้น!',
+                    'result': result
+                }
+            
+            # Run the pipeline and stream progress
+            try:
+                result = None
+                for progress_update in progress_generator():
+                    # Stream the progress update
+                    yield f"data: {json.dumps(progress_update)}\n\n"
+                    
+                    # Store the final result when available
+                    if 'result' in progress_update:
+                        result = progress_update['result']
+                
+                # Handle the explanation format (same as original predict route)
+                if result:
+                    explanation = result.get('explanation', '')
+                    if isinstance(explanation, dict) and 'parsed_sections' in explanation:
+                        explanation_sections = {
+                            'section_1': {
+                                'title': 'วิเคราะห์ Tense ที่ใช้',
+                                'content': format_explanation_content(explanation['parsed_sections'].get('tense_analysis', 'ส่วนนี้ไม่สามารถแยกได้'))
+                            },
+                            'section_2': {
+                                'title': 'คำศัพท์ที่น่าสนใจ',
+                                'content': format_explanation_content(explanation['parsed_sections'].get('vocabulary', 'ส่วนนี้ไม่สามารถแยกได้'))
+                            },
+                            'section_3': {
+                                'title': 'ข้อผิดพลาดที่พบบ่อย',
+                                'content': format_explanation_content(explanation['parsed_sections'].get('common_mistakes', 'ส่วนนี้ไม่สามารถแยกได้'))
+                            }
+                        }
+                    else:
+                        explanation_sections = parse_explanation(explanation)
+                    
+                    # Send final result with parsed explanation
+                    final_data = {
+                        'stage': 4,
+                        'progress': 100,
+                        'message': 'Complete!',
+                        'message_thai': 'เสร็จสิ้น!',
+                        'complete': True,
+                        'result': result,
+                        'explanation_sections': explanation_sections
+                    }
+                    yield f"data: {json.dumps(final_data)}\n\n"
+                
+            except Exception as e:
+                error_data = {
+                    'error': f'Pipeline error: {str(e)}',
+                    'stage': -1,
+                    'progress': 0
+                }
+                yield f"data: {json.dumps(error_data)}\n\n"
+        
+        return Response(generate_progress(), mimetype='text/event-stream')
+        
+    except Exception as e:
+        def error_stream():
+            yield f"data: {json.dumps({'error': f'Server error: {str(e)}'})}\n\n"
+        return Response(error_stream(), mimetype='text/event-stream')
+
+
 @main_bp.route('/validate', methods=['POST'])
 def validate_input():
     """API endpoint for real-time input validation"""
