@@ -13,9 +13,13 @@ from typing import Dict, List, Tuple, Optional
 
 
 class TokenCounter:
-    """Handles token counting for Thai text with configurable limits"""
+    """Handles token counting for Thai text with configurable limits
     
-    def __init__(self, max_tokens: int = 500):
+    Default limit of 100 tokens encourages single-sentence input for optimal
+    tense learning and classification accuracy. Typical sentences use 20-50 tokens.
+    """
+    
+    def __init__(self, max_tokens: int = 100):
         self.max_tokens = max_tokens
         
     def count_tokens(self, text: str) -> Dict[str, int]:
@@ -161,8 +165,8 @@ class SentenceBoundaryDetector:
     def _get_sentence_warning(self, count: int) -> Dict[str, str]:
         """Generate warning for multiple sentences"""
         return {
-            'en': f'Notice: {count} sentences detected. For best analysis, consider using one sentence at a time.',
-            'th': f'แจ้งเตือน: พบ {count} ประโยค เพื่อการวิเคราะห์ที่ดีที่สุด ควรใช้ประโยคเดียวในแต่ละครั้ง'
+            'en': f'Notice: {count} sentences detected. For accurate tense analysis and clearer explanations, we recommend using one sentence at a time.',
+            'th': f'แจ้งเตือน: พบ {count} ประโยค เพื่อการวิเคราะห์ tense ที่แม่นยำและคำอธิบายที่ชัดเจน แนะนำให้ใช้ประโยคเดียวในแต่ละครั้ง'
         }
 
 
@@ -333,7 +337,7 @@ class InputValidator:
     """Main validation class that coordinates all validation checks"""
     
     def __init__(self, 
-                 max_tokens: int = 500,
+                 max_tokens: int = 100,
                  min_thai_percentage: float = 0.8,
                  enable_profanity_filter: bool = True):
         self.token_counter = TokenCounter(max_tokens)
@@ -370,8 +374,8 @@ class InputValidator:
             errors.append({
                 'type': 'token_limit_exceeded',
                 'message': {
-                    'en': f'Text is too long ({length_result["token_count"]} tokens). Maximum allowed is {length_result["max_tokens"]} tokens.',
-                    'th': f'ข้อความยาวเกินไป ({length_result["token_count"]} โทเค็น) ความยาวสูงสุดคือ {length_result["max_tokens"]} โทเค็น'
+                    'en': f'Text is too long ({length_result["token_count"]} tokens). For best learning results, please use one sentence at a time (max {length_result["max_tokens"]} tokens).',
+                    'th': f'ข้อความยาวเกินไป ({length_result["token_count"]} โทเค็น) เพื่อผลการเรียนรู้ที่ดีที่สุด กรุณาใช้ประโยคเดียวในแต่ละครั้ง (สูงสุด {length_result["max_tokens"]} โทเค็น)'
                 }
             })
         
