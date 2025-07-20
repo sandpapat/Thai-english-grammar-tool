@@ -191,7 +191,7 @@ def predict_stream():
                 # Step 3: Grammar Explanation
                 progress_data = {
                     'stage': 3,
-                    'progress': 80,
+                    'progress': 70,
                     'message': 'Generating explanation...',
                     'message_thai': 'กำลังสร้างคำอธิบาย...'
                 }
@@ -199,7 +199,10 @@ def predict_stream():
                 
                 if model_manager.explainer:
                     try:
+                        # This is the long-running call (6-7 seconds)
                         result["explanation"] = model_manager.explainer.explain(result)
+                        
+                        # Only show 100% AFTER the explanation is actually generated
                         progress_data = {
                             'stage': 3,
                             'progress': 100,
@@ -209,8 +212,26 @@ def predict_stream():
                         yield f"data: {json.dumps(progress_data)}\n\n"
                     except Exception as e:
                         result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation generation failed: {str(e)}"
+                        
+                        # Show completion even on error
+                        progress_data = {
+                            'stage': 3,
+                            'progress': 100,
+                            'message': 'Explanation failed',
+                            'message_thai': 'คำอธิบายล้มเหลว'
+                        }
+                        yield f"data: {json.dumps(progress_data)}\n\n"
                 else:
                     result["explanation"] = "[SECTION 1: Context Cues]\nExplanation service unavailable"
+                    
+                    # Show completion for unavailable service
+                    progress_data = {
+                        'stage': 3,
+                        'progress': 100,
+                        'message': 'Explanation unavailable',
+                        'message_thai': 'คำอธิบายไม่พร้อมใช้งาน'
+                    }
+                    yield f"data: {json.dumps(progress_data)}\n\n"
                 
                 # Handle the explanation format (same as original predict route)
                 if result:
