@@ -126,10 +126,10 @@ def predict_stream():
                 
                 result = {"input_thai": thai_text}
                 
-                # Step 1: Translation
+                # Step 1: Translation  
                 progress_data = {
                     'stage': 1,
-                    'progress': 10,
+                    'progress': 5,
                     'message': 'Translating...',
                     'message_thai': 'กำลังแปล...'
                 }
@@ -140,7 +140,7 @@ def predict_stream():
                         result["translation"] = model_manager.translator.translate(thai_text)
                         progress_data = {
                             'stage': 1,
-                            'progress': 33,
+                            'progress': 10,
                             'message': 'Translation complete',
                             'message_thai': 'การแปลเสร็จสิ้น'
                         }
@@ -153,7 +153,7 @@ def predict_stream():
                 # Step 2: Tense Classification
                 progress_data = {
                     'stage': 2,
-                    'progress': 50,
+                    'progress': 15,
                     'message': 'Classifying tense...',
                     'message_thai': 'กำลังจำแนกกาล...'
                 }
@@ -170,7 +170,7 @@ def predict_stream():
                         
                         progress_data = {
                             'stage': 2,
-                            'progress': 66,
+                            'progress': 20,
                             'message': 'Tense classification complete',
                             'message_thai': 'การจำแนกกาลเสร็จสิ้น'
                         }
@@ -188,10 +188,10 @@ def predict_stream():
                     result["confidence"] = 0.0
                     result["all_predictions"] = {}
                 
-                # Step 3: Grammar Explanation
+                # Step 3: Grammar Explanation (This takes ~16-17 seconds!)
                 progress_data = {
                     'stage': 3,
-                    'progress': 70,
+                    'progress': 25,
                     'message': 'Generating explanation...',
                     'message_thai': 'กำลังสร้างคำอธิบาย...'
                 }
