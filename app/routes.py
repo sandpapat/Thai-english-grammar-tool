@@ -51,8 +51,12 @@ def predict():
         # Simple synchronous performance logging (fast database insert)
         def log_performance_data(**kwargs):
             try:
-                from .models import SystemPerformance
-                SystemPerformance.log_performance(**kwargs)
+                from flask import has_app_context
+                if has_app_context():
+                    from .models import SystemPerformance
+                    SystemPerformance.log_performance(**kwargs)
+                else:
+                    print("Performance logging skipped: No Flask app context")
             except Exception as e:
                 print(f"Performance logging failed: {e}")
         
@@ -281,21 +285,25 @@ def predict_stream():
                     }
                     yield f"data: {json.dumps(progress_data)}\n\n"
                 
-                # Log performance synchronously (should be fast)
+                # Log performance synchronously with context check
                 try:
-                    from .models import SystemPerformance
-                    input_length = len(thai_text)
-                    SystemPerformance.log_performance(
-                        user_id=user_id,
-                        input_length=input_length,
-                        translation_time=translation_time,
-                        classification_time=classification_time,
-                        explanation_time=explanation_time,
-                        success=success,
-                        error_stage=error_stage
-                    )
+                    from flask import has_app_context
+                    if has_app_context():
+                        from .models import SystemPerformance
+                        input_length = len(thai_text)
+                        SystemPerformance.log_performance(
+                            user_id=user_id,
+                            input_length=input_length,
+                            translation_time=translation_time,
+                            classification_time=classification_time,
+                            explanation_time=explanation_time,
+                            success=success,
+                            error_stage=error_stage
+                        )
+                    else:
+                        print("Stream performance logging skipped: No Flask app context")
                 except Exception as e:
-                    print(f"Performance logging failed: {e}")
+                    print(f"Stream performance logging failed: {e}")
                 
                 # Handle the explanation format (same as original predict route)
                 if result:
