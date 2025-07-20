@@ -27,11 +27,19 @@ class Pseudocode(UserMixin, db.Model):
     
     def is_proficient(self):
         """Check if user is proficient type"""
-        return self.user_type == UserType.PROFICIENT
+        try:
+            return self.user_type == UserType.PROFICIENT
+        except AttributeError:
+            # Fallback for when user_type column doesn't exist yet
+            return self.pseudocode.startswith('9') if hasattr(self, 'pseudocode') else False
     
     def get_user_type_display(self):
         """Get user type for display purposes"""
-        return self.user_type.value.capitalize()
+        try:
+            return self.user_type.value.capitalize()
+        except AttributeError:
+            # Fallback for when user_type column doesn't exist yet
+            return "Proficient" if self.is_proficient() else "Normal"
     
     def get_id(self):
         """Required for Flask-Login"""
