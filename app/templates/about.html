@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}About Us - Thaislate{% endblock %}
+{% block title %}About Us - Thaislate.ai{% endblock %}
 
 {% block description %}Learn about Thaislate, our innovative Thai-English grammar learning tool powered by AI. Discover our mission, technology, and commitment to enhancing language education.{% endblock %}
 
@@ -146,10 +146,19 @@
 {% endblock %}
 
 {% block content %}
-<div class="about-hero text-center">
+<!-- English Hero -->
+<div id="hero-en" class="about-hero text-center content-section active">
     <div class="container">
-        <h1 class="display-4 mb-4">About <span class="brand-highlight">Thaislate</span></h1>
+        <h1 class="display-4 mb-4">About <span class="brand-highlight">Thaislate.ai</span></h1>
         <p class="lead">Bridging Thai and English through intelligent grammar learning</p>
+    </div>
+</div>
+
+<!-- Thai Hero -->
+<div id="hero-th" class="about-hero text-center content-section">
+    <div class="container">
+        <h1 class="display-4 mb-4">เกี่ยวกับ <span class="brand-highlight">Thaislate.ai</span></h1>
+        <p class="lead">เชื่อมสะพานภาษาไทยและภาษาอังกฤษผ่านการเรียนรู้หลักไวยากรณ์อย่างชาญฉลาด</p>
     </div>
 </div>
 
@@ -202,27 +211,27 @@
                 </div>
                 <div class="col-md-10">
                     <h2 class="mb-3">Our Approach</h2>
-                    <p class="mb-3">Our tool combines cutting-edge language technology with educational best practices:</p>
+                    <p class="mb-3">We believe effective language learning happens when students understand the <em>why</em> behind grammar rules, not just memorize patterns. Our educational philosophy centers on:</p>
                     <div class="feature-grid">
                         <div class="feature-card">
-                            <i class="bi bi-cpu-fill text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>Smart Translation</h5>
-                            <p>Using advanced AI models (Typhoon 4B) optimized for Thai-English translation</p>
+                            <i class="bi bi-lightbulb-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Explanatory Learning</h5>
+                            <p>Moving beyond "what" to "why" - helping students understand the reasoning behind English grammar choices</p>
                         </div>
                         <div class="feature-card">
-                            <i class="bi bi-brain text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>Grammar Intelligence</h5>
-                            <p>Hierarchical tense classification that identifies not just what tense to use, but why</p>
+                            <i class="bi bi-people-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Thai-Centric Design</h5>
+                            <p>Built specifically for Thai speakers, respecting their linguistic background and learning patterns</p>
                         </div>
                         <div class="feature-card">
-                            <i class="bi bi-book-half text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>Educational Explanations</h5>
-                            <p>Context-aware grammar explanations tailored specifically for Thai learners</p>
+                            <i class="bi bi-arrow-up-right-circle text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Confidence Building</h5>
+                            <p>Gradual skill building through clear explanations that reduce anxiety and build competence</p>
                         </div>
                         <div class="feature-card">
-                            <i class="bi bi-heart text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>Cultural Sensitivity</h5>
-                            <p>Designed with Thai learning patterns and cultural context in mind</p>
+                            <i class="bi bi-chat-dots text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Interactive Feedback</h5>
+                            <p>Real-time analysis and personalized explanations that adapt to individual learning needs</p>
                         </div>
                     </div>
                 </div>
@@ -283,31 +292,50 @@
                 </div>
                 <div class="col-md-10">
                     <h2 class="mb-3">Our Technology</h2>
-                    <p class="mb-3">We use a hybrid pipeline approach that combines:</p>
+                    <p class="mb-3">Our system utilizes a sophisticated three-stage AI pipeline, each component carefully selected and optimized for Thai-English language learning:</p>
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <div class="feature-card">
                                 <i class="bi bi-translate text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>Translation Model</h6>
-                                <small>Typhoon-Translate 4B for high-quality Thai→English translation</small>
+                                <h6>Stage 1: Translation</h6>
+                                <small><strong>Typhoon-Translate 4B (GGUF)</strong><br>Optimized for CPU deployment with 80 token limit for focused sentence analysis</small>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="feature-card">
                                 <i class="bi bi-diagram-3 text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>Grammar Analysis</h6>
-                                <small>BERT-based hierarchical classification for tense identification</small>
+                                <h6>Stage 2: Classification</h6>
+                                <small><strong>XLM-RoBERTa Hierarchical</strong><br>Custom-trained model with coarse (3) and fine-grained (24) tense categories</small>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="feature-card">
                                 <i class="bi bi-chat-text text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>Educational Engine</h6>
-                                <small>Typhoon 2.1 Instruct for generating learner-friendly explanations</small>
+                                <h6>Stage 3: Explanation</h6>
+                                <small><strong>Typhoon 2.1 4B Instruct</strong><br>Confidence-aware explanation generation via Together AI API</small>
                             </div>
                         </div>
                     </div>
-                    <p class="text-muted fst-italic">This isn't just about translation – it's about creating an intelligent tutoring system that adapts to how Thai speakers learn English.</p>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-cpu me-2"></i>Performance Specs</h6>
+                            <ul class="list-unstyled small">
+                                <li>• Translation: ~1.2s average</li>
+                                <li>• Classification: 94.7% isolated accuracy</li>
+                                <li>• Pipeline: 74% real-world accuracy</li>
+                                <li>• Explanation: ~11s generation time</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-shield-check me-2"></i>Reliability Features</h6>
+                            <ul class="list-unstyled small">
+                                <li>• Confidence-based explanation adjustment</li>
+                                <li>• Input validation (100 token limit)</li>
+                                <li>• Graceful fallback mechanisms</li>
+                                <li>• Thai profanity filtering</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -405,27 +433,27 @@
                 </div>
                 <div class="col-md-10">
                     <h2 class="mb-3">แนวทางของเรา</h2>
-                    <p class="mb-3">เครื่องมือของเราผสมผสานเทคโนโลยีภาษาขั้นสูงกับหลักการการศึกษาที่ดีที่สุด:</p>
+                    <p class="mb-3">เราเชื่อว่าการเรียนรู้ภาษาที่มีประสิทธิภาพเกิดขึ้นเมื่อผู้เรียนเข้าใจ <em>เหตุผล</em> เบื้องหลังกฎไวยากรณ์ ไม่ใช่แค่จำรูปแบบ ปรัชญาการศึกษาของเรามุ่งเน้น:</p>
                     <div class="feature-grid">
                         <div class="feature-card">
-                            <i class="bi bi-cpu-fill text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>การแปลที่ชาญฉลาด</h5>
-                            <p>ใช้โมเดล AI ขั้นสูง (Typhoon 4B) ที่ปรับแต่งเพื่อการแปลไทย-อังกฤษ</p>
+                            <i class="bi bi-lightbulb-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>การเรียนรู้เชิงอธิบาย</h5>
+                            <p>ก้าวข้ามจาก "อะไร" ไปสู่ "ทำไม" - ช่วยให้ผู้เรียนเข้าใจเหตุผลเบื้องหลังการเลือกใช้ไวยากรณ์ภาษาอังกฤษ</p>
                         </div>
                         <div class="feature-card">
-                            <i class="bi bi-brain text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>ปัญญาไวยากรณ์</h5>
-                            <p>การจำแนก Tense แบบลำดับชั้นที่ระบุไม่เพียงแค่ว่า Tense ไหนที่ใช้ แต่ยังบอกเหตุผล</p>
+                            <i class="bi bi-people-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>การออกแบบเพื่อคนไทย</h5>
+                            <p>สร้างขึ้นเฉพาะสำหรับผู้พูดภาษาไทย เคารพพื้นฐานทางภาษาและรูปแบบการเรียนรู้ของพวกเขา</p>
                         </div>
                         <div class="feature-card">
-                            <i class="bi bi-book-half text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>คำอธิบายเชิงการศึกษา</h5>
-                            <p>คำอธิบายไวยากรณ์ที่คำนึงถึงบริบท ออกแบบเฉพาะสำหรับผู้เรียนไทย</p>
+                            <i class="bi bi-arrow-up-right-circle text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>การสร้างความมั่นใจ</h5>
+                            <p>การพัฒนาทักษะแบบค่อยเป็นค่อยไปผ่านคำอธิบายที่ชัดเจน ลดความวิตกกังวลและเสริมสร้างความสามารถ</p>
                         </div>
                         <div class="feature-card">
-                            <i class="bi bi-heart text-primary mb-3" style="font-size: 2rem;"></i>
-                            <h5>ความไวทางวัฒนธรรม</h5>
-                            <p>ออกแบบโดยคำนึงถึงรูปแบบการเรียนรู้และบริบททางวัฒนธรรมของคนไทย</p>
+                            <i class="bi bi-chat-dots text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>ข้อมูลป้อนกลับแบบโต้ตอบ</h5>
+                            <p>การวิเคราะห์แบบเรียลไทม์และคำอธิบายเฉพาะบุคคลที่ปรับให้เข้ากับความต้องการการเรียนรู้ของแต่ละคน</p>
                         </div>
                     </div>
                 </div>
@@ -486,31 +514,50 @@
                 </div>
                 <div class="col-md-10">
                     <h2 class="mb-3">เทคโนโลยีของเรา</h2>
-                    <p class="mb-3">เราใช้แนวทางไปป์ไลน์แบบไฮบริดที่ประกอบด้วย:</p>
+                    <p class="mb-3">ระบบของเราใช้ไปป์ไลน์ AI สามขั้นตอนที่ซับซ้อน แต่ละองค์ประกอบถูกเลือกและปรับแต่งอย่างระมัดระวังสำหรับการเรียนรู้ภาษาไทย-อังกฤษ:</p>
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <div class="feature-card">
                                 <i class="bi bi-translate text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>โมเดลแปลภาษา</h6>
-                                <small>Typhoon-Translate 4B สำหรับการแปลไทย→อังกฤษคุณภาพสูง</small>
+                                <h6>ขั้นตอนที่ 1: การแปล</h6>
+                                <small><strong>Typhoon-Translate 4B (GGUF)</strong><br>ปรับแต่งสำหรับการใช้งาน CPU พร้อมข้อจำกัด 80 โทเค็นเพื่อการวิเคราะห์ประโยคที่เน้นจุด</small>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="feature-card">
                                 <i class="bi bi-diagram-3 text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>การวิเคราะห์ไวยากรณ์</h6>
-                                <small>การจำแนกแบบลำดับชั้นด้วย BERT สำหรับการระบุ Tense</small>
+                                <h6>ขั้นตอนที่ 2: การจำแนก</h6>
+                                <small><strong>XLM-RoBERTa Hierarchical</strong><br>โมเดลที่ฝึกเฉพาะด้วยหมวดหมู่ tense แบบหยาบ (3) และละเอียด (24)</small>
                             </div>
                         </div>
                         <div class="col-md-4 mb-3">
                             <div class="feature-card">
                                 <i class="bi bi-chat-text text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>เครื่องยนต์การศึกษา</h6>
-                                <small>Typhoon 2.1 Instruct สำหรับสร้างคำอธิบายที่เป็นมิตรกับผู้เรียน</small>
+                                <h6>ขั้นตอนที่ 3: คำอธิบาย</h6>
+                                <small><strong>Typhoon 2.1 4B Instruct</strong><br>การสร้างคำอธิบายที่คำนึงถึงความมั่นใจผ่าน Together AI API</small>
                             </div>
                         </div>
                     </div>
-                    <p class="text-muted fst-italic">นี่ไม่ใช่แค่การแปลภาษา แต่เป็นการสร้างระบบการสอนที่ชาญฉลาดซึ่งปรับตัวให้เข้ากับวิธีการเรียนรู้ภาษาอังกฤษของคนไทย</p>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-cpu me-2"></i>ข้อมูลประสิทธิภาพ</h6>
+                            <ul class="list-unstyled small">
+                                <li>• การแปล: เฉลี่ย ~1.2 วินาทีา</li>
+                                <li>• การจำแนก: ความแม่นยำ 94.7% แบบแยกส่วน</li>
+                                <li>• ไปป์ไลน์: ความแม่นยำ 74% ในโลกจริง</li>
+                                <li>• คำอธิบาย: เวลาสร้าง ~11 วินาที</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="bi bi-shield-check me-2"></i>คุณสมบัติความน่าเชื่อถือ</h6>
+                            <ul class="list-unstyled small">
+                                <li>• การปรับคำอธิบายตามความมั่นใจ</li>
+                                <li>• การตรวจสอบข้อมูลนำเข้า (จำกัด 100 โทเค็น)</li>
+                                <li>• กลไกสำรองที่ลื่นไหล</li>
+                                <li>• การกรองคำหยาบภาษาไทย</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -577,13 +624,14 @@
 {% block extra_js %}
 <script>
     function switchLanguage(lang) {
-        // Hide all content sections
+        // Hide all content sections (including hero sections)
         document.querySelectorAll('.content-section').forEach(section => {
             section.classList.remove('active');
         });
         
-        // Show selected language content
+        // Show selected language content and hero
         document.getElementById('content-' + lang).classList.add('active');
+        document.getElementById('hero-' + lang).classList.add('active');
         
         // Update button states
         document.querySelectorAll('.language-toggle button').forEach(btn => {
