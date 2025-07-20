@@ -1,15 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import func, Enum
-import enum
+from sqlalchemy import func
 
 db = SQLAlchemy()
 
-class UserType(enum.Enum):
-    """User type enumeration"""
+class UserType:
+    """User type constants"""
     NORMAL = 'normal'
     PROFICIENT = 'proficient'
+    
+    @classmethod
+    def is_valid(cls, value):
+        """Check if a user type value is valid"""
+        return value in [cls.NORMAL, cls.PROFICIENT]
 
 class Pseudocode(UserMixin, db.Model):
     """Anonymous user model using only 5-digit pseudocodes"""
@@ -17,13 +21,13 @@ class Pseudocode(UserMixin, db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     pseudocode = db.Column(db.String(5), unique=True, nullable=False, index=True)
-    user_type = db.Column(Enum(UserType), default=UserType.NORMAL, nullable=False)
+    user_type = db.Column(db.String(20), default=UserType.NORMAL, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, default=None)
     is_active = db.Column(db.Boolean, default=True)
     
     def __repr__(self):
-        return f'<Pseudocode {self.pseudocode} ({self.user_type.value})>'
+        return f'<Pseudocode {self.pseudocode} ({self.user_type})>'
     
     def is_proficient(self):
         """Check if user is proficient type"""
@@ -36,10 +40,16 @@ class Pseudocode(UserMixin, db.Model):
     def get_user_type_display(self):
         """Get user type for display purposes"""
         try:
-            return self.user_type.value.capitalize()
+            return self.user_type.capitalize()
         except AttributeError:
             # Fallback for when user_type column doesn't exist yet
             return "Proficient" if self.is_proficient() else "Normal"
+    
+    def set_user_type(self, user_type):
+        """Set user type with validation"""
+        if not UserType.is_valid(user_type):
+            raise ValueError(f"Invalid user type: {user_type}. Must be one of: {UserType.NORMAL}, {UserType.PROFICIENT}")
+        self.user_type = user_type
     
     def get_id(self):
         """Required for Flask-Login"""
@@ -63,6 +73,10 @@ class Pseudocode(UserMixin, db.Model):
         """Create a new pseudocode entry"""
         if len(pseudocode) != 5 or not pseudocode.isdigit():
             raise ValueError("Pseudocode must be exactly 5 digits")
+        
+        # Validate user type
+        if not UserType.is_valid(user_type):
+            raise ValueError(f"Invalid user type: {user_type}")
         
         # Check if already exists
         existing = Pseudocode.query.filter_by(pseudocode=pseudocode).first()

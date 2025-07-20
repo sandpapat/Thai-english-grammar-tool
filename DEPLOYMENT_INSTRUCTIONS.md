@@ -32,18 +32,22 @@ This guide covers deploying the new user type system to your VM environment.
    # If running directly, use Ctrl+C
    ```
 
-4. **Run Database Migration**
+4. **Run Database Migration & Enum Fix**
    ```bash
    # On your VM, in the project directory
+   # First run the enum compatibility fix
+   python fix_enum_issue.py
+   
+   # Then run the full migration if needed
    python migrate_production.py
    ```
 
-   This script will:
+   The `fix_enum_issue.py` script will:
    - ✅ Find your database automatically
-   - 💾 Create a backup 
-   - 🔧 Add the `user_type` column
-   - 📊 Create the `ratings` table
+   - 🔧 Add the `user_type` column (if missing)
+   - 📊 Create the `ratings` table (if missing)
    - 🎯 Set users with pseudocodes starting with '9' as proficient
+   - 🔧 Fix any enum compatibility issues
    - 📈 Create necessary indexes
 
 5. **Verify Migration Success**
