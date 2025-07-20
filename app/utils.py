@@ -37,27 +37,64 @@ def format_explanation_content(content):
     content = re.sub(r'\n\s*\n\s*\n+', '\n\n', content)
     
     # First pass: identify and mark special keywords for highlighting
-    # Common time markers and grammar keywords
+    # Process in order of priority to prevent overlaps
+    
+    # Clean content first - add spaces around punctuation for better word boundaries
+    content = re.sub(r'([.,;:!?])', r' \1 ', content)
+    
+    # Add spaces between Thai and English text for better parsing
+    content = re.sub(r'([ก-๙])([A-Za-z])', r'\1 \2', content)
+    content = re.sub(r'([A-Za-z])([ก-๙])', r'\1 \2', content)
+    
+    # Normalize whitespace
+    content = re.sub(r'\s+', ' ', content)
+    
+    # Define patterns in order of priority (most specific first)
     keyword_patterns = [
-        # Time markers
-        (r'\b(yesterday|today|tomorrow|now|then)\b', 'time-marker'),
+        # Complex grammar terms first (most specific) - single capture group
+        (r'\b(Future Simple Tense|Present Simple Tense|Past Simple Tense|Future Continuous Tense|Present Continuous Tense|Past Continuous Tense|Future Perfect Tense|Present Perfect Tense|Past Perfect Tense)\b', 'grammar-term'),
+        (r'\b(Future Simple|Present Simple|Past Simple|Future Continuous|Present Continuous|Past Continuous|Future Perfect|Present Perfect|Past Perfect)\b', 'grammar-term'),
+        # Perfect tenses
+        (r'\b(Present Perfect|Past Perfect|Future Perfect)\b', 'grammar-term'),
+        # Single tense components 
+        (r'\b(Simple Tense|Continuous Tense|Perfect Tense)\b', 'grammar-term'),
+        (r'\b(Simple|Continuous|Perfect)\b', 'grammar-term'),
+        # Time expressions (compound first)
         (r'\b(last week|last month|last year|next week|next month|next year)\b', 'time-marker'),
-        (r'\b(ago|before|after|since|until)\b', 'time-marker'),
+        (r'\b(every day|every week|every month|every year)\b', 'frequency-marker'),
+        # Single time markers  
+        (r'\b(yesterday|today|tomorrow|now|then|ago|before|after|since|until)\b', 'time-marker'),
+        # Grammar components (standalone Tense and other terms)
+        (r'\b(Subject|Verb|Object|V1|V2|V3|Tense|have|has|been)\b', 'grammar-term'),
+        # Modal verbs
+        (r'\b(will|would|shall|should|can|could|may|might|must)\b', 'modal-verb'),
         # Frequency markers
         (r'\b(always|usually|often|sometimes|never|rarely)\b', 'frequency-marker'),
-        (r'\b(every day|every week|every month|every year)\b', 'frequency-marker'),
-        # Grammar terms - more comprehensive patterns
-        (r'\b(Future Simple|Present Simple|Past Simple|Future Continuous|Present Continuous|Past Continuous|Future Perfect|Present Perfect|Past Perfect)\b', 'grammar-term'),
-        (r'\b(Subject|Verb|Object|V1|V2|V3|Tense)\b', 'grammar-term'),
-        (r'\b(will|would|shall|should|can|could|may|might|must)\b', 'modal-verb'),
         # Place markers
         (r'\b(market|school|hospital|restaurant|office|home|store)\b', 'place-marker')
     ]
     
-    # Apply keyword highlighting - be more careful with overlapping patterns
+    # Apply highlighting with simple overlap prevention
+    highlighted_content = content
     for pattern, css_class in keyword_patterns:
-        # Only highlight if not already highlighted
-        content = re.sub(pattern, rf'<span class="keyword-highlight {css_class}">\1</span>', content, flags=re.IGNORECASE)
+        # Apply highlighting only if the text isn't already highlighted
+        def replace_func(match):
+            matched_text = match.group(0)
+            # Check if this text is already inside a span
+            start_pos = match.start()
+            text_before = highlighted_content[:start_pos]
+            if '<span class="keyword-highlight' in text_before and '</span>' not in text_before[text_before.rfind('<span'):]:
+                # We're inside a span, don't highlight
+                return matched_text
+            return f'<span class="keyword-highlight {css_class}">{matched_text}</span>'
+        
+        highlighted_content = re.sub(pattern, replace_func, highlighted_content, flags=re.IGNORECASE)
+    
+    content = highlighted_content
+    
+    # Add proper spacing around highlighted elements
+    content = re.sub(r'(<span class="keyword-highlight[^"]*">[^<]+</span>)', r' \1 ', content)
+    content = re.sub(r'\s+', ' ', content)  # Normalize whitespace again
     
     # Process line by line for proper structure
     lines = content.split('\n')
@@ -74,6 +111,10 @@ def format_explanation_content(content):
         
         # Handle bold text (but preserve highlighted keywords inside)
         line = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', line)
+        
+        # Ensure proper spacing between highlighted elements and Thai text
+        line = re.sub(r'(<span[^>]+>[^<]+</span>)\s*([ก-๙])', r'\1 \2', line)
+        line = re.sub(r'([ก-๙])\s*(<span[^>]+>[^<]+</span>)', r'\1 \2', line)
         
         # Check if it's a bullet point
         if line.startswith('* ') and len(line) > 2:

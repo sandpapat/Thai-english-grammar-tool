@@ -15,6 +15,8 @@ This is a Flask-based web application for an MSc dissertation in Computer Scienc
 - ✅ **Performance-Based UX**: Countdown timer uses actual response time data for accurate estimates
 - ✅ **Architecture Simplification**: 60% reduction in frontend complexity, eliminated SSE infrastructure
 - ✅ **Direct Form Submission**: Streamlined user flow with immediate form processing
+- ✅ **Output Parsing Fix**: Improved keyword highlighting with proper spacing and overlap prevention
+- ✅ **Enum Compatibility Fix**: Resolved database user_type enum issues for production deployment
 
 ## Project Structure
 
@@ -248,6 +250,8 @@ CREATE TABLE ratings (
 ### Migration
 - **Script**: `migrate_user_types.py` for database schema updates
 - **Automatic Detection**: Pseudocodes starting with "9" are proficient type
+- **Enum Fix**: `fix_enum_issue.py` resolves SQLAlchemy enum compatibility issues
+- **Production Ready**: UserType uses string constants instead of Python enums for better compatibility
 
 ## Development Commands
 
@@ -313,6 +317,8 @@ python -c "from app import create_app; app = create_app(); app.app_context().pus
 - Flash messages provide user feedback with improved accessibility
 - All file paths should be absolute, not relative
 - The explanation sections are parsed using regex pattern matching in `app/utils.py`
+- Keyword highlighting uses prioritized patterns to prevent overlaps (e.g., "Present Perfect Tense" as one unit)
+- Automatic spacing is added between highlighted elements and Thai text for better readability
 - Performance pages use distinct color themes (green for classifier, blue for pipeline)
 - Navigation dropdown requires Bootstrap JavaScript for proper functionality
 - Evaluation data should be interpreted in context of the dual testing approach
@@ -442,6 +448,13 @@ This color coding helps users immediately distinguish between the two evaluation
 - **Form Validation**: Improved validation with proper error states
 - **Navigation Improvements**: Fixed all broken navigation links
 - **Loading States**: Better loading indicators and user feedback
+
+### 8. **Explanation Output Parsing Improvements** (2025-01-20)
+- **Keyword Highlighting**: Fixed overlapping patterns where terms like "Present Perfect Tense" and "before" would concatenate
+- **Pattern Prioritization**: Complex grammar terms (e.g., "Present Perfect Tense") are matched before simple ones (e.g., "Tense")
+- **Spacing Enhancement**: Automatic spacing between highlighted elements and Thai text
+- **CSS Improvements**: Consistent styling with proper margins and dark mode support
+- **Mixed Language Support**: Better handling of Thai-English mixed content with automatic script separation
 
 ## Typography and Font System
 
