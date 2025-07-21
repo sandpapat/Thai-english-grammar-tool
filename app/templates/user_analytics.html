@@ -39,6 +39,12 @@
         background: rgba(255, 255, 255, 0.05);
         border-radius: 8px;
         padding: 1rem;
+        min-height: 400px;
+        position: relative;
+    }
+    
+    .activity-chart canvas {
+        max-height: 350px !important;
     }
     
     .session-info {
@@ -180,7 +186,7 @@
             Daily Activity Chart
         </h3>
         <div class="activity-chart">
-            <canvas id="activityChart" height="100"></canvas>
+            <canvas id="activityChart"></canvas>
         </div>
     </div>
     {% endif %}
@@ -272,66 +278,132 @@
 
 {% if user_stats and user_stats.daily_activity %}
 <script>
-// Daily Activity Chart
+// Daily Activity Chart with improved error handling
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('activityChart').getContext('2d');
-    
-    // Prepare data for Chart.js
-    const dailyData = {{ user_stats.daily_activity | tojsonfilter }};
-    const labels = dailyData.map(item => {
-        const date = new Date(item.date);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    });
-    const counts = dailyData.map(item => item.count);
-    
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Daily Activities',
-                data: counts,
-                borderColor: 'rgba(13, 202, 240, 1)',
-                backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.3,
-                pointBackgroundColor: 'rgba(13, 202, 240, 1)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    try {
+        const canvas = document.getElementById('activityChart');
+        if (!canvas) {
+            console.error('Activity chart canvas not found');
+            return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Could not get canvas context');
+            return;
+        }
+        
+        // Prepare data for Chart.js
+        const dailyData = {{ user_stats.daily_activity | tojsonfilter }};
+        console.log('Daily activity data:', dailyData);
+        
+        if (!dailyData || dailyData.length === 0) {
+            console.warn('No daily activity data available');
+            return;
+        }
+        
+        const labels = dailyData.map(item => {
+            const date = new Date(item.date + 'T00:00:00'); // Add time to prevent timezone issues
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        const counts = dailyData.map(item => item.count);
+        
+        // Dynamic colors based on theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                          (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        
+        const chartColors = {
+            line: isDarkMode ? 'rgba(59, 130, 246, 1)' : 'rgba(13, 202, 240, 1)',
+            fill: isDarkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(13, 202, 240, 0.1)',
+            point: isDarkMode ? 'rgba(59, 130, 246, 1)' : 'rgba(13, 202, 240, 1)',
+            grid: isDarkMode ? 'rgba(248, 250, 252, 0.1)' : 'rgba(255, 255, 255, 0.1)',
+            text: isDarkMode ? 'rgba(248, 250, 252, 0.7)' : 'rgba(255, 255, 255, 0.7)'
+        };
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Daily Activities',
+                    data: counts,
+                    borderColor: chartColors.line,
+                    backgroundColor: chartColors.fill,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: chartColors.point,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1,
-                        color: 'rgba(255, 255, 255, 0.7)'
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
                     },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                    tooltip: {
+                        backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                        titleColor: isDarkMode ? '#f8fafc' : '#1a2238',
+                        bodyColor: isDarkMode ? '#cbd5e1' : '#64748b',
+                        borderColor: chartColors.line,
+                        borderWidth: 1
                     }
                 },
-                x: {
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            color: chartColors.text,
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: chartColors.grid,
+                            drawBorder: false
+                        }
                     },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
+                    x: {
+                        ticks: {
+                            color: chartColors.text,
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: chartColors.grid,
+                            drawBorder: false
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        borderJoinStyle: 'round'
                     }
                 }
             }
+        });
+        
+        console.log('Activity chart created successfully');
+        
+    } catch (error) {
+        console.error('Error creating activity chart:', error);
+        // Show fallback message
+        const chartContainer = document.querySelector('.activity-chart');
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="text-center text-muted p-4"><i class="bi bi-exclamation-triangle me-2"></i>Chart could not be loaded</div>';
         }
-    });
+    }
 });
 </script>
 {% endif %}

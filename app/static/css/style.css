@@ -1075,3 +1075,71 @@ footer {
     font-size: 0.8rem;
     font-weight: bold;
 }
+
+/* Navigation Button Fixes - Prevent disabled/grey states */
+.navbar-nav .nav-link {
+    /* Ensure navigation links are always clickable */
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+}
+
+.navbar-nav .nav-link:not(.disabled) {
+    /* Force normal state for non-disabled links */
+    color: var(--navbar-text) !important;
+}
+
+.navbar-nav .nav-link.disabled {
+    /* Only allow disabled state when explicitly set */
+    pointer-events: none !important;
+    opacity: 0.65 !important;
+    cursor: default !important;
+}
+
+/* Prevent Bootstrap from auto-disabling navigation */
+.navbar-nav .nav-link[href] {
+    /* Links with href should always be clickable */
+    pointer-events: auto !important;
+    opacity: 1 !important;
+}
+
+/* Fix dropdown navigation buttons */
+.dropdown-toggle {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+}
+
+.dropdown-toggle:not(.disabled) {
+    color: var(--navbar-text) !important;
+}
+
+/* Ensure buttons remain interactive during page transitions */
+.navbar-nav .nav-item .nav-link {
+    transition: all 0.2s ease !important;
+    will-change: auto;
+}
+
+/* Fix for loading states */
+.navbar-nav .nav-link[aria-disabled="false"] {
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+}
+
+/* Ensure all navigation remains functional */
+.navbar .navbar-nav,
+.navbar .navbar-nav .nav-item,
+.navbar .navbar-nav .nav-link {
+    pointer-events: auto !important;
+}
+
+/* Dark mode navigation text fix */
+[data-theme="dark"] .navbar-nav .nav-link:not(.disabled) {
+    color: var(--navbar-text) !important;
+}
+
+/* Light mode navigation text fix */
+[data-theme="light"] .navbar-nav .nav-link:not(.disabled) {
+    color: var(--navbar-text) !important;
+}
