@@ -70,6 +70,12 @@ def create_app(config_name=None):
             return value.strftime(format)
         return str(value)
     
+    @app.template_filter('tojsonfilter')
+    def tojson_filter(value):
+        """Convert Python data to JSON for JavaScript"""
+        import json
+        return json.dumps(value)
+    
     @login_manager.user_loader
     def load_user(user_id):
         from .models import Pseudocode
