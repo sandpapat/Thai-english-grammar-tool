@@ -16,11 +16,11 @@ def login():
         
         # Basic validation
         if not pseudocode:
-            flash('Please enter your 5-digit code', 'error')
+            flash('Please enter your 5-character code', 'error')
             return render_template('login.html')
         
-        if len(pseudocode) != 5 or not pseudocode.isdigit():
-            flash('Invalid code format. Please enter exactly 5 digits', 'error')
+        if len(pseudocode) != 5 or not pseudocode.isalnum():
+            flash('Invalid code format. Please enter exactly 5 characters (letters and numbers)', 'error')
             return render_template('login.html')
         
         # Verify pseudocode
@@ -71,7 +71,7 @@ def login():
                 return redirect(next_page)
             return redirect(url_for('main.index'))
         else:
-            flash('Invalid code. Please check your 5-digit code and try again', 'error')
+            flash('Invalid code. Please check your 5-character code and try again', 'error')
     
     return render_template('login.html')
 
