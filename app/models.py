@@ -459,7 +459,7 @@ class UserActivity(db.Model):
             'total_activities': total_activities,
             'activity_breakdown': {activity_type: count for activity_type, count in activity_counts},
             'daily_activity': [
-                {'date': date.strftime('%Y-%m-%d'), 'count': count} 
+                {'date': str(date), 'count': count} 
                 for date, count in daily_activity
             ],
             'translation_count': translation_count,

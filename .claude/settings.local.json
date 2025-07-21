@@ -15,7 +15,8 @@
       "Bash(ls:*)",
       "Bash(pkill:*)",
       "Bash(find:*)",
-      "Bash(sqlite3:*)"
+      "Bash(sqlite3:*)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }
