@@ -7,7 +7,8 @@ import time
 import threading
 from collections import defaultdict, deque
 from functools import wraps
-from flask import request, jsonify, current_user
+from flask import request, jsonify
+from flask_login import current_user
 from datetime import datetime, timedelta
 
 
