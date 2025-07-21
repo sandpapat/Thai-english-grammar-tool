@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}User Analytics - Thaislate{% endblock %}
+
+{% block head %}
+<!-- Chart.js for activity visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .analytics-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .analytics-card:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--bs-primary);
+    }
+    
+    .stat-label {
+        color: var(--bs-body-color);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .activity-chart {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .session-info {
+        background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 110, 253, 0.1));
+        border-left: 4px solid var(--bs-info);
+    }
+    
+    .user-type-badge {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .user-type-normal {
+        background-color: rgba(108, 117, 125, 0.2);
+        color: var(--bs-secondary);
+        border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+    
+    .user-type-proficient {
+        background-color: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .activity-breakdown {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .activity-item {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+    
+    .activity-item .count {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--bs-success);
+    }
+    
+    .activity-item .label {
+        font-size: 0.8rem;
+        color: var(--bs-body-color);
+        text-transform: capitalize;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- User Header -->
+    <div class="analytics-card">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="mb-2">
+                    <i class="bi bi-person-circle me-2"></i>
+                    Your Analytics
+                </h1>
+                <p class="text-muted mb-0">
+                    Welcome <strong>{{ user.pseudocode }}</strong>!
+                    <span class="user-type-badge ms-2 {% if user.is_proficient() %}user-type-proficient{% else %}user-type-normal{% endif %}">
+                        {{ user.get_user_type_display() }}
+                    </span>
+                </p>
+            </div>
+            <div class="text-end">
+                {% if user_stats and user_stats.last_activity %}
+                <small class="text-muted">
+                    Last activity: {{ user_stats.last_activity.strftime('%B %d, %Y at %I:%M %p') }}
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if user_stats %}
+    <!-- Key Statistics -->
+    <div class="row">
+        <div class="col-md-3 col-sm-6">
+            <div class="analytics-card text-center">
+                <div class="stat-number text-primary">{{ user_stats.translation_count }}</div>
+                <div class="stat-label">Translations</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="analytics-card text-center">
+                <div class="stat-number text-success">{{ user_stats.login_count }}</div>
+                <div class="stat-label">Login Sessions</div>
+            </div>
+        </div>
+        {% if user.is_proficient() %}
+        <div class="col-md-3 col-sm-6">
+            <div class="analytics-card text-center">
+                <div class="stat-number text-warning">{{ user_stats.feedback_count }}</div>
+                <div class="stat-label">Feedback Given</div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-md-3 col-sm-6">
+            <div class="analytics-card text-center">
+                <div class="stat-number text-info">{{ user_stats.total_activities }}</div>
+                <div class="stat-label">Total Activities</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Breakdown -->
+    {% if user_stats.activity_breakdown %}
+    <div class="analytics-card">
+        <h3 class="mb-3">
+            <i class="bi bi-bar-chart me-2"></i>
+            Activity Breakdown (Last {{ user_stats.days_analyzed }} days)
+        </h3>
+        <div class="activity-breakdown">
+            {% for activity_type, count in user_stats.activity_breakdown.items() %}
+            <div class="activity-item">
+                <div class="count">{{ count }}</div>
+                <div class="label">{{ activity_type.replace('_', ' ') }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Daily Activity Chart -->
+    {% if user_stats.daily_activity %}
+    <div class="analytics-card">
+        <h3 class="mb-3">
+            <i class="bi bi-graph-up me-2"></i>
+            Daily Activity Chart
+        </h3>
+        <div class="activity-chart">
+            <canvas id="activityChart" height="100"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Current Session Info -->
+    {% if session_info %}
+    <div class="analytics-card session-info">
+        <h3 class="mb-3">
+            <i class="bi bi-clock-history me-2"></i>
+            Current Session
+        </h3>
+        <div class="row">
+            <div class="col-md-4">
+                <strong>Session Started:</strong><br>
+                {% if session_info.current_session_start %}
+                    {{ session_info.current_session_start.strftime('%B %d, %Y at %I:%M %p') }}
+                {% else %}
+                    No active session
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <strong>Last Activity:</strong><br>
+                {% if session_info.last_activity %}
+                    {{ session_info.last_activity.strftime('%B %d, %Y at %I:%M %p') }}
+                {% else %}
+                    No recent activity
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <strong>Session Duration:</strong><br>
+                {% if session_info.session_duration %}
+                    {{ "%.1f"|format(session_info.session_duration) }} minutes
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+        </div>
+        <div class="mt-3">
+            <small class="text-muted">
+                <i class="bi bi-info-circle me-1"></i>
+                Sessions automatically expire after 15 minutes of inactivity. Only one device can be logged in at a time.
+            </small>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user.is_proficient() %}
+    <!-- Proficient User Features -->
+    <div class="analytics-card">
+        <h3 class="mb-3">
+            <i class="bi bi-star me-2"></i>
+            Proficient User Features
+        </h3>
+        <div class="row">
+            <div class="col-md-6">
+                <h5><i class="bi bi-heart me-2"></i>Rating System</h5>
+                <p>As a proficient user, you can rate translation quality and provide feedback to help improve the system.</p>
+                <p><strong>Feedback submitted:</strong> {{ user_stats.feedback_count }} ratings</p>
+            </div>
+            <div class="col-md-6">
+                <h5><i class="bi bi-graph-up-arrow me-2"></i>Enhanced Analytics</h5>
+                <p>Your feedback contributions are tracked here to show your impact on system improvement.</p>
+                {% if user_stats.feedback_count > 0 %}
+                    <p class="text-success"><i class="bi bi-check-circle me-1"></i>Thank you for your valuable feedback!</p>
+                {% else %}
+                    <p class="text-muted"><i class="bi bi-info-circle me-1"></i>Start providing ratings to see your impact.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- No Data Available -->
+    <div class="analytics-card text-center">
+        <h3 class="mb-3">
+            <i class="bi bi-graph-up me-2"></i>
+            No Analytics Data
+        </h3>
+        <p class="text-muted">We couldn't load your analytics data at this time. Please try refreshing the page or contact support if the problem persists.</p>
+        <button class="btn btn-primary" onclick="window.location.reload()">
+            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Page
+        </button>
+    </div>
+    {% endif %}
+
+    <!-- Navigation -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-house me-2"></i>Back to Home
+        </a>
+        <a href="{{ url_for('main.system_performance') }}" class="btn btn-outline-info">
+            <i class="bi bi-speedometer2 me-2"></i>System Performance
+        </a>
+    </div>
+</div>
+
+{% if user_stats and user_stats.daily_activity %}
+<script>
+// Daily Activity Chart
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    
+    // Prepare data for Chart.js
+    const dailyData = {{ user_stats.daily_activity | tojsonfilter }};
+    const labels = dailyData.map(item => {
+        const date = new Date(item.date);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+    const counts = dailyData.map(item => item.count);
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Daily Activities',
+                data: counts,
+                borderColor: 'rgba(13, 202, 240, 1)',
+                backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: 'rgba(13, 202, 240, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

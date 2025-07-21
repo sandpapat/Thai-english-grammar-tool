@@ -10,12 +10,14 @@ import os
 import json
 import re
 import time
+import threading
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from transformers import XLMRobertaModel, AutoConfig, PreTrainedModel, AutoTokenizer
 from safetensors.torch import load_file as safe_load_file
 from dotenv import load_dotenv
+from functools import wraps
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,6 +27,23 @@ try:
 except ImportError:
     Together = None
     print("Warning: together package not installed. GrammarExplainer will use mock explanations.")
+
+# Thread safety locks for model inference to prevent concurrent access issues
+_model_locks = {
+    'translator': threading.RLock(),
+    'classifier': threading.RLock(), 
+    'explainer': threading.RLock()
+}
+
+def thread_safe_model_call(model_type):
+    """Decorator to ensure thread-safe model inference calls"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            with _model_locks[model_type]:
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def extract_first_sentence(text):
@@ -391,8 +410,9 @@ class TyphoonTranslator:
             print(f"✗ Error loading GGUF model: {e}")
             print("  Using mock translations as fallback")
     
+    @thread_safe_model_call('translator')
     def translate(self, thai_text):
-        """Translate Thai text to English"""
+        """Translate Thai text to English (thread-safe)"""
         if self.model:
             try:
                 # Use proper prompt format for Typhoon
@@ -490,8 +510,9 @@ class TenseClassifier:
         with open(os.path.join(self.model_path, "fine_labels.json")) as f:
             self.id2fine = json.load(f)
     
+    @thread_safe_model_call('classifier')
     def classify(self, english_text, top_k=3):
-        """Classify tense from English text"""
+        """Classify tense from English text (thread-safe)"""
         if self.model and self.tokenizer:
             try:
                 # Tokenize input
@@ -623,8 +644,9 @@ class GrammarExplainer:
         else:
             print("✗ Together package not available. Using mock explanations.")
     
+    @thread_safe_model_call('explainer')
     def explain(self, analysis_result):
-        """Generate grammar explanation based on analysis using Together AI API"""
+        """Generate grammar explanation based on analysis using Together AI API (thread-safe)"""
         thai_text = analysis_result.get('input_thai', '')
         translation = analysis_result.get('translation', '')
         analyzed_sentence = analysis_result.get('analyzed_sentence', translation)
@@ -945,9 +967,22 @@ class ModelManager:
         except Exception as e:
             print(f"✗ Explanation model failed to load: {e}")
     
-    def full_pipeline(self, thai_text, progress_callback=None, user_id=None, log_performance=True, performance_callback=None):
-        """Run full NLP pipeline on Thai text with optional progress callbacks and performance logging"""
+    def full_pipeline(self, thai_text, progress_callback=None, user_id=None, log_performance=True, performance_callback=None, timeout=75):
+        """
+        Run full NLP pipeline on Thai text with optional progress callbacks and performance logging
+        
+        Args:
+            thai_text: Input Thai text
+            progress_callback: Optional callback for progress updates
+            user_id: User ID for performance logging
+            log_performance: Whether to log performance metrics
+            performance_callback: Callback for performance logging
+            timeout: Maximum time in seconds for pipeline execution (default: 75s)
+        """
         result = {"input_thai": thai_text}
+        
+        # Pipeline execution tracking
+        pipeline_start_time = time.time()
         
         # Initialize timing variables
         translation_time = None
@@ -956,9 +991,24 @@ class ModelManager:
         success = True
         error_stage = None
         
+        # Timeout check helper
+        def check_timeout():
+            elapsed = time.time() - pipeline_start_time
+            if elapsed > timeout:
+                raise TimeoutError(f"Pipeline execution exceeded {timeout} seconds limit")
+            return elapsed
+        
         # Step 1: Translation
         if progress_callback:
             progress_callback(1, 33, "Translating...", "กำลังแปล...")
+        
+        try:
+            check_timeout()  # Check timeout before starting translation
+        except TimeoutError as e:
+            result["translation"] = f"Pipeline timeout: {str(e)}"
+            result["analyzed_sentence"] = ""
+            result["is_multi_sentence"] = False
+            return result
         
         if self.translator:
             try:
@@ -989,6 +1039,34 @@ class ModelManager:
         # Step 2: Tense Classification
         if progress_callback:
             progress_callback(2, 66, "Classifying tense...", "กำลังจำแนกกาล...")
+        
+        try:
+            check_timeout()  # Check timeout before starting classification
+        except TimeoutError as e:
+            result["coarse_label"] = "TIMEOUT"
+            result["fine_label"] = f"Classification timeout: {str(e)}"
+            result["fine_code"] = "TIMEOUT"
+            result["confidence"] = 0.0
+            result["all_predictions"] = {}
+            success = False
+            error_stage = "timeout_classification"
+            # Skip to end for performance logging
+            if log_performance and performance_callback and callable(performance_callback):
+                try:
+                    input_length = len(thai_text)
+                    total_time = time.time() - pipeline_start_time
+                    performance_callback(
+                        user_id=user_id,
+                        input_length=input_length,
+                        translation_time=translation_time,
+                        classification_time=None,
+                        explanation_time=None,
+                        success=False,
+                        error_stage="timeout_classification"
+                    )
+                except Exception as e:
+                    print(f"Performance logging failed: {e}")
+            return result
         
         if self.classifier and "analyzed_sentence" in result and result["analyzed_sentence"] and success:
             try:
@@ -1024,6 +1102,30 @@ class ModelManager:
         # Step 3: Grammar Explanation
         if progress_callback:
             progress_callback(3, 100, "Generating explanation...", "กำลังสร้างคำอธิบาย...")
+        
+        try:
+            check_timeout()  # Check timeout before starting explanation
+        except TimeoutError as e:
+            result["explanation"] = f"[SECTION 1: Context Cues]\nExplanation timeout: {str(e)}"
+            success = False
+            error_stage = "timeout_explanation"
+            # Skip to performance logging
+            if log_performance and performance_callback and callable(performance_callback):
+                try:
+                    input_length = len(thai_text)
+                    total_time = time.time() - pipeline_start_time
+                    performance_callback(
+                        user_id=user_id,
+                        input_length=input_length,
+                        translation_time=translation_time,
+                        classification_time=classification_time,
+                        explanation_time=None,
+                        success=False,
+                        error_stage="timeout_explanation"
+                    )
+                except Exception as e:
+                    print(f"Performance logging failed: {e}")
+            return result
         
         if self.explainer and success:
             try:

@@ -23,7 +23,7 @@
     
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body data-user-logged-in="{% if current_user.is_authenticated %}true{% else %}false{% endif %}">
     <!-- Skip to content link for keyboard navigation -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
@@ -53,13 +53,6 @@
                             <i class="bi bi-book" aria-hidden="true"></i> <span lang="th">คู่มือ Tense</span>
                         </a>
                     </li>
-                    <li class="nav-item" role="none">
-                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" 
-                           href="{{ url_for('main.about') }}" role="menuitem"
-                           {% if request.endpoint == 'main.about' %}aria-current="page"{% endif %}>
-                            <i class="bi bi-info-circle" aria-hidden="true"></i> About Us
-                        </a>
-                    </li>
                     <li class="nav-item dropdown" role="none">
                         <a class="nav-link dropdown-toggle {% if request.endpoint in ['main.performance', 'main.classifier_performance', 'main.pipeline_performance', 'main.system_performance'] %}active{% endif %}" 
                            href="#" role="menuitem" data-bs-toggle="dropdown" aria-expanded="false"
@@ -86,6 +79,13 @@
                                 <i class="bi bi-speedometer2 me-2" aria-hidden="true"></i>Combined View
                             </a></li>
                         </ul>
+                    </li>
+                    <li class="nav-item" role="none">
+                        <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" 
+                           href="{{ url_for('main.about') }}" role="menuitem"
+                           {% if request.endpoint == 'main.about' %}aria-current="page"{% endif %}>
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> About Us
+                        </a>
                     </li>
                 </ul>
                 
@@ -121,6 +121,11 @@
                                 <li role="none"><span class="dropdown-item-text text-muted">
                                     <small>{{ current_user.get_user_type_display() }} User</small>
                                 </span></li>
+                                <li role="none"><hr class="dropdown-divider"></li>
+                                <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.user_analytics' %}active{% endif %}" 
+                                    href="{{ url_for('main.user_analytics') }}" role="menuitem">
+                                    <i class="bi bi-person-lines-fill me-2" aria-hidden="true"></i>My Analytics
+                                </a></li>
                                 <li role="none"><hr class="dropdown-divider"></li>
                                 <li role="none"><a class="dropdown-item" href="{{ url_for('auth.logout') }}" role="menuitem">
                                     <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Logout
@@ -257,6 +262,9 @@
             }
         })();
     </script>
+    
+    <!-- Session Management and Activity Tracking -->
+    <script src="{{ url_for('static', filename='js/session-management.js') }}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

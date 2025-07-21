@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import func
+import uuid
 
 db = SQLAlchemy()
 
@@ -265,4 +266,232 @@ class Rating(db.Model):
             'avg_overall_rating': round(avg_stats.avg_overall or 0, 2),
             'translation_distribution': {str(rating): count for rating, count in translation_dist},
             'overall_distribution': {str(rating): count for rating, count in overall_dist}
+        }
+
+
+class UserSession(db.Model):
+    """Single-device session management for users"""
+    __tablename__ = 'user_sessions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('pseudocodes.id'), nullable=False)
+    session_token = db.Column(db.String(64), unique=True, nullable=False, index=True)
+    user_agent = db.Column(db.Text)
+    ip_address = db.Column(db.String(45))  # IPv6 support
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_activity = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    is_active = db.Column(db.Boolean, default=True, index=True)
+    
+    # Relationship
+    user = db.relationship('Pseudocode', backref=db.backref('sessions', lazy=True))
+    
+    def __repr__(self):
+        return f'<UserSession {self.user_id}: {self.session_token[:8]}... (active: {self.is_active})>'
+    
+    @staticmethod
+    def create_session(user_id, user_agent=None, ip_address=None):
+        """Create new session and deactivate any existing sessions for this user"""
+        # First, deactivate all existing sessions for this user (single-device login)
+        UserSession.query.filter_by(user_id=user_id, is_active=True).update({
+            'is_active': False,
+            'last_activity': datetime.utcnow()
+        })
+        
+        # Create new session
+        session = UserSession(
+            user_id=user_id,
+            session_token=str(uuid.uuid4()),
+            user_agent=user_agent,
+            ip_address=ip_address
+        )
+        
+        db.session.add(session)
+        db.session.commit()
+        return session
+    
+    @staticmethod
+    def get_active_session(user_id):
+        """Get the active session for a user"""
+        return UserSession.query.filter_by(
+            user_id=user_id,
+            is_active=True
+        ).first()
+    
+    @staticmethod
+    def validate_session(session_token, max_idle_minutes=15):
+        """Validate session and check for idle timeout"""
+        session = UserSession.query.filter_by(
+            session_token=session_token,
+            is_active=True
+        ).first()
+        
+        if not session:
+            return None, "Session not found or inactive"
+        
+        # Check idle timeout
+        idle_time = datetime.utcnow() - session.last_activity
+        if idle_time > timedelta(minutes=max_idle_minutes):
+            # Session expired due to inactivity
+            session.is_active = False
+            db.session.commit()
+            return None, f"Session expired after {max_idle_minutes} minutes of inactivity"
+        
+        # Update last activity
+        session.last_activity = datetime.utcnow()
+        db.session.commit()
+        
+        return session, "Valid"
+    
+    @staticmethod
+    def cleanup_expired_sessions(max_idle_minutes=15):
+        """Clean up expired sessions (call this periodically)"""
+        cutoff_time = datetime.utcnow() - timedelta(minutes=max_idle_minutes)
+        
+        expired_count = UserSession.query.filter(
+            UserSession.is_active == True,
+            UserSession.last_activity < cutoff_time
+        ).update({
+            'is_active': False,
+            'last_activity': datetime.utcnow()
+        })
+        
+        db.session.commit()
+        return expired_count
+    
+    def invalidate(self):
+        """Invalidate this session"""
+        self.is_active = False
+        self.last_activity = datetime.utcnow()
+        db.session.commit()
+
+
+class UserActivity(db.Model):
+    """User activity tracking for analytics"""
+    __tablename__ = 'user_activity'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('pseudocodes.id'), nullable=False)
+    activity_type = db.Column(db.String(50), nullable=False, index=True)  # 'login', 'translation', 'feedback', 'logout'
+    session_token = db.Column(db.String(64), index=True)
+    details = db.Column(db.JSON)  # Store additional activity details
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.Text)
+    
+    # Relationship
+    user = db.relationship('Pseudocode', backref=db.backref('activities', lazy=True))
+    
+    def __repr__(self):
+        return f'<UserActivity {self.user_id}: {self.activity_type} at {self.timestamp}>'
+    
+    @staticmethod
+    def log_activity(user_id, activity_type, session_token=None, details=None, ip_address=None, user_agent=None):
+        """Log user activity"""
+        activity = UserActivity(
+            user_id=user_id,
+            activity_type=activity_type,
+            session_token=session_token,
+            details=details,
+            ip_address=ip_address,
+            user_agent=user_agent
+        )
+        
+        db.session.add(activity)
+        db.session.commit()
+        return activity
+    
+    @staticmethod
+    def get_user_stats(user_id, days=30):
+        """Get user activity statistics"""
+        cutoff_date = datetime.utcnow() - timedelta(days=days)
+        
+        # Total activities
+        total_activities = UserActivity.query.filter(
+            UserActivity.user_id == user_id,
+            UserActivity.timestamp >= cutoff_date
+        ).count()
+        
+        # Activity breakdown
+        activity_counts = db.session.query(
+            UserActivity.activity_type,
+            func.count(UserActivity.id)
+        ).filter(
+            UserActivity.user_id == user_id,
+            UserActivity.timestamp >= cutoff_date
+        ).group_by(UserActivity.activity_type).all()
+        
+        # Daily activity counts for chart
+        daily_activity = db.session.query(
+            func.date(UserActivity.timestamp).label('date'),
+            func.count(UserActivity.id).label('count')
+        ).filter(
+            UserActivity.user_id == user_id,
+            UserActivity.timestamp >= cutoff_date
+        ).group_by(func.date(UserActivity.timestamp)).all()
+        
+        # Translation specific stats
+        translation_count = UserActivity.query.filter(
+            UserActivity.user_id == user_id,
+            UserActivity.activity_type == 'translation',
+            UserActivity.timestamp >= cutoff_date
+        ).count()
+        
+        # Feedback stats (for proficient users)
+        feedback_count = UserActivity.query.filter(
+            UserActivity.user_id == user_id,
+            UserActivity.activity_type == 'feedback',
+            UserActivity.timestamp >= cutoff_date
+        ).count()
+        
+        # Login frequency
+        login_count = UserActivity.query.filter(
+            UserActivity.user_id == user_id,
+            UserActivity.activity_type == 'login',
+            UserActivity.timestamp >= cutoff_date
+        ).count()
+        
+        # Last activity
+        last_activity = UserActivity.query.filter(
+            UserActivity.user_id == user_id
+        ).order_by(UserActivity.timestamp.desc()).first()
+        
+        return {
+            'total_activities': total_activities,
+            'activity_breakdown': {activity_type: count for activity_type, count in activity_counts},
+            'daily_activity': [
+                {'date': date.strftime('%Y-%m-%d'), 'count': count} 
+                for date, count in daily_activity
+            ],
+            'translation_count': translation_count,
+            'feedback_count': feedback_count,
+            'login_count': login_count,
+            'last_activity': last_activity.timestamp if last_activity else None,
+            'days_analyzed': days
+        }
+    
+    @staticmethod
+    def get_all_user_summary():
+        """Get summary statistics for all users"""
+        # Most active users
+        most_active = db.session.query(
+            UserActivity.user_id,
+            func.count(UserActivity.id).label('activity_count')
+        ).group_by(UserActivity.user_id).order_by(
+            func.count(UserActivity.id).desc()
+        ).limit(10).all()
+        
+        # Activity type distribution
+        activity_dist = db.session.query(
+            UserActivity.activity_type,
+            func.count(UserActivity.id)
+        ).group_by(UserActivity.activity_type).all()
+        
+        return {
+            'most_active_users': [
+                {'user_id': user_id, 'activity_count': count} 
+                for user_id, count in most_active
+            ],
+            'activity_distribution': {
+                activity_type: count for activity_type, count in activity_dist
+            }
         }

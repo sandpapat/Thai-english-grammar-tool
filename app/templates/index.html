@@ -637,9 +637,19 @@
         document.getElementById('validationFeedback').innerHTML += warningMessages;
     }
     
+    // Double-click prevention state
+    let isSubmitting = false;
+    let submitTimeout = null;
+    
     // Real-time SSE form submission with progress tracking
     document.getElementById('analyseForm').addEventListener('submit', function(e) {
         e.preventDefault(); // Always prevent default form submission
+        
+        // Prevent double submission
+        if (isSubmitting) {
+            console.log('Form submission already in progress, ignoring duplicate request');
+            return;
+        }
         
         const thai_text = document.getElementById('thai_text').value.trim();
         
@@ -652,6 +662,15 @@
             alert('กรุณาแก้ไขข้อผิดพลาดก่อนส่ง / Please fix validation errors before submitting');
             return;
         }
+        
+        // Set submission state to prevent duplicates
+        isSubmitting = true;
+        
+        // Auto-reset submission state after timeout (safety net)
+        submitTimeout = setTimeout(() => {
+            isSubmitting = false;
+            console.log('Auto-reset submission state after timeout');
+        }, 120000); // 2 minutes timeout
         
         // Start processing with countdown timer
         startProcessingWithCountdown(thai_text);
@@ -684,6 +703,10 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Processing...';
             
+            // Add visual indication that request is being processed
+            submitBtn.style.opacity = '0.7';
+            submitBtn.setAttribute('title', 'Processing your request, please wait...');
+            
             // Start countdown
             startCountdown(estimatedTime);
             
@@ -699,6 +722,14 @@
             form.appendChild(input);
             
             document.body.appendChild(form);
+            
+            // Reset submission state before navigation (since form will redirect)
+            isSubmitting = false;
+            if (submitTimeout) {
+                clearTimeout(submitTimeout);
+                submitTimeout = null;
+            }
+            
             form.submit();
             
         } catch (error) {
@@ -740,6 +771,13 @@
     function handleProcessingError(errorMessage) {
         const submitBtn = document.getElementById('submitBtn');
         const loadingSection = document.getElementById('loadingSection');
+        
+        // Reset submission state to allow retry
+        isSubmitting = false;
+        if (submitTimeout) {
+            clearTimeout(submitTimeout);
+            submitTimeout = null;
+        }
         
         // Re-enable form
         submitBtn.disabled = false;

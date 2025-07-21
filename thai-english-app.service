@@ -1,0 +1,38 @@
+[Unit]
+Description=Thai-English Grammar Learning Tool
+After=network.target
+
+[Service]
+Type=exec
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/thai-english-app
+Environment=PATH=/home/ubuntu/thai-english-app/venv/bin
+Environment=FLASK_ENV=production
+Environment=SECRET_KEY=your-production-secret-key-here
+Environment=DATABASE_URL=sqlite:///app.db
+Environment=TOGETHER_API_KEY=your-together-api-key-here
+ExecStart=/home/ubuntu/thai-english-app/venv/bin/gunicorn -c gunicorn_config.py app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=on-failure
+RestartSec=10
+
+# Security settings
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/home/ubuntu/thai-english-app
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=4G
+
+# Health check
+ExecStartPre=/bin/sleep 10
+HealthCheckInterval=30s
+
+[Install]
+WantedBy=multi-user.target

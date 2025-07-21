@@ -2,12 +2,14 @@
 Main application routes
 """
 import time
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, session
 from flask_login import login_required, current_user
 from .pipeline import ModelManager
 from .validation import InputValidator
 from .utils import format_explanation_content, parse_explanation
 from .data import get_performance_data
+from .rate_limiter import rate_limit, get_rate_limit_info
+from .models import UserActivity
 
 # Create blueprint
 main_bp = Blueprint('main', __name__)
@@ -29,6 +31,7 @@ def index():
 
 @main_bp.route('/predict', methods=['POST'])
 @login_required
+@rate_limit
 def predict():
     """Process Thai text through NLP pipeline"""
     try:
@@ -59,6 +62,20 @@ def predict():
                     print("Performance logging skipped: No Flask app context")
             except Exception as e:
                 print(f"Performance logging failed: {e}")
+        
+        # Log translation activity
+        session_token = session.get('session_token')
+        UserActivity.log_activity(
+            user_id=current_user.id,
+            activity_type='translation',
+            session_token=session_token,
+            details={
+                'input_length': len(thai_text),
+                'has_multiple_sentences': validation_result.get('text_stats', {}).get('sentence_count', 1) > 1
+            },
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
+        )
         
         # Run the pipeline with user ID for performance logging
         user_id = current_user.id if current_user and current_user.is_authenticated else None
@@ -148,6 +165,99 @@ def get_average_response_time():
             'success_rate': 0,
             'average_input_length': 50
         })
+
+
+@main_bp.route('/health')
+def health_check():
+    """Health check endpoint for monitoring and load balancers"""
+    try:
+        from .models import db
+        from .rate_limiter import rate_limiter
+        
+        # Check database connection
+        db.session.execute('SELECT 1')
+        
+        # Get system stats
+        rate_stats = rate_limiter.get_stats()
+        
+        # Check model manager status
+        model_status = {
+            'translator': model_manager.translator is not None,
+            'classifier': model_manager.classifier is not None,
+            'explainer': model_manager.explainer is not None
+        }
+        
+        health_data = {
+            'status': 'healthy',
+            'timestamp': time.time(),
+            'database': 'connected',
+            'models': model_status,
+            'rate_limiter': rate_stats,
+            'all_models_loaded': all(model_status.values())
+        }
+        
+        # Return appropriate status code
+        status_code = 200 if health_data['all_models_loaded'] else 503
+        
+        return jsonify(health_data), status_code
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': time.time()
+        }), 503
+
+
+@main_bp.route('/api/rate-limit-info')
+def rate_limit_info():
+    """Get current rate limit status for user"""
+    try:
+        info = get_rate_limit_info()
+        return jsonify(info)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@main_bp.route('/user-analytics')
+@login_required
+def user_analytics():
+    """Display user-specific analytics dashboard"""
+    try:
+        from .models import UserActivity, UserSession
+        
+        # Get user analytics data
+        user_stats = UserActivity.get_user_stats(current_user.id, days=30)
+        
+        # Get current session info
+        session_token = session.get('session_token')
+        current_session = None
+        if session_token:
+            current_session = UserSession.query.filter_by(
+                session_token=session_token,
+                is_active=True
+            ).first()
+        
+        # Session information
+        session_info = {
+            'current_session_start': current_session.created_at if current_session else None,
+            'last_activity': current_session.last_activity if current_session else None,
+            'session_duration': None
+        }
+        
+        if current_session:
+            duration = current_session.last_activity - current_session.created_at
+            session_info['session_duration'] = duration.total_seconds() / 60  # minutes
+        
+        return render_template(
+            'user_analytics.html',
+            user_stats=user_stats,
+            session_info=session_info,
+            user=current_user
+        )
+    except Exception as e:
+        flash(f'Error loading analytics data: {str(e)}', 'error')
+        return render_template('user_analytics.html', user_stats=None, session_info=None, user=current_user)
 
 
 @main_bp.route('/tenses')
@@ -247,6 +357,22 @@ def submit_rating():
             comments=data.get('comments', '').strip() or None
         )
         
+        # Log feedback activity
+        session_token = session.get('session_token')
+        UserActivity.log_activity(
+            user_id=current_user.id,
+            activity_type='feedback',
+            session_token=session_token,
+            details={
+                'rating_id': rating.id,
+                'translation_rating': translation_rating,
+                'overall_rating': overall_rating,
+                'has_comments': bool(data.get('comments', '').strip())
+            },
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
+        )
+        
         return jsonify({
             'success': True,
             'message': 'Rating submitted successfully',
@@ -263,4 +389,95 @@ def submit_rating():
         return jsonify({
             'success': False,
             'error': 'An error occurred while submitting your rating'
+        }), 500
+
+
+@main_bp.route('/api/extend-session', methods=['POST'])
+@login_required
+def extend_session():
+    """Extend user session to prevent timeout"""
+    try:
+        from .models import UserSession
+        
+        session_token = session.get('session_token')
+        if not session_token:
+            return jsonify({
+                'success': False,
+                'error': 'No session token found'
+            }), 400
+        
+        # Update session activity
+        user_session, status = UserSession.validate_session(session_token, max_idle_minutes=15)
+        
+        if user_session:
+            # Log session extension activity
+            UserActivity.log_activity(
+                user_id=current_user.id,
+                activity_type='session_extended',
+                session_token=session_token,
+                details={'extension_method': 'manual'},
+                ip_address=request.remote_addr,
+                user_agent=request.headers.get('User-Agent')
+            )
+            
+            return jsonify({
+                'success': True,
+                'message': 'Session extended successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Session invalid or expired'
+            }), 401
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to extend session'
+        }), 500
+
+
+@main_bp.route('/api/track-activity', methods=['POST'])
+@login_required
+def track_activity():
+    """Track user activity for analytics (lightweight endpoint)"""
+    try:
+        data = request.get_json()
+        if not data or 'activity_type' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing activity type'
+            }), 400
+        
+        activity_type = data.get('activity_type')
+        activity_data = data.get('data', {})
+        
+        # Only track certain activity types
+        allowed_types = ['page_view', 'page_leave', 'form_submit', 'session_warning']
+        if activity_type not in allowed_types:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid activity type'
+            }), 400
+        
+        # Log the activity
+        session_token = session.get('session_token')
+        UserActivity.log_activity(
+            user_id=current_user.id,
+            activity_type=activity_type,
+            session_token=session_token,
+            details=activity_data,
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Activity tracked'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': 'Failed to track activity'
         }), 500

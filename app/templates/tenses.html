@@ -4,49 +4,183 @@
 
 {% block extra_css %}
 <style>
-    /* Dark mode compatible tense cards */
-    .tense-card {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        color: var(--text-primary);
+    /* Accordion Styling */
+    .accordion {
+        --bs-accordion-border-radius: 12px;
+        --bs-accordion-border-color: rgba(255, 255, 255, 0.2);
+        --bs-accordion-bg: rgba(255, 255, 255, 0.05);
+        --bs-accordion-btn-bg: rgba(255, 255, 255, 0.1);
+        --bs-accordion-btn-color: var(--bs-body-color);
+        --bs-accordion-body-padding-x: 1.5rem;
+        --bs-accordion-body-padding-y: 1.5rem;
+    }
+    
+    .accordion-button {
+        font-weight: 600;
+        font-size: 1.1rem;
+        border: none;
+        background: rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(10px);
+        color: var(--bs-body-color) !important;
         transition: all 0.3s ease;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background: rgba(255, 255, 255, 0.15) !important;
+        box-shadow: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .accordion-button::after {
+        transition: transform 0.3s ease;
+    }
+    
+    .accordion-button:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-1px);
+    }
+    
+    .accordion-body {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Tense Cards within Accordion */
+    .tense-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        color: var(--bs-body-color);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
     }
     
     .tense-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px var(--card-shadow);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
     }
     
     .tense-card-header {
-        background: var(--bg-secondary);
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        color: var(--bs-body-color);
+        padding: 1rem;
+        border-radius: 9px 9px 0 0;
+    }
+    
+    .tense-card-body {
+        padding: 1rem;
     }
     
     .tense-list-item {
-        background: var(--card-bg);
-        border-bottom: 1px solid var(--border-color);
-        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--bs-body-color);
+        padding: 0.75rem;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
     }
     
     .tense-list-item:last-child {
         border-bottom: none;
+        margin-bottom: 0;
     }
     
     .text-muted-custom {
-        color: var(--text-secondary) !important;
+        color: var(--bs-secondary-color) !important;
     }
     
-    /* Main section card */
-    .tense-section {
-        background: var(--card-bg);
-        border: 1px solid var(--border-color);
-        box-shadow: 0 2px 10px var(--card-shadow);
+    /* Quick Navigation */
+    .tense-nav {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    .tense-section-header {
-        background: var(--button-primary);
-        border-bottom: 1px solid var(--border-color);
+    .tense-nav-item {
+        display: inline-block;
+        margin: 0.25rem;
+        padding: 0.5rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        color: var(--bs-body-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+    
+    .tense-nav-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--bs-body-color);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+    
+    /* Color-coded badges */
+    .badge-formula {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        font-weight: 500;
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--bs-primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 1000;
+    }
+    
+    .back-to-top.show {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .back-to-top:hover {
+        background: var(--bs-primary);
+        transform: translateY(-3px);
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .tense-nav-item {
+            display: block;
+            margin: 0.5rem 0;
+            text-align: center;
+        }
+        
+        .accordion-button {
+            font-size: 1rem;
+        }
+        
+        .back-to-top {
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+        }
+    }
+    
+    /* Smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
     }
 </style>
 {% endblock %}
@@ -54,317 +188,414 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h1 class="text-center mb-4">
-            <i class="bi bi-book"></i> <span lang="th">คู่มือการใช้ Tense ภาษาอังกฤษ</span>
-        </h1>
-        
-        <p class="text-center text-muted-custom mb-5">
-            <span lang="th">ความเข้าใจการใช้ Tense ภาษาอังกฤษที่แตกต่างกันสำหรับการแปลไทย-อังกฤษ</span>
-        </p>
+        <!-- Header -->
+        <div class="text-center mb-5" id="top">
+            <h1 class="mb-3">
+                <i class="bi bi-book"></i> <span lang="th">คู่มือการใช้ Tense ภาษาอังกฤษ</span>
+            </h1>
+            <p class="text-muted-custom mb-4">
+                <span lang="th">ความเข้าใจการใช้ Tense ภาษาอังกฤษที่แตกต่างกันสำหรับการแปลไทย-อังกฤษ</span>
+            </p>
+        </div>
 
-        <!-- Present Tenses -->
-        <div class="tense-section shadow mb-4">
-            <div class="tense-section-header text-white">
-                <h3 class="mb-0 p-3">
-                    <i class="bi bi-clock"></i> Present Tenses (<span lang="th">ปัจจุบัน</span>)
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Present Simple -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-primary">
-                            <div class="tense-card-header">
-                                <h5 class="text-primary mb-2">Present Simple</h5>
-                                <div class="badge bg-primary text-white">Subject + V<sub>1</sub> (s/es)</div>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong><span lang="th">กิจวัตรและพฤติกรรมประจำ:</span></strong><br>
-                                        <small class="text-muted-custom"><span lang="th">ใช้เมื่อพูดถึงกิจวัตรหรือพฤติกรรมที่ทำเป็นประจำ</span></small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>ข้อเท็จจริงและความรู้วิทยาศาสตร์:</strong><br>
-                                        <small class="text-muted-custom">ใช้กับข้อเท็จจริงที่เป็นสัจธรรมหรือเป็นความรู้ทางวิทยาศาสตร์</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>ตารางเวลาและแผนการ:</strong><br>
-                                        <small class="text-muted-custom">ใช้เมื่อกล่าวถึงตารางเวลา เช่น ตารางเดินรถ หรือแผนที่กำหนดไว้</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>สุภาษิตและคำกล่าวทั่วไป:</strong><br>
-                                        <small class="text-muted-custom">ใช้กับสุภาษิต คำพังเพย หรือคำกล่าวทั่วไป</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>พาดหัวข่าว:</strong><br>
-                                        <small class="text-muted-custom">ใช้ในพาดหัวข่าวหรือข้อความที่เน้นย่อประโยค สังเกตว่าแม้จะพูดถึงเหตุการณ์ที่เกิดขึ้นแล้ว แต่พาดหัวข่าวมักใช้ Present Simple เพื่อสร้างความรู้สึกสดใหม่และดึงดูดความสนใจผู้อ่าน</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>แผนการและความตั้งใจในอนาคต:</strong><br>
-                                        <small class="text-muted-custom">ใช้เมื่อพูดถึง "แผนการ" หรือ "ความตั้งใจ" ในอนาคต แม้ว่าโครงสร้างจะใช้ Present Simple แต่ความหมายมักชี้ไปยังสิ่งที่ผู้พูดหรือผู้ถูกถาม "ตั้งใจจะทำ" ในอนาคต</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Present Continuous -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-success">
-                            <div class="tense-card-header">
-                                <h5 class="text-success mb-2">Present Continuous</h5>
-                                <div class="badge bg-success text-white">Subject + am/is/are + V<sub>ing</sub> (Present Participle)</div>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำที่เกิดขึ้นขณะพูด:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่ทำอยู่ขณะพูด</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>กิจกรรมในช่วงเวลานี้:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่ทำอยู่ในช่วงนี้ เช่น โปรเจค หรือ สิ่งที่ใช้เวลาทำนาน เป็นหลักวัน</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>เหตุการณ์ในอนาคตที่วางแผนแล้ว:</strong><br>
-                                        <small class="text-muted-custom">เหตุการณ์ที่จะเกิดขึ้นในอนาคตโดยมี "การวางแผนไว้แล้ว" โดยมักจะเจอ "v.to be + going to"</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>การเปลี่ยนแปลงที่กำลังดำเนินอยู่:</strong><br>
-                                        <small class="text-muted-custom">เหตุการณ์ที่กำลังมีการเปลี่ยนแปลง พัฒนาขึ้น หรือก้าวหน้าขึ้น</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Present Perfect -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-info">
-                            <div class="tense-card-header">
-                                <h5 class="text-info mb-2">Present Perfect</h5>
-                                <div class="badge bg-info text-white">Subject + have/has + V<sub>3</sub> (Past Participle)</div>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำที่เพิ่งสิ้นสุด:</strong><br>
-                                        <small class="text-muted-custom">ใช้เมื่อเหตุการณ์เพิ่งจะสิ้นสุดลง</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำในอดีตที่มีผลต่อปัจจุบัน:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่เกิดขึ้นตั้งแต่อดีตและมีผลหรือคงสภาพจนถึงปัจจุบัน (การกระทำอาจจะจบไปแล้ว)</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>ประสบการณ์:</strong><br>
-                                        <small class="text-muted-custom">ประสบการณ์ (เจอคำว่า "First / ... time")</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Present Perfect Continuous -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-warning">
-                            <div class="tense-card-header">
-                                <h5 class="text-warning mb-2">Present Perfect Continuous</h5>
-                                <div class="badge bg-warning text-white">Subject + have/has + been + V<sub>ing</sub> (Present Participle)</div>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำต่อเนื่องจากอดีตถึงปัจจุบัน:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่ทำเรื่อยมาจนถึงปัจจุบัน โดยเน้น ระยะเวลา มักเจอ For since</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Quick Navigation -->
+        <div class="tense-nav text-center">
+            <h5 class="mb-3"><i class="bi bi-compass"></i> Quick Navigation</h5>
+            <div class="d-flex flex-wrap justify-content-center">
+                <a href="#present-section" class="tense-nav-item">
+                    <i class="bi bi-clock me-1"></i>Present Tenses
+                </a>
+                <a href="#past-section" class="tense-nav-item">
+                    <i class="bi bi-clock-history me-1"></i>Past Tenses
+                </a>
+                <a href="#future-section" class="tense-nav-item">
+                    <i class="bi bi-clock-forward me-1"></i>Future Tenses
+                </a>
             </div>
         </div>
 
-        <!-- Past Tenses -->
-        <div class="tense-section shadow mb-4">
-            <div class="tense-section-header text-white">
-                <h3 class="mb-0 p-3">
-                    <i class="bi bi-clock-history"></i> Past Tenses (อดีต)
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Past Simple -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-secondary">
-                            <div class="tense-card-header">
-                                <h5 class="text-secondary mb-2">Past Simple</h5>
-                                <div class="badge bg-secondary text-white">Subject + V<sub>2</sub></div>
+        <!-- Main Accordion -->
+        <div class="accordion" id="tenseAccordion">
+            
+            <!-- Present Tenses Section -->
+            <div class="accordion-item" id="present-section">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapsePresent" aria-expanded="true" aria-controls="collapsePresent">
+                        <i class="bi bi-clock me-2"></i>
+                        <strong>Present Tenses (<span lang="th">ปัจจุบัน</span>)</strong>
+                        <span class="badge bg-primary ms-2">4 Tenses</span>
+                    </button>
+                </h2>
+                <div id="collapsePresent" class="accordion-collapse collapse show" data-bs-parent="#tenseAccordion">
+                    <div class="accordion-body">
+                        <!-- Present Tenses Sub-Accordion -->
+                        <div class="accordion" id="presentAccordion">
+                            
+                            <!-- Present Simple -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#presentSimple" aria-expanded="false" aria-controls="presentSimple">
+                                        <span class="text-primary me-2">Present Simple</span>
+                                        <span class="badge badge-formula bg-primary">Subject + V₁ (s/es)</span>
+                                    </button>
+                                </h2>
+                                <div id="presentSimple" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong><span lang="th">กิจวัตรและพฤติกรรมประจำ:</span></strong><br>
+                                                    <small class="text-muted-custom"><span lang="th">ใช้เมื่อพูดถึงกิจวัตรหรือพฤติกรรมที่ทำเป็นประจำ</span></small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>ข้อเท็จจริงและความรู้วิทยาศาสตร์:</strong><br>
+                                                    <small class="text-muted-custom">ใช้กับข้อเท็จจริงที่เป็นสัจธรรมหรือเป็นความรู้ทางวิทยาศาสตร์</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>ตารางเวลาและแผนการ:</strong><br>
+                                                    <small class="text-muted-custom">ใช้เมื่อกล่าวถึงตารางเวลา เช่น ตารางเดินรถ หรือแผนที่กำหนดไว้</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>สุภาษิตและคำกล่าวทั่วไป:</strong><br>
+                                                    <small class="text-muted-custom">ใช้กับสุภาษิต คำพังเพย หรือคำกล่าวทั่วไป</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>พาดหัวข่าว:</strong><br>
+                                                    <small class="text-muted-custom">ใช้ในพาดหัวข่าวหรือข้อความที่เน้นย่อประโยค สังเกตว่าแม้จะพูดถึงเหตุการณ์ที่เกิดขึ้นแล้ว แต่พาดหัวข่าวมักใช้ Present Simple เพื่อสร้างความรู้สึกสดใหม่และดึงดูดความสนใจผู้อ่าน</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>แผนการและความตั้งใจในอนาคต:</strong><br>
+                                                    <small class="text-muted-custom">ใช้เมื่อพูดถึง "แผนการ" หรือ "ความตั้งใจ" ในอนาคต แม้ว่าโครงสร้างจะใช้ Present Simple แต่ความหมายมักชี้ไปยังสิ่งที่ผู้พูดหรือผู้ถูกถาม "ตั้งใจจะทำ" ในอนาคต</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำในอดีตทั่วไป:</strong><br>
-                                        <small class="text-muted-custom">การกระทำในอดีตทั่วไป โดยไม่มีบริบทหรือรายละเอียดเพิ่มเติม</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Past Continuous -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-dark">
-                            <div class="tense-card-header">
-                                <h5 class="text-dark mb-2">Past Continuous</h5>
-                                <div class="badge bg-dark text-white">Subject + was/were + V<sub>ing</sub> (Present Participle)</div>
+                            <!-- Present Continuous -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#presentContinuous" aria-expanded="false" aria-controls="presentContinuous">
+                                        <span class="text-success me-2">Present Continuous</span>
+                                        <span class="badge badge-formula bg-success">Subject + am/is/are + Vᵢₙᵍ</span>
+                                    </button>
+                                </h2>
+                                <div id="presentContinuous" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำที่เกิดขึ้นขณะพูด:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่ทำอยู่ขณะพูด</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>กิจกรรมในช่วงเวลานี้:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่ทำอยู่ในช่วงนี้ เช่น โปรเจค หรือ สิ่งที่ใช้เวลาทำนาน เป็นหลักวัน</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>เหตุการณ์ในอนาคตที่วางแผนแล้ว:</strong><br>
+                                                    <small class="text-muted-custom">เหตุการณ์ที่จะเกิดขึ้นในอนาคตโดยมี "การวางแผนไว้แล้ว" โดยมักจะเจอ "v.to be + going to"</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>การเปลี่ยนแปลงที่กำลังดำเนินอยู่:</strong><br>
+                                                    <small class="text-muted-custom">เหตุการณ์ที่กำลังมีการเปลี่ยนแปลง พัฒนาขึ้น หรือก้าวหน้าขึ้น</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำที่ถูกขัดจังหวะ:</strong><br>
-                                        <small class="text-muted-custom">ใช้คู่กับ Past Simple เพื่อบอกว่าเหตุการณ์ใน Past simple เกิด "แทรก" อีกเหตุการณ์ที่กำลังทำในอดีต</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำ ณ เวลาหนึ่งในอดีต:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่กำลังทำอยู่ ณ เวลาหนึ่งในอดีต</small>
-                                    </li>
-                                </ul>
+
+                            <!-- Present Perfect -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#presentPerfect" aria-expanded="false" aria-controls="presentPerfect">
+                                        <span class="text-info me-2">Present Perfect</span>
+                                        <span class="badge badge-formula bg-info">Subject + have/has + V₃</span>
+                                    </button>
+                                </h2>
+                                <div id="presentPerfect" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำที่เพิ่งสิ้นสุด:</strong><br>
+                                                    <small class="text-muted-custom">ใช้เมื่อเหตุการณ์เพิ่งจะสิ้นสุดลง</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำในอดีตที่มีผลต่อปัจจุบัน:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่เกิดขึ้นตั้งแต่อดีตและมีผลหรือคงสภาพจนถึงปัจจุบัน (การกระทำอาจจะจบไปแล้ว)</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>ประสบการณ์:</strong><br>
+                                                    <small class="text-muted-custom">ประสบการณ์ (เจอคำว่า "First / ... time")</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Present Perfect Continuous -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#presentPerfectCont" aria-expanded="false" aria-controls="presentPerfectCont">
+                                        <span class="text-warning me-2">Present Perfect Continuous</span>
+                                        <span class="badge badge-formula bg-warning text-dark">Subject + have/has + been + Vᵢₙᵍ</span>
+                                    </button>
+                                </h2>
+                                <div id="presentPerfectCont" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำต่อเนื่องจากอดีตถึงปัจจุบัน:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่ทำเรื่อยมาจนถึงปัจจุบัน โดยเน้น ระยะเวลา มักเจอ For since</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <!-- Past Perfect -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-danger">
-                            <div class="tense-card-header">
-                                <h5 class="text-danger mb-2">Past Perfect</h5>
-                                <div class="badge bg-danger text-white">Subject + had + V<sub>3</sub> (Past Participle)</div>
+            <!-- Past Tenses Section -->
+            <div class="accordion-item" id="past-section">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapsePast" aria-expanded="false" aria-controls="collapsePast">
+                        <i class="bi bi-clock-history me-2"></i>
+                        <strong>Past Tenses (<span lang="th">อดีต</span>)</strong>
+                        <span class="badge bg-secondary ms-2">4 Tenses</span>
+                    </button>
+                </h2>
+                <div id="collapsePast" class="accordion-collapse collapse" data-bs-parent="#tenseAccordion">
+                    <div class="accordion-body">
+                        <!-- Past Tenses Sub-Accordion -->
+                        <div class="accordion" id="pastAccordion">
+                            
+                            <!-- Past Simple -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#pastSimple" aria-expanded="false" aria-controls="pastSimple">
+                                        <span class="text-secondary me-2">Past Simple</span>
+                                        <span class="badge badge-formula bg-secondary">Subject + V₂</span>
+                                    </button>
+                                </h2>
+                                <div id="pastSimple" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำในอดีตทั่วไป:</strong><br>
+                                                    <small class="text-muted-custom">การกระทำในอดีตทั่วไป โดยไม่มีบริบทหรือรายละเอียดเพิ่มเติม</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำที่เกิดก่อนเหตุการณ์อื่นในอดีต:</strong><br>
-                                        <small class="text-muted-custom">ใช้เมื่อต้องการแสดงว่าเหตุการณ์หนึ่งเกิดขึ้นและเสร็จก่อนอีกเหตุการณ์ในอดีต (เช่น Past Simple หรือ ตัวบอกเวลาในอดีต) เช่นในประโยคนี้ "เธอทำการบ้านเสร็จก่อนที่จะทานข้าวเย็น"</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Past Perfect Continuous -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-primary">
-                            <div class="tense-card-header">
-                                <h5 class="text-primary mb-2">Past Perfect Continuous</h5>
-                                <div class="badge bg-primary text-white">Subject + had + been + V<sub>ing</sub> (Present Participle)</div>
+                            <!-- Past Continuous -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#pastContinuous" aria-expanded="false" aria-controls="pastContinuous">
+                                        <span class="text-dark me-2">Past Continuous</span>
+                                        <span class="badge badge-formula bg-dark">Subject + was/were + Vᵢₙᵍ</span>
+                                    </button>
+                                </h2>
+                                <div id="pastContinuous" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำที่ถูกขัดจังหวะ:</strong><br>
+                                                    <small class="text-muted-custom">ใช้คู่กับ Past Simple เพื่อบอกว่าเหตุการณ์ใน Past simple เกิด "แทรก" อีกเหตุการณ์ที่กำลังทำในอดีต</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำ ณ เวลาหนึ่งในอดีต:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่กำลังทำอยู่ ณ เวลาหนึ่งในอดีต</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำต่อเนื่องก่อนเหตุการณ์ในอดีต:</strong><br>
-                                        <small class="text-muted-custom">ใช้คู่กับ Past Simple หรือ ตัวบอกเวลาในอดีต เพื่อบอกสิ่งที่กำลังทำอยู่สักพักหนึ่งก่อนอีกสิ่งจะเกิดในอดีต (เน้นว่ากำลังทำอยู่ตอนนั้น)</small>
-                                    </li>
-                                </ul>
+
+                            <!-- Past Perfect -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#pastPerfect" aria-expanded="false" aria-controls="pastPerfect">
+                                        <span class="text-danger me-2">Past Perfect</span>
+                                        <span class="badge badge-formula bg-danger">Subject + had + V₃</span>
+                                    </button>
+                                </h2>
+                                <div id="pastPerfect" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำที่เกิดก่อนเหตุการณ์อื่นในอดีต:</strong><br>
+                                                    <small class="text-muted-custom">ใช้เมื่อต้องการแสดงว่าเหตุการณ์หนึ่งเกิดขึ้นและเสร็จก่อนอีกเหตุการณ์ในอดีต (เช่น Past Simple หรือ ตัวบอกเวลาในอดีต) เช่นในประโยคนี้ "เธอทำการบ้านเสร็จก่อนที่จะทานข้าวเย็น"</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Past Perfect Continuous -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#pastPerfectCont" aria-expanded="false" aria-controls="pastPerfectCont">
+                                        <span class="text-primary me-2">Past Perfect Continuous</span>
+                                        <span class="badge badge-formula bg-primary">Subject + had + been + Vᵢₙᵍ</span>
+                                    </button>
+                                </h2>
+                                <div id="pastPerfectCont" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำต่อเนื่องก่อนเหตุการณ์ในอดีต:</strong><br>
+                                                    <small class="text-muted-custom">ใช้คู่กับ Past Simple หรือ ตัวบอกเวลาในอดีต เพื่อบอกสิ่งที่กำลังทำอยู่สักพักหนึ่งก่อนอีกสิ่งจะเกิดในอดีต (เน้นว่ากำลังทำอยู่ตอนนั้น)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Future Tenses -->
-        <div class="tense-section shadow mb-4">
-            <div class="tense-section-header text-white">
-                <h3 class="mb-0 p-3">
-                    <i class="bi bi-clock-forward"></i> Future Tenses (อนาคต)
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Future Simple -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-success">
-                            <div class="tense-card-header">
-                                <h5 class="text-success mb-2">Future Simple</h5>
-                                <div class="badge bg-success text-white">Subject + will + V<sub>inf</sub> (Verb Infinitive)</div>
+            <!-- Future Tenses Section -->
+            <div class="accordion-item" id="future-section">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapseFuture" aria-expanded="false" aria-controls="collapseFuture">
+                        <i class="bi bi-clock-forward me-2"></i>
+                        <strong>Future Tenses (<span lang="th">อนาคต</span>)</strong>
+                        <span class="badge bg-success ms-2">4 Tenses</span>
+                    </button>
+                </h2>
+                <div id="collapseFuture" class="accordion-collapse collapse" data-bs-parent="#tenseAccordion">
+                    <div class="accordion-body">
+                        <!-- Future Tenses Sub-Accordion -->
+                        <div class="accordion" id="futureAccordion">
+                            
+                            <!-- Future Simple -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#futureSimple" aria-expanded="false" aria-controls="futureSimple">
+                                        <span class="text-success me-2">Future Simple</span>
+                                        <span class="badge badge-formula bg-success">Subject + will + Vᵢₙf</span>
+                                    </button>
+                                </h2>
+                                <div id="futureSimple" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การคาดการณ์ (50% ความเป็นไปได้):</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่คาดจะเกิด หรือมีแนวโน้มในอนาคต (50%)</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>คำสัญญาและการเสนอความช่วยเหลือ:</strong><br>
+                                                    <small class="text-muted-custom">การให้คำสัญญา หรือเสนออะไรให้ใคร (promise)</small>
+                                                </div>
+                                                <div class="tense-list-item">
+                                                    <strong>การตัดสินใจฉับพลัน:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่เพิ่งคิดว่าจะทำเดี๋ยวนั้น (ไม่ได้วางแผนว่าจะทำมาก่อน)</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การคาดการณ์ (50% ความเป็นไปได้):</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่คาดจะเกิด หรือมีแนวโน้มในอนาคต (50%)</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>คำสัญญาและการเสนอความช่วยเหลือ:</strong><br>
-                                        <small class="text-muted-custom">การให้คำสัญญา หรือเสนออะไรให้ใคร (promise)</small>
-                                    </li>
-                                    <li class="tense-list-item">
-                                        <strong>การตัดสินใจฉับพลัน:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่เพิ่งคิดว่าจะทำเดี๋ยวนั้น (ไม่ได้วางแผนว่าจะทำมาก่อน)</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Future Continuous -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-info">
-                            <div class="tense-card-header">
-                                <h5 class="text-info mb-2">Future Continuous</h5>
-                                <div class="badge bg-info text-white">Subject + will + be + V<sub>ing</sub> (Present Participle)</div>
+                            <!-- Future Continuous -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#futureContinuous" aria-expanded="false" aria-controls="futureContinuous">
+                                        <span class="text-info me-2">Future Continuous</span>
+                                        <span class="badge badge-formula bg-info">Subject + will + be + Vᵢₙᵍ</span>
+                                    </button>
+                                </h2>
+                                <div id="futureContinuous" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำในอนาคตที่ยาวนาน:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่คาดว่าน่าจะเกิดขึ้น คงจะทำอยู่ หรือวางแผนว่าจะทำ ณ เวลาหนึ่งในอนาคต</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำในอนาคตที่ยาวนาน:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่คาดว่าน่าจะเกิดขึ้น คงจะทำอยู่ หรือวางแผนว่าจะทำ ณ เวลาหนึ่งในอนาคต</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <!-- Future Perfect -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-warning">
-                            <div class="tense-card-header">
-                                <h5 class="text-warning mb-2">Future Perfect</h5>
-                                <div class="badge bg-warning text-white">Subject + will + have + V<sub>3</sub> (Past Participle)</div>
+                            <!-- Future Perfect -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#futurePerfect" aria-expanded="false" aria-controls="futurePerfect">
+                                        <span class="text-warning me-2">Future Perfect</span>
+                                        <span class="badge badge-formula bg-warning text-dark">Subject + will + have + V₃</span>
+                                    </button>
+                                </h2>
+                                <div id="futurePerfect" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำที่จะเสร็จสิ้นในอนาคต:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่คาดว่าคงจบ เสร็จสิ้น หรือครบเวลาแล้ว ณ เวลาหนึ่งในอนาคต</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำที่จะเสร็จสิ้นในอนาคต:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่คาดว่าคงจบ เสร็จสิ้น หรือครบเวลาแล้ว ณ เวลาหนึ่งในอนาคต</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Future Perfect Continuous -->
-                    <div class="col-md-6 mb-4">
-                        <div class="tense-card h-100 border-danger">
-                            <div class="tense-card-header">
-                                <h5 class="text-danger mb-2">Future Perfect Continuous</h5>
-                                <div class="badge bg-danger text-white">Subject + will + have + been + V<sub>ing</sub> (Present Participle)</div>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="tense-list-item">
-                                        <strong>การกระทำที่จะเสร็จและต่อเนื่องในอนาคต:</strong><br>
-                                        <small class="text-muted-custom">สิ่งที่คาดว่าคงจบ เสร็จสิ้น หรือครบเวลาแล้ว ณ เวลาหนึ่งในอนาคต และจะคงสภาพหรือทำแบบนี้ต่อไปอีก</small>
-                                    </li>
-                                </ul>
+                            <!-- Future Perfect Continuous -->
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                            data-bs-target="#futurePerfectCont" aria-expanded="false" aria-controls="futurePerfectCont">
+                                        <span class="text-danger me-2">Future Perfect Continuous</span>
+                                        <span class="badge badge-formula bg-danger">Subject + will + have + been + Vᵢₙᵍ</span>
+                                    </button>
+                                </h2>
+                                <div id="futurePerfectCont" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
+                                    <div class="accordion-body">
+                                        <div class="tense-card">
+                                            <div class="tense-card-body">
+                                                <div class="tense-list-item">
+                                                    <strong>การกระทำที่จะเสร็จและต่อเนื่องในอนาคต:</strong><br>
+                                                    <small class="text-muted-custom">สิ่งที่คาดว่าคงจบ เสร็จสิ้น หรือครบเวลาแล้ว ณ เวลาหนึ่งในอนาคต และจะคงสภาพหรือทำแบบนี้ต่อไปอีก</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -373,7 +604,7 @@
         </div>
 
         <!-- Usage Note -->
-        <div class="alert alert-info">
+        <div class="alert alert-info mt-4">
             <h5><i class="bi bi-info-circle"></i> หมายเหตุสำหรับการแปลไทย-อังกฤษ</h5>
             <p class="mb-0">
                 เนื่องจากกริยาภาษาไทยไม่เปลี่ยนรูปเพื่อแสดง Tense ดังนั้น Tense ในภาษาอังกฤษจึงต้องอนุมานจากบริบท เช่น คำบอกเวลา 
@@ -383,4 +614,60 @@
         </div>
     </div>
 </div>
+
+<!-- Back to Top Button -->
+<button class="back-to-top" onclick="scrollToTop()" title="Back to top">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Back to top button functionality
+    const backToTopButton = document.querySelector('.back-to-top');
+    
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopButton.classList.add('show');
+        } else {
+            backToTopButton.classList.remove('show');
+        }
+    });
+    
+    // Smooth scroll to anchor links
+    const navLinks = document.querySelectorAll('.tense-nav-item');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                // Open the accordion section if it's collapsed
+                const accordionButton = targetElement.querySelector('.accordion-button');
+                if (accordionButton && accordionButton.classList.contains('collapsed')) {
+                    accordionButton.click();
+                }
+                
+                // Smooth scroll with offset
+                setTimeout(() => {
+                    const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition - 100;
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }, 300);
+            }
+        });
+    });
+});
+
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+</script>
 {% endblock %}

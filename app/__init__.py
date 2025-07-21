@@ -2,8 +2,8 @@
 Flask application factory and configuration
 """
 import os
-from flask import Flask
-from flask_login import LoginManager
+from flask import Flask, session, request, redirect, url_for
+from flask_login import LoginManager, current_user, logout_user
 from .models import db
 from .auth import auth_bp
 
@@ -56,6 +56,68 @@ def create_app(config_name=None):
     def load_user(user_id):
         from .models import Pseudocode
         return Pseudocode.query.get(int(user_id))
+    
+    # Session validation middleware (idle timeout check)
+    @app.before_request
+    def validate_session():
+        """Validate session on each request and check for idle timeout"""
+        from .models import UserSession, UserActivity
+        
+        # Skip validation for certain routes
+        skip_routes = ['auth.login', 'auth.logout', 'static', 'main.health_check']
+        if request.endpoint in skip_routes or request.endpoint is None:
+            return
+        
+        # Skip validation for non-authenticated users
+        if not current_user.is_authenticated:
+            return
+        
+        # Get session token
+        session_token = session.get('session_token')
+        if not session_token:
+            # No session token, force logout
+            logout_user()
+            session.clear()
+            return redirect(url_for('auth.login'))
+        
+        # Validate session and check timeout
+        user_session, status = UserSession.validate_session(session_token, max_idle_minutes=15)
+        
+        if not user_session:
+            # Session invalid or expired
+            if "expired" in status.lower():
+                # Log the timeout
+                UserActivity.log_activity(
+                    user_id=current_user.id,
+                    activity_type='timeout_logout',
+                    session_token=session_token,
+                    details={'reason': status},
+                    ip_address=request.remote_addr,
+                    user_agent=request.headers.get('User-Agent')
+                )
+            
+            # Force logout
+            logout_user()
+            session.clear()
+            return redirect(url_for('auth.login'))
+        
+        # Session is valid, session activity already updated in validate_session()
+    
+    # Cleanup expired sessions periodically
+    @app.before_request
+    def cleanup_sessions():
+        """Cleanup expired sessions (run randomly to avoid overhead)"""
+        import random
+        from .models import UserSession
+        
+        # Only run cleanup 1% of the time to avoid overhead
+        if random.random() < 0.01:
+            try:
+                expired_count = UserSession.cleanup_expired_sessions()
+                if expired_count > 0:
+                    print(f"Cleaned up {expired_count} expired sessions")
+            except Exception as e:
+                print(f"Session cleanup error: {e}")
     
     # Register blueprints
     app.register_blueprint(auth_bp)
