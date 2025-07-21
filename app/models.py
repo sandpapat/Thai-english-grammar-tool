@@ -17,11 +17,11 @@ class UserType:
         return value in [cls.NORMAL, cls.PROFICIENT]
 
 class Pseudocode(UserMixin, db.Model):
-    """Anonymous user model using only 5-digit pseudocodes"""
+    """Anonymous user model using 5-character pseudocodes"""
     __tablename__ = 'pseudocodes'
     
     id = db.Column(db.Integer, primary_key=True)
-    pseudocode = db.Column(db.String(5), unique=True, nullable=False, index=True)
+    pseudocode = db.Column(db.String(20), unique=True, nullable=False, index=True)
     user_type = db.Column(db.String(20), default=UserType.NORMAL, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, default=None)
@@ -72,8 +72,12 @@ class Pseudocode(UserMixin, db.Model):
     @staticmethod
     def create_pseudocode(pseudocode, user_type=UserType.NORMAL):
         """Create a new pseudocode entry"""
-        if len(pseudocode) != 5 or not pseudocode.isdigit():
-            raise ValueError("Pseudocode must be exactly 5 digits")
+        # Validate pseudocode format - exactly 5 characters, letters and numbers only
+        if len(pseudocode) != 5:
+            raise ValueError("Pseudocode must be exactly 5 characters")
+        
+        if not pseudocode.isalnum():
+            raise ValueError("Pseudocode can only contain letters and numbers")
         
         # Validate user type
         if not UserType.is_valid(user_type):
@@ -83,11 +87,6 @@ class Pseudocode(UserMixin, db.Model):
         existing = Pseudocode.query.filter_by(pseudocode=pseudocode).first()
         if existing:
             raise ValueError("Pseudocode already exists")
-        
-        # Auto-determine user type based on pseudocode range (for demo purposes)
-        # Proficient users: pseudocodes starting with 9 (90000-99999)
-        if pseudocode.startswith('9'):
-            user_type = UserType.PROFICIENT
         
         new_user = Pseudocode(pseudocode=pseudocode, user_type=user_type)
         db.session.add(new_user)

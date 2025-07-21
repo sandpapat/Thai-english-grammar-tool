@@ -12,23 +12,23 @@
                 </h2>
                 
                 <p class="text-center text-muted mb-4">
-                    Enter your 5-digit pseudocode to access the system
+                    Enter your 5-character pseudocode to access the system
                 </p>
                 
                 <form method="POST" action="{{ url_for('auth.login') }}">
                     <div class="mb-4">
-                        <label for="pseudocode" class="form-label">5-Digit Code</label>
+                        <label for="pseudocode" class="form-label">5-Character Code</label>
                         <input type="text" 
                                class="form-control form-control-lg text-center" 
                                id="pseudocode" 
                                name="pseudocode" 
                                maxlength="5" 
-                               pattern="[0-9]{5}" 
-                               placeholder="12345"
+                               pattern="[A-Za-z0-9]{5}" 
+                               placeholder="USER1 or 90001"
                                required
                                autocomplete="off">
                         <div class="form-text text-center">
-                            Enter the 5-digit code you received
+                            Enter your 5-character code (letters and numbers only)
                         </div>
                     </div>
                     
@@ -52,9 +52,12 @@
 // Auto-focus on the input field
 document.getElementById('pseudocode').focus();
 
-// Only allow numeric input
+// Allow only alphanumeric input (letters and numbers)
 document.getElementById('pseudocode').addEventListener('input', function(e) {
-    this.value = this.value.replace(/[^0-9]/g, '');
+    // Remove any invalid characters, keep only letters and numbers
+    this.value = this.value.replace(/[^A-Za-z0-9]/g, '');
+    // Convert to uppercase for consistency
+    this.value = this.value.toUpperCase();
 });
 </script>
 {% endblock %}
