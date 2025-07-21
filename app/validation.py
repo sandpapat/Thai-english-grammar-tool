@@ -165,8 +165,8 @@ class SentenceBoundaryDetector:
     def _get_sentence_warning(self, count: int) -> Dict[str, str]:
         """Generate warning for multiple sentences"""
         return {
-            'en': f'Notice: {count} sentences detected. For accurate tense analysis and clearer explanations, we recommend using one sentence at a time.',
-            'th': f'แจ้งเตือน: พบ {count} ประโยค เพื่อการวิเคราะห์ tense ที่แม่นยำและคำอธิบายที่ชัดเจน แนะนำให้ใช้ประโยคเดียวในแต่ละครั้ง'
+            'en': f'Notice: {count} sentences detected. The system will analyze only the first sentence for tense classification and explanation.',
+            'th': f'แจ้งเตือน: ระบบตรวจพบ {count} ประโยค ระบบจะวิเคราะห์เฉพาะประโยคแรกเท่านั้นสำหรับการจำแนก tense และคำอธิบาย'
         }
 
 

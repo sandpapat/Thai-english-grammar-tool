@@ -27,6 +27,61 @@ except ImportError:
     print("Warning: together package not installed. GrammarExplainer will use mock explanations.")
 
 
+def extract_first_sentence(text):
+    """
+    Extract the first sentence from English text.
+    Returns tuple of (first_sentence, is_multi_sentence)
+    """
+    if not text:
+        return text, False
+    
+    # Simple sentence splitting using common sentence endings
+    # Handle common abbreviations that shouldn't split sentences
+    text = text.strip()
+    
+    # Replace common abbreviations temporarily to avoid false splits
+    abbreviations = {
+        'Mr.': 'Mr<DOT>',
+        'Mrs.': 'Mrs<DOT>',
+        'Ms.': 'Ms<DOT>',
+        'Dr.': 'Dr<DOT>',
+        'Ph.D.': 'PhD<DOT>',
+        'i.e.': 'ie<DOT>',
+        'e.g.': 'eg<DOT>',
+        'etc.': 'etc<DOT>',
+        'vs.': 'vs<DOT>',
+        'U.S.': 'US<DOT>',
+        'U.K.': 'UK<DOT>'
+    }
+    
+    temp_text = text
+    for abbr, replacement in abbreviations.items():
+        temp_text = temp_text.replace(abbr, replacement)
+    
+    # Split on sentence endings followed by space and capital letter
+    # or end of string
+    sentence_pattern = r'([.!?]+)\s+(?=[A-Z])|([.!?]+)$'
+    matches = list(re.finditer(sentence_pattern, temp_text))
+    
+    if not matches:
+        # No sentence ending found, treat whole text as one sentence
+        return text, False
+    
+    # Get the end position of the first sentence
+    first_end = matches[0].end()
+    first_sentence = temp_text[:first_end].strip()
+    
+    # Restore abbreviations
+    for abbr, replacement in abbreviations.items():
+        first_sentence = first_sentence.replace(replacement, abbr)
+    
+    # Check if there's more text after the first sentence
+    remaining_text = temp_text[first_end:].strip()
+    is_multi_sentence = bool(remaining_text)
+    
+    return first_sentence, is_multi_sentence
+
+
 class XLMRHierClassifier(PreTrainedModel):
     """
     Hierarchical XLM-RoBERTa classifier for tense classification
@@ -572,12 +627,16 @@ class GrammarExplainer:
         """Generate grammar explanation based on analysis using Together AI API"""
         thai_text = analysis_result.get('input_thai', '')
         translation = analysis_result.get('translation', '')
+        analyzed_sentence = analysis_result.get('analyzed_sentence', translation)
+        is_multi_sentence = analysis_result.get('is_multi_sentence', False)
         fine_code = analysis_result.get('fine_code', 'UNKNOWN')
         confidence = analysis_result.get('confidence', 0.0)
         
         if self.client:
             try:
-                explanation = self._generate_explanation_api(thai_text, translation, fine_code, confidence)
+                explanation = self._generate_explanation_api(
+                    thai_text, translation, analyzed_sentence, is_multi_sentence, fine_code, confidence
+                )
                 return self._parse_explanation_sections(explanation)
             except Exception as e:
                 print(f"API explanation failed: {e}")
@@ -586,8 +645,8 @@ class GrammarExplainer:
         # Mock explanation as fallback
         return self._generate_mock_explanation(analysis_result)
     
-    def _generate_explanation_api(self, thai_text, english_translation, fine_label, confidence):
-        """Generate explanation using Together AI API with exact prompt from notebook 05"""
+    def _generate_explanation_api(self, thai_text, english_translation, analyzed_sentence, is_multi_sentence, fine_label, confidence):
+        """Generate explanation using Together AI API with enhanced context for sentence analysis"""
         # Get detailed tag definitions
         fine_def = self.tense_definitions.fine_definitions.get(fine_label, {})
         
@@ -644,6 +703,8 @@ Tense ที่ตรวจพบ: {fine_label}
 <input>
 ประโยคภาษาไทย: {thai_text}
 การแปลภาษาอังกฤษ: {english_translation}
+{f"ประโยคที่วิเคราะห์: {analyzed_sentence}" if is_multi_sentence else ""}
+{f"หมายเหตุ: ระบบได้วิเคราะห์เฉพาะประโยคแรกเท่านั้น เนื่องจากพบหลายประโยค" if is_multi_sentence else ""}
 Tense ที่ระบบตรวจพบ: {fine_label} (ความมั่นใจ: {confidence:.1%})
 </input>
 
@@ -902,15 +963,26 @@ class ModelManager:
         if self.translator:
             try:
                 start_time = time.time()
-                result["translation"] = self.translator.translate(thai_text)
+                full_translation = self.translator.translate(thai_text)
+                result["translation"] = full_translation
                 translation_time = time.time() - start_time
+                
+                # Extract first sentence for classification
+                first_sentence, is_multi_sentence = extract_first_sentence(full_translation)
+                result["analyzed_sentence"] = first_sentence
+                result["is_multi_sentence"] = is_multi_sentence
+                
             except Exception as e:
                 translation_time = time.time() - start_time if 'start_time' in locals() else 0
                 result["translation"] = f"Translation failed: {str(e)}"
+                result["analyzed_sentence"] = ""
+                result["is_multi_sentence"] = False
                 success = False
                 error_stage = "translation"
         else:
             result["translation"] = "Translation service unavailable"
+            result["analyzed_sentence"] = ""
+            result["is_multi_sentence"] = False
             success = False
             error_stage = "translation"
         
@@ -918,10 +990,11 @@ class ModelManager:
         if progress_callback:
             progress_callback(2, 66, "Classifying tense...", "กำลังจำแนกกาล...")
         
-        if self.classifier and "translation" in result and success:
+        if self.classifier and "analyzed_sentence" in result and result["analyzed_sentence"] and success:
             try:
                 start_time = time.time()
-                classification_result = self.classifier.classify(result["translation"])
+                # Classify only the first sentence
+                classification_result = self.classifier.classify(result["analyzed_sentence"])
                 classification_time = time.time() - start_time
                 
                 result["coarse_label"] = classification_result["coarse_label"]
