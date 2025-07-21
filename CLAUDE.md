@@ -74,7 +74,7 @@ Website/
 1. **NLP Pipeline** (`app/pipeline.py`)
    - `TyphoonTranslator`: Thai-to-English translation using Typhoon Translate 4B (GGUF model via llama-cpp)
    - `TenseClassifier`: Tense classification using pretrained XLM-RoBERTa (Transformers)
-   - `GrammarExplainer`: Grammar explanation using Typhoon 2.1 4B Instruct (Transformers)
+   - `GrammarExplainer`: Grammar explanation using Typhoon 2.1 12B Instruct (Together AI API)
    - `ModelManager`: Coordinates all models with graceful error handling
 
 2. **Web Application** (Refactored with Blueprint Architecture)
@@ -369,11 +369,12 @@ python -c "from app import create_app; app = create_app(); app.app_context().pus
 
 ## Model Integration Notes
 
-- **Translator**: GGUF model loaded via llama-cpp-python, requires llama.cpp backend
-- **Classifier & Explainer**: Both use Transformers library from Hugging Face
+- **Translator**: GGUF model loaded via llama-cpp-python, runs locally with llama.cpp backend
+- **Classifier**: XLM-RoBERTa model loaded via Transformers library, runs locally
+- **Explainer**: Typhoon 2.1 12B Instruct accessed via Together AI API (cloud-based)
 - Models are loaded with error handling to allow graceful degradation
 - Each model can fail independently without breaking the entire pipeline
-- Consider memory usage as two Transformers models + one GGUF model will be loaded
+- **Local Memory Usage**: One GGUF model + one Transformers model (explainer is API-based)
 
 ## Testing Approach
 
