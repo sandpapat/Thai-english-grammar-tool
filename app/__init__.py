@@ -53,6 +53,23 @@ def create_app(config_name=None):
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
     
+    # Add custom Jinja2 filters
+    @app.template_filter('safe_strftime')
+    def safe_strftime(value, format='%B %d, %Y at %I:%M %p'):
+        """Safely format datetime objects"""
+        from datetime import datetime
+        if value is None:
+            return 'Never'
+        if isinstance(value, str):
+            try:
+                # Try to parse if it's a string
+                value = datetime.fromisoformat(value.replace('Z', '+00:00'))
+            except (ValueError, AttributeError):
+                return value  # Return as-is if can't parse
+        if hasattr(value, 'strftime'):
+            return value.strftime(format)
+        return str(value)
+    
     @login_manager.user_loader
     def load_user(user_id):
         from .models import Pseudocode

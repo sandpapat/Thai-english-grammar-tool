@@ -116,7 +116,7 @@
             <div class="text-end">
                 {% if user_stats and user_stats.last_activity %}
                 <small class="text-muted">
-                    Last activity: {% if user_stats.last_activity %}{{ user_stats.last_activity.strftime('%B %d, %Y at %I:%M %p') if user_stats.last_activity.__class__.__name__ == 'datetime' else user_stats.last_activity }}{% else %}Never{% endif %}
+                    Last activity: {{ user_stats.last_activity|safe_strftime }}
                 </small>
                 {% endif %}
             </div>
@@ -195,19 +195,11 @@
         <div class="row">
             <div class="col-md-4">
                 <strong>Session Started:</strong><br>
-                {% if session_info.current_session_start %}
-                    {% if session_info.current_session_start %}{{ session_info.current_session_start.strftime('%B %d, %Y at %I:%M %p') if session_info.current_session_start.__class__.__name__ == 'datetime' else session_info.current_session_start }}{% else %}No active session{% endif %}
-                {% else %}
-                    No active session
-                {% endif %}
+                {{ session_info.current_session_start|safe_strftime if session_info.current_session_start else 'No active session' }}
             </div>
             <div class="col-md-4">
                 <strong>Last Activity:</strong><br>
-                {% if session_info.last_activity %}
-                    {% if session_info.last_activity %}{{ session_info.last_activity.strftime('%B %d, %Y at %I:%M %p') if session_info.last_activity.__class__.__name__ == 'datetime' else session_info.last_activity }}{% else %}No recent activity{% endif %}
-                {% else %}
-                    No recent activity
-                {% endif %}
+                {{ session_info.last_activity|safe_strftime if session_info.last_activity else 'No recent activity' }}
             </div>
             <div class="col-md-4">
                 <strong>Session Duration:</strong><br>
