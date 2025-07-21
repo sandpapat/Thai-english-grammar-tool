@@ -30,11 +30,12 @@ def create_app(config_name=None):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         app.config['WTF_CSRF_ENABLED'] = False
-    elif config_name == 'production':
+    elif config_name == 'production' or os.environ.get('FLASK_ENV') == 'production':
         app.config['DEBUG'] = False
         app.config['SESSION_COOKIE_SECURE'] = True
         app.config['SESSION_COOKIE_HTTPONLY'] = True
         app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+        app.config['SESSION_COOKIE_DOMAIN'] = '.thaislate.ai'
     else:
         app.config['DEBUG'] = True
     
