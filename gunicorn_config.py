@@ -18,7 +18,7 @@ max_requests = 0  # Reduced from 1000 - prevents memory accumulation
 max_requests_jitter = 10  # Reduced proportionally
 
 # Load application code before the worker processes are forked
-preload_app = True
+preload_app = False
 
 # Logging - Enhanced for production monitoring
 loglevel = 'info'
