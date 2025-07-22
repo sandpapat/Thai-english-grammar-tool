@@ -1143,3 +1143,41 @@ footer {
 [data-theme="light"] .navbar-nav .nav-link:not(.disabled) {
     color: var(--navbar-text) !important;
 }
+
+/* Fix for dropdown menu being disabled on homepage */
+.navbar {
+    position: relative;
+    z-index: 1030; /* Bootstrap's navbar z-index */
+}
+
+.navbar .dropdown-menu {
+    z-index: 1031; /* Above navbar */
+    pointer-events: auto !important;
+}
+
+/* Ensure dropdowns work regardless of page state */
+.navbar-nav .dropdown-toggle,
+.navbar-nav .dropdown-menu,
+.navbar-nav .dropdown-item {
+    pointer-events: auto !important;
+    user-select: auto !important;
+    cursor: pointer !important;
+}
+
+/* Prevent form states from affecting navigation */
+body.form-submitting .navbar,
+body.form-submitting .navbar * {
+    pointer-events: auto !important;
+}
+
+/* Additional dropdown menu fixes */
+.navbar .dropdown {
+    position: static; /* Prevent z-index issues */
+}
+
+.navbar .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: auto;
+    right: auto;
+}

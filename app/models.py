@@ -59,7 +59,7 @@ class Pseudocode(UserMixin, db.Model):
     @staticmethod
     def verify_pseudocode(pseudocode):
         """Verify if a pseudocode exists and is active"""
-        if not pseudocode or len(pseudocode) != 5 or not pseudocode.isdigit():
+        if not pseudocode or len(pseudocode) != 5 or not pseudocode.isalnum():
             return None
         
         user = Pseudocode.query.filter_by(pseudocode=pseudocode, is_active=True).first()
