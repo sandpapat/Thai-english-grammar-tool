@@ -16,7 +16,8 @@
       "Bash(pkill:*)",
       "Bash(find:*)",
       "Bash(sqlite3:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "WebFetch(domain:cloud.google.com)"
     ],
     "deny": []
   }

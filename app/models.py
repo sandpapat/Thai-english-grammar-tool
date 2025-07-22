@@ -245,7 +245,10 @@ class Rating(db.Model):
             explanation_quality=explanation_quality,
             educational_value=educational_value,
             issue_tags=issue_tags,
-            comments=comments
+            comments=comments,
+            # Set legacy fields to maintain backward compatibility
+            translation_rating=translation_accuracy,  # Use accuracy as legacy translation rating
+            overall_quality_rating=educational_value  # Use educational value as legacy overall rating
         )
         
         db.session.add(rating)

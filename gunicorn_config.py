@@ -7,14 +7,14 @@ bind = "0.0.0.0:5000"
 backlog = 2048
 
 # Worker processes - Optimized for heavy ML models
-workers = 2  # Reduced from 4 - heavy models need more memory per worker
+workers = 1  # Reduced from 4 - heavy models need more memory per worker
 worker_class = "sync"
 worker_connections = 1000
-timeout = 90  # Increased from 30 - ML inference can be slow
+timeout = 300  # Increased from 30 - ML inference can be slow
 keepalive = 2
 
 # Restart workers more frequently to prevent memory leaks from large models
-max_requests = 50  # Reduced from 1000 - prevents memory accumulation
+max_requests = 0  # Reduced from 1000 - prevents memory accumulation
 max_requests_jitter = 10  # Reduced proportionally
 
 # Load application code before the worker processes are forked
