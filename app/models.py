@@ -186,15 +186,26 @@ class SystemPerformance(db.Model):
 
 
 class Rating(db.Model):
-    """User rating model for proficient users to rate translation and overall quality"""
+    """Enhanced rating model for proficient users with multi-criteria assessment"""
     __tablename__ = 'ratings'
     
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('pseudocodes.id'), nullable=False, index=True)
     input_thai = db.Column(db.Text, nullable=False)  # Original Thai text
     translation_text = db.Column(db.Text, nullable=False)  # Translation that was rated
-    translation_rating = db.Column(db.Integer, nullable=False)  # 1-5 scale
-    overall_quality_rating = db.Column(db.Integer, nullable=False)  # 1-5 scale
+    
+    # Multi-criteria ratings (1-5 scale)
+    translation_accuracy = db.Column(db.Integer, nullable=False)  # Does English correctly convey Thai meaning?
+    translation_fluency = db.Column(db.Integer, nullable=False)  # Does English sound natural?
+    explanation_quality = db.Column(db.Integer, nullable=False)  # Is grammar explanation accurate and helpful?
+    educational_value = db.Column(db.Integer, nullable=False)  # How helpful for Thai English learners?
+    
+    # Legacy fields for backward compatibility (will be migrated)
+    translation_rating = db.Column(db.Integer, nullable=True)  # Legacy field - to be removed after migration
+    overall_quality_rating = db.Column(db.Integer, nullable=True)  # To be removed
+    
+    # Additional feedback
+    issue_tags = db.Column(db.JSON, nullable=True)  # Array of selected issue tags
     comments = db.Column(db.Text, nullable=True)  # Optional user comments
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     
@@ -202,14 +213,23 @@ class Rating(db.Model):
     user = db.relationship('Pseudocode', backref=db.backref('ratings', lazy=True))
     
     def __repr__(self):
-        return f'<Rating {self.id}: T:{self.translation_rating}/5 O:{self.overall_quality_rating}/5>'
+        return f'<Rating {self.id}: Acc:{self.translation_accuracy}/5 Flu:{self.translation_fluency}/5 Exp:{self.explanation_quality}/5 Edu:{self.educational_value}/5>'
     
     @staticmethod
-    def create_rating(user_id, input_thai, translation_text, translation_rating, overall_quality_rating, comments=None):
-        """Create a new rating entry"""
-        # Validate ratings are in 1-5 range
-        if not (1 <= translation_rating <= 5) or not (1 <= overall_quality_rating <= 5):
-            raise ValueError("Ratings must be between 1 and 5")
+    def create_rating(user_id, input_thai, translation_text, translation_accuracy, translation_fluency, 
+                     explanation_quality, educational_value, issue_tags=None, comments=None):
+        """Create a new rating entry with multi-criteria assessment"""
+        # Validate all ratings are in 1-5 range
+        ratings = {
+            'translation_accuracy': translation_accuracy,
+            'translation_fluency': translation_fluency,
+            'explanation_quality': explanation_quality,
+            'educational_value': educational_value
+        }
+        
+        for field, value in ratings.items():
+            if not isinstance(value, int) or not (1 <= value <= 5):
+                raise ValueError(f"{field} must be an integer between 1 and 5")
         
         # Verify user is proficient
         user = Pseudocode.query.get(user_id)
@@ -220,8 +240,11 @@ class Rating(db.Model):
             user_id=user_id,
             input_thai=input_thai,
             translation_text=translation_text,
-            translation_rating=translation_rating,
-            overall_quality_rating=overall_quality_rating,
+            translation_accuracy=translation_accuracy,
+            translation_fluency=translation_fluency,
+            explanation_quality=explanation_quality,
+            educational_value=educational_value,
+            issue_tags=issue_tags,
             comments=comments
         )
         
@@ -231,40 +254,60 @@ class Rating(db.Model):
     
     @staticmethod
     def get_rating_stats():
-        """Get aggregate rating statistics"""
+        """Get aggregate rating statistics for enhanced multi-criteria ratings"""
         total_ratings = Rating.query.count()
         
         if total_ratings == 0:
             return {
                 'total_ratings': 0,
-                'avg_translation_rating': 0,
-                'avg_overall_rating': 0,
-                'rating_distribution': {}
+                'avg_translation_accuracy': 0,
+                'avg_translation_fluency': 0,
+                'avg_explanation_quality': 0,
+                'avg_educational_value': 0,
+                'rating_distributions': {},
+                'common_issue_tags': []
             }
         
-        # Average ratings
+        # Average ratings for all criteria
         avg_stats = db.session.query(
-            func.avg(Rating.translation_rating).label('avg_translation'),
-            func.avg(Rating.overall_quality_rating).label('avg_overall')
+            func.avg(Rating.translation_accuracy).label('avg_accuracy'),
+            func.avg(Rating.translation_fluency).label('avg_fluency'),
+            func.avg(Rating.explanation_quality).label('avg_explanation'),
+            func.avg(Rating.educational_value).label('avg_educational')
         ).first()
         
-        # Rating distribution
-        translation_dist = db.session.query(
-            Rating.translation_rating,
-            func.count(Rating.translation_rating)
-        ).group_by(Rating.translation_rating).all()
+        # Get distribution for each criterion
+        distributions = {}
+        for criterion in ['translation_accuracy', 'translation_fluency', 'explanation_quality', 'educational_value']:
+            dist = db.session.query(
+                getattr(Rating, criterion),
+                func.count(getattr(Rating, criterion))
+            ).group_by(getattr(Rating, criterion)).all()
+            distributions[criterion] = {str(rating): count for rating, count in dist}
         
-        overall_dist = db.session.query(
-            Rating.overall_quality_rating,
-            func.count(Rating.overall_quality_rating)
-        ).group_by(Rating.overall_quality_rating).all()
+        # Get common issue tags
+        all_tags = []
+        ratings_with_tags = Rating.query.filter(Rating.issue_tags.isnot(None)).all()
+        for rating in ratings_with_tags:
+            if rating.issue_tags:
+                all_tags.extend(rating.issue_tags)
+        
+        # Count tag frequency
+        tag_counts = {}
+        for tag in all_tags:
+            tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        
+        # Sort tags by frequency
+        common_tags = sorted(tag_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         
         return {
             'total_ratings': total_ratings,
-            'avg_translation_rating': round(avg_stats.avg_translation or 0, 2),
-            'avg_overall_rating': round(avg_stats.avg_overall or 0, 2),
-            'translation_distribution': {str(rating): count for rating, count in translation_dist},
-            'overall_distribution': {str(rating): count for rating, count in overall_dist}
+            'avg_translation_accuracy': round(avg_stats.avg_accuracy or 0, 2),
+            'avg_translation_fluency': round(avg_stats.avg_fluency or 0, 2),
+            'avg_explanation_quality': round(avg_stats.avg_explanation or 0, 2),
+            'avg_educational_value': round(avg_stats.avg_educational or 0, 2),
+            'rating_distributions': distributions,
+            'common_issue_tags': common_tags
         }
 
 

@@ -308,7 +308,7 @@ def system_performance():
 @main_bp.route('/api/submit-rating', methods=['POST'])
 @login_required
 def submit_rating():
-    """Submit a rating for proficient users"""
+    """Submit an enhanced multi-criteria rating for proficient users"""
     try:
         # Check if user is proficient
         if not current_user.is_proficient():
@@ -326,8 +326,9 @@ def submit_rating():
                 'error': 'No data provided'
             }), 400
         
-        # Validate required fields
-        required_fields = ['input_thai', 'translation_text', 'translation_rating', 'overall_quality_rating']
+        # Validate required fields for new multi-criteria rating
+        required_fields = ['input_thai', 'translation_text', 'translation_accuracy', 
+                          'translation_fluency', 'explanation_quality', 'educational_value']
         for field in required_fields:
             if field not in data or data[field] is None:
                 return jsonify({
@@ -335,29 +336,45 @@ def submit_rating():
                     'error': f'Missing required field: {field}'
                 }), 400
         
-        # Validate rating values
-        translation_rating = int(data['translation_rating'])
-        overall_rating = int(data['overall_quality_rating'])
+        # Validate all rating values
+        rating_fields = {
+            'translation_accuracy': int(data['translation_accuracy']),
+            'translation_fluency': int(data['translation_fluency']),
+            'explanation_quality': int(data['explanation_quality']),
+            'educational_value': int(data['educational_value'])
+        }
         
-        if not (1 <= translation_rating <= 5) or not (1 <= overall_rating <= 5):
+        for field, value in rating_fields.items():
+            if not (1 <= value <= 5):
+                return jsonify({
+                    'success': False,
+                    'error': f'{field} must be between 1 and 5'
+                }), 400
+        
+        # Validate issue tags (optional)
+        issue_tags = data.get('issue_tags', [])
+        if issue_tags and not isinstance(issue_tags, list):
             return jsonify({
                 'success': False,
-                'error': 'Ratings must be between 1 and 5'
+                'error': 'issue_tags must be an array'
             }), 400
         
-        # Create the rating
-        from .models import Rating, db
+        # Create the rating with new multi-criteria structure
+        from .models import Rating, db, UserActivity
         
         rating = Rating.create_rating(
             user_id=current_user.id,
             input_thai=data['input_thai'],
             translation_text=data['translation_text'],
-            translation_rating=translation_rating,
-            overall_quality_rating=overall_rating,
+            translation_accuracy=rating_fields['translation_accuracy'],
+            translation_fluency=rating_fields['translation_fluency'],
+            explanation_quality=rating_fields['explanation_quality'],
+            educational_value=rating_fields['educational_value'],
+            issue_tags=issue_tags if issue_tags else None,
             comments=data.get('comments', '').strip() or None
         )
         
-        # Log feedback activity
+        # Log feedback activity with new detailed tracking
         session_token = session.get('session_token')
         UserActivity.log_activity(
             user_id=current_user.id,
@@ -365,8 +382,12 @@ def submit_rating():
             session_token=session_token,
             details={
                 'rating_id': rating.id,
-                'translation_rating': translation_rating,
-                'overall_rating': overall_rating,
+                'rating_type': 'multi_criteria',
+                'translation_accuracy': rating_fields['translation_accuracy'],
+                'translation_fluency': rating_fields['translation_fluency'],
+                'explanation_quality': rating_fields['explanation_quality'],
+                'educational_value': rating_fields['educational_value'],
+                'issue_tags_count': len(issue_tags) if issue_tags else 0,
                 'has_comments': bool(data.get('comments', '').strip())
             },
             ip_address=request.remote_addr,
@@ -375,7 +396,7 @@ def submit_rating():
         
         return jsonify({
             'success': True,
-            'message': 'Rating submitted successfully',
+            'message': 'Detailed rating submitted successfully',
             'rating_id': rating.id
         })
         

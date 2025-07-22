@@ -175,74 +175,152 @@
             </div>
         </div>
 
-        <!-- Rating Interface (Proficient Users Only) -->
+        <!-- Enhanced Rating Interface (Proficient Users Only) -->
         {% if current_user.is_authenticated and current_user.is_proficient() %}
-        <div class="card shadow mb-4" id="ratingCard">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0">
-                    <i class="bi bi-star"></i> Rate This Analysis
-                    <small class="text-muted ms-2">(Proficient User Feature)</small>
-                </h4>
+        <div class="rating-container shadow mb-4" id="ratingCard">
+            <div class="rating-header">
+                <h3>Translation Quality Assessment</h3>
+                <p>Help us improve by rating this translation</p>
             </div>
-            <div class="card-body">
-                <p class="text-muted mb-3">
-                    Your feedback helps improve our system. Please rate the quality of the translation and overall analysis.
-                </p>
+            
+            <div class="rating-content">
+                <div class="progress-indicator mb-4">
+                    <div class="progress-bar" id="ratingProgress" style="width: 0%"></div>
+                </div>
                 
                 <form id="ratingForm">
                     <input type="hidden" id="inputThai" value="{{ result.input_thai }}">
                     <input type="hidden" id="translationText" value="{{ result.translation }}">
                     
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Translation Quality</label>
-                            <div class="rating-stars mb-2" data-rating="translation">
-                                <i class="bi bi-star rating-star" data-value="1"></i>
-                                <i class="bi bi-star rating-star" data-value="2"></i>
-                                <i class="bi bi-star rating-star" data-value="3"></i>
-                                <i class="bi bi-star rating-star" data-value="4"></i>
-                                <i class="bi bi-star rating-star" data-value="5"></i>
-                            </div>
-                            <small class="text-muted">Rate how accurate the English translation is</small>
-                            <input type="hidden" id="translationRating" name="translation_rating" required>
-                        </div>
+                    <div class="rating-section">
+                        <div class="rating-title">Quality Assessment</div>
                         
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Overall Quality</label>
-                            <div class="rating-stars mb-2" data-rating="overall">
-                                <i class="bi bi-star rating-star" data-value="1"></i>
-                                <i class="bi bi-star rating-star" data-value="2"></i>
-                                <i class="bi bi-star rating-star" data-value="3"></i>
-                                <i class="bi bi-star rating-star" data-value="4"></i>
-                                <i class="bi bi-star rating-star" data-value="5"></i>
+                        <div class="multi-criteria-rating">
+                            <!-- Translation Accuracy -->
+                            <div class="criterion">
+                                <div class="criterion-header">
+                                    <span class="criterion-name">Translation Accuracy</span>
+                                    <span class="criterion-help">Does the English correctly convey the Thai meaning?</span>
+                                </div>
+                                <div class="rating-scale">
+                                    {% for i in range(1, 6) %}
+                                    <div class="rating-option">
+                                        <input type="radio" name="translation_accuracy" id="trans_acc{{ i }}" value="{{ i }}">
+                                        <label for="trans_acc{{ i }}">
+                                            {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3 %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif %}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            <small class="text-muted">Rate the overall analysis quality</small>
-                            <input type="hidden" id="overallRating" name="overall_quality_rating" required>
+
+                            <!-- Translation Fluency -->
+                            <div class="criterion">
+                                <div class="criterion-header">
+                                    <span class="criterion-name">Translation Fluency</span>
+                                    <span class="criterion-help">Does the English sound natural?</span>
+                                </div>
+                                <div class="rating-scale">
+                                    {% for i in range(1, 6) %}
+                                    <div class="rating-option">
+                                        <input type="radio" name="translation_fluency" id="trans_flu{{ i }}" value="{{ i }}">
+                                        <label for="trans_flu{{ i }}">
+                                            {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3 %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif %}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Grammar Explanation Quality -->
+                            <div class="criterion">
+                                <div class="criterion-header">
+                                    <span class="criterion-name">Grammar Explanation Quality</span>
+                                    <span class="criterion-help">Is the grammar explanation accurate and helpful?</span>
+                                </div>
+                                <div class="rating-scale">
+                                    {% for i in range(1, 6) %}
+                                    <div class="rating-option">
+                                        <input type="radio" name="explanation_quality" id="exp_qual{{ i }}" value="{{ i }}">
+                                        <label for="exp_qual{{ i }}">
+                                            {% if i == 1 %}Poor{% elif i == 2 %}Fair{% elif i == 3 %}Good{% elif i == 4 %}Very Good{% else %}Excellent{% endif %}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Educational Value -->
+                            <div class="criterion">
+                                <div class="criterion-header">
+                                    <span class="criterion-name">Educational Value</span>
+                                    <span class="criterion-help">How helpful is this for Thai English learners?</span>
+                                </div>
+                                <div class="rating-scale">
+                                    {% for i in range(1, 6) %}
+                                    <div class="rating-option">
+                                        <input type="radio" name="educational_value" id="edu_val{{ i }}" value="{{ i }}">
+                                        <label for="edu_val{{ i }}">
+                                            {% if i == 1 %}Not Helpful{% elif i == 2 %}Slightly Helpful{% elif i == 3 %}Moderately Helpful{% elif i == 4 %}Very Helpful{% else %}Extremely Helpful{% endif %}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Feedback Tags -->
+                        <div class="quick-feedback">
+                            <div class="comments-title">Quick Issues (Optional - Click any that apply)</div>
+                            
+                            <div class="tag-section">
+                                <div class="tag-section-title">Translation Issues:</div>
+                                <div class="quick-tags" data-category="translation">
+                                    <span class="tag" data-tag="Wrong word choice">Wrong word choice</span>
+                                    <span class="tag" data-tag="Missing context">Missing context</span>
+                                    <span class="tag" data-tag="Too literal">Too literal</span>
+                                    <span class="tag" data-tag="Awkward phrasing">Awkward phrasing</span>
+                                    <span class="tag" data-tag="Grammar error">Grammar error</span>
+                                    <span class="tag positive" data-tag="Perfect translation">Perfect translation</span>
+                                </div>
+                            </div>
+                            
+                            <div class="tag-section">
+                                <div class="tag-section-title">Explanation Issues:</div>
+                                <div class="quick-tags" data-category="explanation">
+                                    <span class="tag" data-tag="Wrong grammar rule">Wrong grammar rule</span>
+                                    <span class="tag" data-tag="Too complex">Too complex</span>
+                                    <span class="tag" data-tag="Too basic">Too basic</span>
+                                    <span class="tag" data-tag="Missing key points">Missing key points</span>
+                                    <span class="tag" data-tag="Incorrect tense analysis">Incorrect tense analysis</span>
+                                    <span class="tag" data-tag="Poor examples">Poor examples</span>
+                                    <span class="tag positive" data-tag="Clear explanation">Clear explanation</span>
+                                    <span class="tag positive" data-tag="Very educational">Very educational</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="comments-section">
+                            <div class="comments-title">Additional Comments (Optional)</div>
+                            <textarea class="comments-textarea" id="comments" name="comments" 
+                                      placeholder="Any specific feedback about the translation accuracy, grammar explanation quality, or suggestions for improvement for Thai English learners..."></textarea>
                         </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="comments" class="form-label fw-bold">Additional Comments (Optional)</label>
-                        <textarea class="form-control" id="comments" name="comments" rows="3" 
-                                  placeholder="Share any specific feedback about the translation or analysis..."></textarea>
-                    </div>
-                    
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-warning" id="submitRating" disabled>
-                            <i class="bi bi-send"></i> Submit Rating
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary ms-2" id="toggleRating">
-                            <i class="bi bi-eye-slash"></i> Hide Rating
-                        </button>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary" id="submitRating">Submit Rating</button>
+                        <button type="button" class="btn btn-secondary" id="toggleRating">Hide Rating</button>
                     </div>
                 </form>
                 
                 <div id="ratingSuccess" class="alert alert-success mt-3 d-none">
-                    <i class="bi bi-check-circle"></i> Thank you for your feedback! Your rating has been submitted successfully.
+                    <i class="bi bi-check-circle"></i> Thank you for your feedback! Your detailed rating has been submitted successfully.
                 </div>
                 
                 <div id="ratingError" class="alert alert-danger mt-3 d-none">
-                    <i class="bi bi-exclamation-triangle"></i> There was an error submitting your rating. Please try again.
+                    <i class="bi bi-exclamation-triangle"></i> <span id="errorMessage">There was an error submitting your rating. Please try again.</span>
                 </div>
             </div>
         </div>
@@ -265,91 +343,80 @@
 {% if current_user.is_authenticated and current_user.is_proficient() %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let translationRating = 0;
-    let overallRating = 0;
+    // Track selected tags
+    let selectedTags = [];
     
-    // Star rating functionality
-    document.querySelectorAll('.rating-stars').forEach(function(ratingGroup) {
-        const stars = ratingGroup.querySelectorAll('.rating-star');
-        const ratingType = ratingGroup.getAttribute('data-rating');
-        
-        stars.forEach(function(star, index) {
-            star.addEventListener('click', function() {
-                const rating = parseInt(this.getAttribute('data-value'));
-                
-                // Update the visual state
-                stars.forEach(function(s, i) {
-                    if (i < rating) {
-                        s.classList.add('active');
-                    } else {
-                        s.classList.remove('active');
-                    }
-                });
-                
-                // Store the rating
-                if (ratingType === 'translation') {
-                    translationRating = rating;
-                    document.getElementById('translationRating').value = rating;
-                } else if (ratingType === 'overall') {
-                    overallRating = rating;
-                    document.getElementById('overallRating').value = rating;
-                }
-                
-                // Enable submit button if both ratings are provided
-                updateSubmitButton();
-            });
+    // Tag selection functionality
+    document.querySelectorAll('.tag').forEach(function(tag) {
+        tag.addEventListener('click', function() {
+            const tagText = this.getAttribute('data-tag');
             
-            // Hover effects
-            star.addEventListener('mouseenter', function() {
-                const rating = parseInt(this.getAttribute('data-value'));
-                stars.forEach(function(s, i) {
-                    if (i < rating) {
-                        s.style.color = '#ffc107';
-                    } else {
-                        s.style.color = '#ddd';
-                    }
-                });
-            });
-        });
-        
-        // Reset on mouse leave
-        ratingGroup.addEventListener('mouseleave', function() {
-            const currentRating = ratingType === 'translation' ? translationRating : overallRating;
-            stars.forEach(function(s, i) {
-                if (i < currentRating) {
-                    s.style.color = '#ffc107';
-                    s.classList.add('active');
-                } else {
-                    s.style.color = '#ddd';
-                    s.classList.remove('active');
-                }
-            });
+            if (this.classList.contains('selected')) {
+                this.classList.remove('selected');
+                selectedTags = selectedTags.filter(t => t !== tagText);
+            } else {
+                this.classList.add('selected');
+                selectedTags.push(tagText);
+            }
         });
     });
     
-    function updateSubmitButton() {
-        const submitBtn = document.getElementById('submitRating');
-        if (translationRating > 0 && overallRating > 0) {
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.disabled = true;
+    // Auto-update progress bar based on completed criteria
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'radio') {
+            updateProgress();
         }
+    });
+    
+    function updateProgress() {
+        const criteria = ['translation_accuracy', 'translation_fluency', 'explanation_quality', 'educational_value'];
+        const completed = criteria.filter(c => document.querySelector(`input[name="${c}"]:checked`)).length;
+        const progress = (completed / criteria.length) * 100;
+        document.getElementById('ratingProgress').style.width = progress + '%';
     }
+    
+    // Toggle rating visibility
+    document.getElementById('toggleRating').addEventListener('click', function() {
+        const card = document.getElementById('ratingCard');
+        const form = document.getElementById('ratingForm');
+        
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            this.innerHTML = 'Hide Rating';
+            this.classList.remove('btn-secondary');
+            this.classList.add('btn-outline-secondary');
+        } else {
+            form.style.display = 'none';
+            this.innerHTML = 'Show Rating';
+            this.classList.remove('btn-outline-secondary');
+            this.classList.add('btn-secondary');
+        }
+    });
     
     // Form submission
     document.getElementById('ratingForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        if (translationRating === 0 || overallRating === 0) {
-            alert('Please provide ratings for both translation quality and overall quality.');
+        // Get all ratings
+        const translationAccuracy = document.querySelector('input[name="translation_accuracy"]:checked')?.value;
+        const translationFluency = document.querySelector('input[name="translation_fluency"]:checked')?.value;
+        const explanationQuality = document.querySelector('input[name="explanation_quality"]:checked')?.value;
+        const educationalValue = document.querySelector('input[name="educational_value"]:checked')?.value;
+        
+        // Validate all criteria are rated
+        if (!translationAccuracy || !translationFluency || !explanationQuality || !educationalValue) {
+            alert('Please provide ratings for all four quality criteria.');
             return;
         }
         
         const formData = {
             input_thai: document.getElementById('inputThai').value,
             translation_text: document.getElementById('translationText').value,
-            translation_rating: translationRating,
-            overall_quality_rating: overallRating,
+            translation_accuracy: parseInt(translationAccuracy),
+            translation_fluency: parseInt(translationFluency),
+            explanation_quality: parseInt(explanationQuality),
+            educational_value: parseInt(educationalValue),
+            issue_tags: selectedTags,
             comments: document.getElementById('comments').value.trim()
         };
         
@@ -373,8 +440,8 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(data)
         })
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+        .then(responseData => {
+            if (responseData.success) {
                 // Show success message
                 document.getElementById('ratingSuccess').classList.remove('d-none');
                 document.getElementById('ratingError').classList.add('d-none');
@@ -384,22 +451,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update toggle button
                 const toggleBtn = document.getElementById('toggleRating');
-                toggleBtn.innerHTML = '<i class="bi bi-eye"></i> Show Rating Form';
-                toggleBtn.onclick = function() {
-                    const form = document.getElementById('ratingForm');
-                    const success = document.getElementById('ratingSuccess');
-                    if (form.style.display === 'none') {
-                        form.style.display = 'block';
-                        success.classList.add('d-none');
-                        this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Rating';
-                    } else {
-                        form.style.display = 'none';
-                        success.classList.remove('d-none');
-                        this.innerHTML = '<i class="bi bi-eye"></i> Show Rating Form';
-                    }
-                };
+                toggleBtn.innerHTML = 'Show Rating Form';
+                toggleBtn.classList.remove('btn-outline-secondary');
+                toggleBtn.classList.add('btn-secondary');
             } else {
                 // Show error message
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.textContent = responseData.error || 'There was an error submitting your rating. Please try again.';
                 document.getElementById('ratingError').classList.remove('d-none');
                 document.getElementById('ratingSuccess').classList.add('d-none');
                 
@@ -418,20 +476,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = originalText;
         });
     }
-    
-    // Toggle rating visibility
-    document.getElementById('toggleRating').addEventListener('click', function() {
-        const card = document.getElementById('ratingCard');
-        const form = document.getElementById('ratingForm');
-        
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            this.innerHTML = '<i class="bi bi-eye-slash"></i> Hide Rating';
-        } else {
-            form.style.display = 'none';
-            this.innerHTML = '<i class="bi bi-eye"></i> Show Rating';
-        }
-    });
 });
 </script>
 {% endif %}
