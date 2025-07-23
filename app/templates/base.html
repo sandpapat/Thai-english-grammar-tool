@@ -43,7 +43,12 @@
                         <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" 
                            href="{{ url_for('main.index') }}" role="menuitem"
                            {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
-                            <i class="bi bi-house" aria-hidden="true"></i> Home
+                            <i class="bi bi-house" aria-hidden="true"></i> 
+                            {% if get_current_locale() == 'th' %}
+                                หน้าหลัก
+                            {% else %}
+                                Home
+                            {% endif %}
                         </a>
                     </li>
                     <li class="nav-item" role="none">
@@ -62,21 +67,41 @@
                         <a class="nav-link dropdown-toggle {% if request.endpoint in ['main.performance', 'main.classifier_performance', 'main.pipeline_performance', 'main.system_performance'] %}active{% endif %}" 
                            href="#" role="menuitem" data-bs-toggle="dropdown" aria-expanded="false"
                            aria-haspopup="true" id="performanceDropdown">
-                            <i class="bi bi-speedometer2" aria-hidden="true"></i> Performance
+                            <i class="bi bi-speedometer2" aria-hidden="true"></i> 
+                            {% if get_current_locale() == 'th' %}
+                                ประสิทธิภาพ
+                            {% else %}
+                                Performance
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="performanceDropdown" role="menu">
                             <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.system_performance' %}active{% endif %}" 
                                 href="{{ url_for('main.system_performance') }}" role="menuitem">
-                                <i class="bi bi-graph-up me-2" aria-hidden="true"></i>System Performance
+                                <i class="bi bi-graph-up me-2" aria-hidden="true"></i>
+                                {% if get_current_locale() == 'th' %}
+                                    ประสิทธิภาพระบบ
+                                {% else %}
+                                    System Performance
+                                {% endif %}
                             </a></li>
                             <li role="none"><hr class="dropdown-divider"></li>
                             <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.classifier_performance' %}active{% endif %}" 
                                 href="{{ url_for('main.classifier_performance') }}" role="menuitem">
-                                <i class="bi bi-cpu me-2" aria-hidden="true"></i>BERT Classifier
+                                <i class="bi bi-cpu me-2" aria-hidden="true"></i>
+                                {% if get_current_locale() == 'th' %}
+                                    ตัวจำแนก BERT
+                                {% else %}
+                                    BERT Classifier
+                                {% endif %}
                             </a></li>
                             <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.pipeline_performance' %}active{% endif %}" 
                                 href="{{ url_for('main.pipeline_performance') }}" role="menuitem">
-                                <i class="bi bi-diagram-3 me-2" aria-hidden="true"></i>Full Pipeline
+                                <i class="bi bi-diagram-3 me-2" aria-hidden="true"></i>
+                                {% if get_current_locale() == 'th' %}
+                                    Pipeline เต็มรูปแบบ
+                                {% else %}
+                                    Full Pipeline
+                                {% endif %}
                             </a></li>
                         </ul>
                     </li>
@@ -84,7 +109,12 @@
                         <a class="nav-link {% if request.endpoint == 'main.about' %}active{% endif %}" 
                            href="{{ url_for('main.about') }}" role="menuitem"
                            {% if request.endpoint == 'main.about' %}aria-current="page"{% endif %}>
-                            <i class="bi bi-info-circle" aria-hidden="true"></i> About Us
+                            <i class="bi bi-info-circle" aria-hidden="true"></i> 
+                            {% if get_current_locale() == 'th' %}
+                                เกี่ยวกับเรา
+                            {% else %}
+                                About Us
+                            {% endif %}
                         </a>
                     </li>
                 </ul>
@@ -145,18 +175,33 @@
                                 <li role="none"><hr class="dropdown-divider"></li>
                                 <li role="none"><a class="dropdown-item {% if request.endpoint == 'main.user_analytics' %}active{% endif %}" 
                                     href="{{ url_for('main.user_analytics') }}" role="menuitem">
-                                    <i class="bi bi-person-lines-fill me-2" aria-hidden="true"></i>My Analytics
+                                    <i class="bi bi-person-lines-fill me-2" aria-hidden="true"></i>
+                                    {% if get_current_locale() == 'th' %}
+                                        ข้อมูลของฉัน
+                                    {% else %}
+                                        My Analytics
+                                    {% endif %}
                                 </a></li>
                                 <li role="none"><hr class="dropdown-divider"></li>
                                 <li role="none"><a class="dropdown-item" href="{{ url_for('auth.logout') }}" role="menuitem">
-                                    <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Logout
+                                    <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>
+                                    {% if get_current_locale() == 'th' %}
+                                        ออกจากระบบ
+                                    {% else %}
+                                        Logout
+                                    {% endif %}
                                 </a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item" role="none">
                             <a class="nav-link" href="{{ url_for('auth.login') }}" role="menuitem">
-                                <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Login
+                                <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> 
+                                {% if get_current_locale() == 'th' %}
+                                    เข้าสู่ระบบ
+                                {% else %}
+                                    Login
+                                {% endif %}
                             </a>
                         </li>
                     {% endif %}

@@ -195,6 +195,125 @@ body::before {
     z-index: -1;
 }
 
+/* Language Transition Smoothing */
+.navbar-nav .nav-link {
+    min-width: 60px; /* Minimum width for nav items */
+    text-align: center;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Ensure consistent sizing for language-specific content */
+.navbar-nav .nav-link:not(.dropdown-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Language switcher consistent sizing */
+.navbar-nav .nav-item .nav-link[href*="set-language"] {
+    min-width: 50px;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dropdown items consistent spacing */
+.dropdown-item {
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+/* Prevent layout shift during language switching */
+.container, .container-fluid {
+    transition: all 0.3s ease;
+}
+
+/* Smooth transitions for all text content */
+* {
+    transition: none; /* Disable default transitions to prevent jarring effects */
+}
+
+/* Enable only specific smooth transitions */
+body, .nav-link, .btn, .card {
+    transition: all 0.3s ease;
+}
+
+/* Homepage content consistent sizing */
+.hero-subtitle {
+    min-height: 2em; /* Ensure consistent height regardless of text length */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Main content headers consistent sizing */
+.card-body h2 {
+    min-height: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tips box consistent sizing */
+.tips-header h5 {
+    min-height: 1.2em;
+    display: flex;
+    align-items: center;
+}
+
+/* Form labels consistent sizing */
+.form-label {
+    min-height: 1.5em;
+    display: flex;
+    align-items: center;
+}
+
+/* Button text consistent sizing */
+.modern-btn {
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card titles consistent sizing */
+.card-title {
+    min-height: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Information cards consistent sizing */
+.card-text.small {
+    min-height: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Loading message consistent sizing */
+#loadingMessage h5 {
+    min-height: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Stats labels consistent sizing */
+.stat-label {
+    min-height: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
 /* Universal Font Application - Prompt for Everything */
 .thai-text, 
 [lang="th"],
