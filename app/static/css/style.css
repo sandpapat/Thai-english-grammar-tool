@@ -197,7 +197,7 @@ body::before {
 
 /* Language Transition Smoothing */
 .navbar-nav .nav-link {
-    min-width: 60px; /* Minimum width for nav items */
+    min-width: 120px; /* Wider minimum width to lock positions */
     text-align: center;
     transition: all 0.3s ease;
     white-space: nowrap; /* Prevent text wrapping */
@@ -233,6 +233,25 @@ body::before {
     align-items: center;
     justify-content: center;
     font-size: 0.9rem !important; /* Slightly smaller for language toggle */
+}
+
+/* Dark mode and language toggle buttons specific spacing */
+#darkModeToggle {
+    min-width: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Preserve Bootstrap me-2 margin classes for icons */
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+/* Ensure all icon margins work properly */
+.navbar-nav .nav-link .bi,
+.dropdown-item .bi {
+    margin-right: 0.5rem !important;
 }
 
 /* Language switcher text should be same size */
@@ -282,9 +301,57 @@ body::before {
 .navbar-nav .nav-link {
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important; /* Center content within the fixed width */
     height: 40px; /* Fixed height for consistent alignment */
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+}
+
+/* Restore icon spacing in navigation */
+.navbar-nav .nav-link i {
+    margin-right: 0.5rem !important; /* Bootstrap's default spacing */
+}
+
+/* Specific spacing for dropdown items */
+.dropdown-item i {
+    margin-right: 0.5rem !important;
+}
+
+/* Language switcher should not have icon spacing issues */
+.navbar-nav .nav-item .nav-link[href*="set-language"] i {
+    margin-right: 0 !important; /* No margin for language buttons */
+}
+
+/* Lock specific button positions with fixed widths */
+.navbar-nav .nav-link[href*="index"] {
+    min-width: 100px; /* Home/หน้าหลัก */
+}
+
+.navbar-nav .nav-link[href*="tenses"] {
+    min-width: 140px; /* Tense Guide/คู่มือ Tense */
+}
+
+.navbar-nav .dropdown-toggle[id="performanceDropdown"] {
+    min-width: 140px; /* Performance/ประสิทธิภาพ */
+}
+
+.navbar-nav .nav-link[href*="about"] {
+    min-width: 120px; /* About Us/เกี่ยวกับเรา */
+}
+
+.navbar-nav .nav-link[href*="login"] {
+    min-width: 100px; /* Login/เข้าสู่ระบบ */
+}
+
+/* Ensure dropdown items also have consistent spacing */
+.dropdown-menu {
+    min-width: 200px; /* Fixed dropdown width */
+}
+
+.dropdown-item {
+    text-align: left !important; /* Left align dropdown items */
+    display: flex !important;
+    align-items: center !important;
 }
 
 /* Ensure dropdown toggle has same alignment */
@@ -307,6 +374,18 @@ body::before {
 /* Enable only specific smooth transitions */
 body, .nav-link, .btn, .card {
     transition: all 0.3s ease;
+}
+
+/* Smooth text transitions for language switching */
+.navbar-nav .nav-link,
+.dropdown-item {
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Prevent any unwanted width changes during transitions */
+.navbar-nav .nav-link {
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Homepage content consistent sizing */
