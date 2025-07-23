@@ -77,6 +77,11 @@ def create_app(config_name=None):
         # 3. Request headers (Accept-Language)
         return request.accept_languages.best_match(app.config['LANGUAGES'].keys()) or 'en'
     
+    # Make get_locale available in templates
+    @app.template_global()
+    def get_current_locale():
+        return get_locale()
+    
     # Initialize login manager
     login_manager = LoginManager()
     login_manager.init_app(app)

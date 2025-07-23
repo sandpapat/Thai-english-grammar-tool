@@ -19,6 +19,7 @@
       "Bash(timeout:*)",
       "WebFetch(domain:cloud.google.com)",
       "Bash(cd:*)",
+      "Bash(cd:*)",
       "Bash(cd:*)"
     ],
     "deny": []

@@ -332,7 +332,7 @@
             <i class="bi bi-translate me-3"></i>Thaislate
         </h1>
         <p class="hero-subtitle">
-            {% if get_locale() == 'th' %}
+            {% if get_current_locale() == 'th' %}
                 การเรียนรู้ไวยากรณ์ไทย-อังกฤษด้วยเทคโนโลยี AI พร้อมคำอธิบายที่ชาญฉลาด
             {% else %}
                 NLP-powered Thai-English grammar learning with intelligent explanations
@@ -349,7 +349,7 @@
                 <div class="card-body">
                     <h2 class="text-center mb-4">
                         <i class="bi bi-chat-text me-2" aria-hidden="true"></i> 
-                        {% if get_locale() == 'th' %}
+                        {% if get_current_locale() == 'th' %}
                             พร้อมเรียนรู้แล้วหรือยัง?
                         {% else %}
                             Ready to Learn?
@@ -357,7 +357,7 @@
                     </h2>
                     
                     <p class="text-center text-muted mb-4">
-                        {% if get_locale() == 'th' %}
+                        {% if get_current_locale() == 'th' %}
                             ใส่ประโยคภาษาไทยเพื่อวิเคราะห์การแปลเป็นภาษาอังกฤษและโครงสร้างไวยากรณ์
                         {% else %}
                             Enter a Thai sentence to analyze its English translation and grammatical structure
@@ -369,21 +369,21 @@
                         <div class="tips-header">
                             <h5 class="mb-0">
                                 <i class="bi bi-lightbulb me-2"></i>
-                                {% if get_locale() == 'th' %}
+                                {% if get_current_locale() == 'th' %}
                                     เคล็ดลับสำหรับผลลัพธ์ที่ดีที่สุด
                                 {% else %}
                                     Tips for Best Results
                                 {% endif %}
                             </h5>
                             <button type="button" class="btn-close btn-sm" 
-                                    aria-label="{% if get_locale() == 'th' %}ปิดเคล็ดลับ{% else %}Close tips{% endif %}" 
+                                    aria-label="{% if get_current_locale() == 'th' %}ปิดเคล็ดลับ{% else %}Close tips{% endif %}" 
                                     onclick="document.getElementById('tipsBox').style.display='none'"></button>
                         </div>
                         <div class="tips-content">
                             <div class="tip-item">
                                 <i class="bi bi-person-x-fill tip-icon"></i>
                                 <div>
-                                    {% if get_locale() == 'th' %}
+                                    {% if get_current_locale() == 'th' %}
                                         <strong>หลีกเลี่ยงชื่อจริงและสถานที่จริง</strong>
                                         <p class="mb-0 small">เพื่อความเป็นส่วนตัว กรุณาหลีกเลี่ยงการใช้ชื่อคนไทยจริงหรือสถานที่จริงในประโยคของคุณ</p>
                                     {% else %}
@@ -395,7 +395,7 @@
                             <div class="tip-item">
                                 <i class="bi bi-text-left tip-icon"></i>
                                 <div>
-                                    {% if get_locale() == 'th' %}
+                                    {% if get_current_locale() == 'th' %}
                                         <strong>ประโยคเรียบง่ายทำงานได้ดีที่สุด</strong>
                                         <p class="mb-0 small">ตัวจำแนกทำงานได้ดีที่สุดกับโครงสร้างประโยคที่เรียบง่าย แม้ว่าจะรองรับประโยคความซ้อนได้ แต่ความแม่นยำอาจสูงกว่าในประโยคเรียบง่าย</p>
                                     {% else %}
@@ -407,7 +407,7 @@
                             <div class="tip-item">
                                 <i class="bi bi-clock-history tip-icon"></i>
                                 <div>
-                                    {% if get_locale() == 'th' %}
+                                    {% if get_current_locale() == 'th' %}
                                         <strong>รวมตัวบ่งชี้เวลา</strong>
                                         <p class="mb-0 small">เนื่องจากภาษาไทยไม่มี tense ทางไวยากรณ์ จึงควรเพิ่มตัวบ่งชี้เวลา (เมื่อวาน, พรุ่งนี้, ตอนนี้) หรือบริบทเพื่อช่วยโมเดลระบุ tense ที่ถูกต้อง</p>
                                     {% else %}
@@ -423,7 +423,7 @@
                     <div class="mb-4">
                         <label for="thai_text" class="form-label">
                             <i class="bi bi-pencil-square me-2" aria-hidden="true"></i> 
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 ประโยคภาษาไทย
                             {% else %}
                                 Thai Sentence
@@ -434,7 +434,7 @@
                             id="thai_text" 
                             name="thai_text" 
                             rows="3" 
-                            placeholder="{% if get_locale() == 'th' %}พิมพ์ประโยคภาษาไทยที่นี่...{% else %}Type Thai sentence here...{% endif %}"
+                            placeholder="{% if get_current_locale() == 'th' %}พิมพ์ประโยคภาษาไทยที่นี่...{% else %}Type Thai sentence here...{% endif %}"
                             lang="th"
                             required
                             autofocus
@@ -480,14 +480,14 @@
                         <button type="submit" class="btn modern-btn" id="submitBtn" 
                                 aria-describedby="submit-help">
                             <i class="bi bi-play-circle me-2" aria-hidden="true"></i> 
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 วิเคราะห์ด้วย AI
                             {% else %}
                                 Analyze with AI
                             {% endif %}
                         </button>
                         <div id="submit-help" class="visually-hidden">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 ส่งข้อความภาษาไทยเพื่อการแปลและการวิเคราะห์ไวยากรณ์
                             {% else %}
                                 Submit Thai text for translation and grammatical analysis
@@ -502,7 +502,7 @@
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                             <div id="loadingMessage">
-                                {% if get_locale() == 'th' %}
+                                {% if get_current_locale() == 'th' %}
                                     <h5 id="loadingMessageTh">กำลังประมวลผลข้อความของคุณ...</h5>
                                 {% else %}
                                     <h5 id="loadingMessageEn">Processing your text...</h5>
@@ -511,7 +511,7 @@
                                     <span class="badge bg-secondary fs-6">
                                         <i class="bi bi-clock me-1"></i>
                                         <span id="countdownTime">~8</span> 
-                                        {% if get_locale() == 'th' %}
+                                        {% if get_current_locale() == 'th' %}
                                             วินาทีที่เหลือ
                                         {% else %}
                                             seconds remaining
@@ -545,14 +545,14 @@
                     <div class="card-body text-center">
                         <i class="bi bi-translate text-primary" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 การแปล
                             {% else %}
                                 Translation
                             {% endif %}
                         </h5>
                         <p class="card-text small">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 ไทยเป็นอังกฤษด้วย Typhoon Translate 4B (ในเครื่อง)
                             {% else %}
                                 Thai to English using Typhoon Translate 4B (local)
@@ -566,14 +566,14 @@
                     <div class="card-body text-center">
                         <i class="bi bi-tags text-success" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 การจำแนก
                             {% else %}
                                 Classification
                             {% endif %}
                         </h5>
                         <p class="card-text small">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 การตรวจจับ Tense ด้วย XLM-RoBERTa
                             {% else %}
                                 Tense detection using XLM-RoBERTa
@@ -587,14 +587,14 @@
                     <div class="card-body text-center">
                         <i class="bi bi-lightbulb text-warning" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 คำอธิบาย
                             {% else %}
                                 Explanation
                             {% endif %}
                         </h5>
                         <p class="card-text small">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 เคล็ดลับไวยากรณ์ด้วย Typhoon 2.1 12B Instruct (API)
                             {% else %}
                                 Grammar tips using Typhoon 2.1 12B Instruct (API)
@@ -608,14 +608,14 @@
                     <div class="card-body text-center">
                         <i class="bi bi-keyboard text-info" style="font-size: 2rem;" aria-hidden="true"></i>
                         <h5 class="card-title mt-2">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 แป้นพิมพ์ลัด
                             {% else %}
                                 Keyboard Shortcuts
                             {% endif %}
                         </h5>
                         <div class="card-text small text-start">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 <p class="mb-1"><kbd>Alt + S</kbd> โฟกัสช่องใส่ข้อความ</p>
                                 <p class="mb-1"><kbd>Alt + Enter</kbd> ส่ง</p>
                                 <p class="mb-0"><kbd>Escape</kbd> ล้างข้อความ</p>
@@ -635,14 +635,14 @@
             <div class="card-body text-center py-5">
                 <i class="bi bi-lock" style="font-size: 4rem; color: var(--brand-primary);"></i>
                 <h2 class="mt-3 mb-3">
-                    {% if get_locale() == 'th' %}
+                    {% if get_current_locale() == 'th' %}
                         ยินดีต้อนรับสู่ Thaislate
                     {% else %}
                         Welcome to Thaislate
                     {% endif %}
                 </h2>
                 <p class="text-muted mb-4">
-                    {% if get_locale() == 'th' %}
+                    {% if get_current_locale() == 'th' %}
                         กรุณาเข้าสู่ระบบด้วยรหัสนามแฝง 5 หลักเพื่อเข้าใช้เครื่องมือเรียนรู้ไวยากรณ์ไทย-อังกฤษที่ขับเคลื่อนด้วย AI
                     {% else %}
                         Please log in with your 5-digit pseudocode to access the AI-powered Thai-English grammar learning tool
@@ -650,7 +650,7 @@
                 </p>
                 <a href="{{ url_for('auth.login') }}" class="btn modern-btn">
                     <i class="bi bi-box-arrow-in-right me-2"></i> 
-                    {% if get_locale() == 'th' %}
+                    {% if get_current_locale() == 'th' %}
                         เข้าสู่ระบบเพื่อเริ่มเรียนรู้
                     {% else %}
                         Login to Start Learning
@@ -662,7 +662,7 @@
                     <div class="stat-item">
                         <div class="stat-number"><i class="bi bi-translate"></i></div>
                         <div class="stat-label">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 การแปล
                             {% else %}
                                 Translation
@@ -672,7 +672,7 @@
                     <div class="stat-item">
                         <div class="stat-number"><i class="bi bi-tags"></i></div>
                         <div class="stat-label">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 วิเคราะห์ Tense
                             {% else %}
                                 Tense Analysis
@@ -682,7 +682,7 @@
                     <div class="stat-item">
                         <div class="stat-number"><i class="bi bi-lightbulb"></i></div>
                         <div class="stat-label">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 คำอธิบาย
                             {% else %}
                                 Explanations
@@ -692,7 +692,7 @@
                     <div class="stat-item">
                         <div class="stat-number"><i class="bi bi-graph-up"></i></div>
                         <div class="stat-label">
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 เรียนรู้ได้ดีขึ้น
                             {% else %}
                                 Learn Better

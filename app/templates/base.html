@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ get_locale() }}">
+<html lang="{{ get_current_locale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,7 +51,7 @@
                            href="{{ url_for('main.tenses') }}" role="menuitem"
                            {% if request.endpoint == 'main.tenses' %}aria-current="page"{% endif %}>
                             <i class="bi bi-book" aria-hidden="true"></i> 
-                            {% if get_locale() == 'th' %}
+                            {% if get_current_locale() == 'th' %}
                                 <span lang="th">คู่มือ Tense</span>
                             {% else %}
                                 Tense Guide
@@ -93,7 +93,7 @@
                 <ul class="navbar-nav ms-2" role="menubar">
                     <!-- Language Switcher -->
                     <li class="nav-item" role="none">
-                        {% if get_locale() == 'th' %}
+                        {% if get_current_locale() == 'th' %}
                         <a href="{{ url_for('main.set_language', language='en') }}" 
                            class="nav-link btn btn-link border-0 p-2"
                            role="menuitem"
