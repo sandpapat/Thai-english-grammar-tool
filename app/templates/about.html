@@ -13,32 +13,6 @@
         margin-bottom: 3rem;
     }
     
-    .language-toggle {
-        background: var(--card-bg);
-        border: 2px solid var(--border-color);
-        border-radius: 50px;
-        padding: 0.5rem;
-        display: inline-flex;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 6px var(--card-shadow);
-    }
-    
-    .language-toggle button {
-        background: none;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 25px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
-    
-    .language-toggle button.active {
-        background: var(--button-primary);
-        color: white;
-        transform: scale(1.05);
-    }
     
     .about-section {
         margin-bottom: 3rem;
@@ -250,19 +224,6 @@
         font-weight: bold;
     }
     
-    .content-section {
-        display: none;
-    }
-    
-    .content-section.active {
-        display: block;
-        animation: fadeIn 0.3s ease-in-out;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
     
     .stats-grid {
         display: grid;
@@ -289,37 +250,24 @@
 {% endblock %}
 
 {% block content %}
-<!-- English Hero -->
-<div id="hero-en" class="about-hero text-center content-section active">
+<!-- Hero Section -->
+<div class="about-hero text-center">
     <div class="container">
-        <h1 class="display-4 mb-4">About <span class="brand-highlight">Thaislate.ai</span></h1>
-        <p class="lead">Bridging Thai and English through intelligent grammar learning</p>
-    </div>
-</div>
-
-<!-- Thai Hero -->
-<div id="hero-th" class="about-hero text-center content-section">
-    <div class="container">
-        <h1 class="display-4 mb-4">เกี่ยวกับ <span class="brand-highlight">Thaislate.ai</span></h1>
-        <p class="lead">เชื่อมสะพานภาษาไทยและภาษาอังกฤษผ่านการเรียนรู้หลักไวยากรณ์อย่างชาญฉลาด</p>
+        {% if get_current_locale() == 'th' %}
+            <h1 class="display-4 mb-4"><span lang="th">เกี่ยวกับ</span> <span class="brand-highlight">Thaislate.ai</span></h1>
+            <p class="lead" lang="th">เชื่อมสะพานภาษาไทยและภาษาอังกฤษผ่านการเรียนรู้หลักไวยากรณ์อย่างชาญฉลาด</p>
+        {% else %}
+            <h1 class="display-4 mb-4">About <span class="brand-highlight">Thaislate.ai</span></h1>
+            <p class="lead">Bridging Thai and English through intelligent grammar learning</p>
+        {% endif %}
     </div>
 </div>
 
 <div class="container">
-    <!-- Language Toggle -->
-    <div class="text-center">
-        <div class="language-toggle">
-            <button type="button" class="btn-en active" onclick="switchLanguage('en')">
-                <i class="bi bi-globe"></i> English
-            </button>
-            <button type="button" class="btn-th" onclick="switchLanguage('th')">
-                <i class="bi bi-translate"></i> ภาษาไทย
-            </button>
-        </div>
-    </div>
 
+    {% if get_current_locale() == 'en' %}
     <!-- English Content -->
-    <div id="content-en" class="content-section active">
+    <div>
         <!-- Mission Section -->
         <div class="about-section">
             <div class="row align-items-center">
@@ -583,9 +531,9 @@
             </div>
         </div>
     </div>
-
+    {% else %}
     <!-- Thai Content -->
-    <div id="content-th" class="content-section">
+    <div>
         <!-- Mission Section -->
         <div class="about-section">
             <div class="row align-items-center">
@@ -849,40 +797,9 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    function switchLanguage(lang) {
-        // Hide all content sections (including hero sections)
-        document.querySelectorAll('.content-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        
-        // Show selected language content and hero
-        document.getElementById('content-' + lang).classList.add('active');
-        document.getElementById('hero-' + lang).classList.add('active');
-        
-        // Update button states
-        document.querySelectorAll('.language-toggle button').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        if (lang === 'en') {
-            document.querySelector('.btn-en').classList.add('active');
-        } else {
-            document.querySelector('.btn-th').classList.add('active');
-        }
-        
-        // Save preference
-        localStorage.setItem('aboutPageLanguage', lang);
-    }
-    
-    // Load saved language preference
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedLang = localStorage.getItem('aboutPageLanguage') || 'en';
-        switchLanguage(savedLang);
-    });
-</script>
 {% endblock %}

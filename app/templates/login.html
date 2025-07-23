@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Login - Thai-English Grammar Learning Tool{% endblock %}
+{% block title %}{% if get_current_locale() == 'th' %}เข้าสู่ระบบ - เครื่องมือเรียน Grammar ไทย-อังกฤษ{% else %}Login - Thai-English Grammar Learning Tool{% endif %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -8,32 +8,56 @@
         <div class="card shadow">
             <div class="card-body p-5">
                 <h2 class="text-center mb-4">
-                    <i class="bi bi-key"></i> Login
+                    <i class="bi bi-key"></i> 
+                    {% if get_current_locale() == 'th' %}
+                        <span lang="th">เข้าสู่ระบบ</span>
+                    {% else %}
+                        Login
+                    {% endif %}
                 </h2>
                 
                 <p class="text-center text-muted mb-4">
-                    Enter your 5-character pseudocode to access the system
+                    {% if get_current_locale() == 'th' %}
+                        <span lang="th">กรอกรหัสสมมติ 5 หลักเพื่อเข้าใช้ระบบ</span>
+                    {% else %}
+                        Enter your 5-character pseudocode to access the system
+                    {% endif %}
                 </p>
                 
                 <form method="POST" action="{{ url_for('auth.login') }}">
                     <div class="mb-4">
-                        <label for="pseudocode" class="form-label">5-Character Code</label>
+                        <label for="pseudocode" class="form-label">
+                            {% if get_current_locale() == 'th' %}
+                                <span lang="th">รหัส 5 หลัก</span>
+                            {% else %}
+                                5-Character Code
+                            {% endif %}
+                        </label>
                         <input type="text" 
                                class="form-control form-control-lg text-center" 
                                id="pseudocode" 
                                name="pseudocode" 
                                maxlength="5" 
                                pattern="[A-Za-z0-9]{5}" 
-                               placeholder="USER1 or 90001"
+                               placeholder="{% if get_current_locale() == 'th' %}USER1 หรือ 90001{% else %}USER1 or 90001{% endif %}"
                                required
                                autocomplete="off">
                         <div class="form-text text-center">
-                            Enter your 5-character code (letters and numbers only)
+                            {% if get_current_locale() == 'th' %}
+                                <span lang="th">กรอกรหัส 5 หลัก (ตัวอักษรและตัวเลขเท่านั้น)</span>
+                            {% else %}
+                                Enter your 5-character code (letters and numbers only)
+                            {% endif %}
                         </div>
                     </div>
                     
                     <button type="submit" class="btn btn-primary w-100 btn-lg">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
+                        <i class="bi bi-box-arrow-in-right"></i> 
+                        {% if get_current_locale() == 'th' %}
+                            <span lang="th">เข้าสู่ระบบ</span>
+                        {% else %}
+                            Login
+                        {% endif %}
                     </button>
                 </form>
                 
@@ -41,7 +65,11 @@
                 
                 <div class="text-center text-muted small">
                     <i class="bi bi-shield-lock"></i> 
-                    Your participation is anonymous. No personal information is stored.
+                    {% if get_current_locale() == 'th' %}
+                        <span lang="th">การมีส่วนร่วมของคุณเป็นแบบไม่ระบุตัวตน ไม่มีการเก็บข้อมูลส่วนบุคคล</span>
+                    {% else %}
+                        Your participation is anonymous. No personal information is stored.
+                    {% endif %}
                 </div>
             </div>
         </div>
