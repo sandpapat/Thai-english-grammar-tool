@@ -278,12 +278,62 @@ body::before {
     font-weight: 600 !important;
 }
 
-/* Thai text specific font sizing */
-.navbar-nav [lang="th"],
-.dropdown-item [lang="th"] {
-    font-size: 1rem !important;
+/* Thai text specific font sizing - Reduced for visual balance */
+.navbar-nav [lang="th"] {
+    font-size: 0.9rem !important; /* Reduced from 1rem to match English visual size */
     font-family: var(--font-universal) !important;
     font-weight: 500 !important;
+    letter-spacing: 0.01em !important; /* Slight letter spacing for clarity */
+}
+
+/* Thai navigation text in conditional blocks */
+.navbar-nav .nav-link:lang(th),
+.navbar-nav .nav-link *:lang(th) {
+    font-size: 0.9rem !important;
+}
+
+/* Thai dropdown items - slightly smaller for visual consistency */
+.dropdown-item [lang="th"] {
+    font-size: 0.85rem !important;
+    font-family: var(--font-universal) !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Target Thai text in conditional template blocks */
+/* When current locale is Thai, reduce all navigation text size */
+html[lang="th"] .navbar-nav .nav-link {
+    font-size: 0.9rem !important;
+    letter-spacing: 0.01em !important;
+}
+
+html[lang="th"] .dropdown-item {
+    font-size: 0.85rem !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Specific adjustments for different Thai navigation items */
+html[lang="th"] .navbar-nav .nav-link[href*="index"],
+html[lang="th"] .navbar-nav .nav-link[href*="tenses"],
+html[lang="th"] .navbar-nav .nav-link[href*="about"],
+html[lang="th"] .navbar-nav .nav-link[href*="login"] {
+    font-size: 0.9rem !important;
+}
+
+html[lang="th"] .navbar-nav .dropdown-toggle {
+    font-size: 0.9rem !important;
+}
+
+/* Thai dropdown menu items specific sizing */
+html[lang="th"] .dropdown-item {
+    font-size: 0.85rem !important;
+    letter-spacing: 0.01em !important;
+    line-height: 1.4 !important;
+}
+
+/* User dropdown menu items in Thai */
+html[lang="th"] .dropdown-menu .dropdown-item {
+    font-size: 0.85rem !important;
 }
 
 /* Ensure navbar brand and all navigation text use same font metrics */
@@ -396,12 +446,25 @@ body, .nav-link, .btn, .card {
     justify-content: center;
 }
 
+/* Thai hero subtitle - reduce size for visual balance */
+html[lang="th"] .hero-subtitle {
+    font-size: 1.15rem; /* Reduced from 1.25rem default */
+    letter-spacing: 0.01em;
+    line-height: 1.5;
+}
+
 /* Main content headers consistent sizing */
 .card-body h2 {
     min-height: 1.5em;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Thai card headers - slightly reduce size */
+html[lang="th"] .card-body h2 {
+    font-size: 1.4rem; /* Reduced from ~1.5rem default */
+    letter-spacing: 0.01em;
 }
 
 /* Tips box consistent sizing */
@@ -411,11 +474,23 @@ body, .nav-link, .btn, .card {
     align-items: center;
 }
 
+/* Thai tips header - adjust size */
+html[lang="th"] .tips-header h5 {
+    font-size: 1.15rem; /* Reduced from ~1.25rem default */
+    letter-spacing: 0.01em;
+}
+
 /* Form labels consistent sizing */
 .form-label {
     min-height: 1.5em;
     display: flex;
     align-items: center;
+}
+
+/* Thai form labels - adjust size */
+html[lang="th"] .form-label {
+    font-size: 0.95rem; /* Slightly reduced */
+    letter-spacing: 0.01em;
 }
 
 /* Button text consistent sizing */
@@ -426,6 +501,12 @@ body, .nav-link, .btn, .card {
     justify-content: center;
 }
 
+/* Thai button text - adjust size */
+html[lang="th"] .modern-btn {
+    font-size: 1.05rem; /* Slightly reduced from 1.125rem default */
+    letter-spacing: 0.01em;
+}
+
 /* Card titles consistent sizing */
 .card-title {
     min-height: 1.5em;
@@ -433,6 +514,82 @@ body, .nav-link, .btn, .card {
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+/* Thai card titles - adjust size */
+html[lang="th"] .card-title {
+    font-size: 1.15rem; /* Reduced from ~1.25rem default */
+    letter-spacing: 0.01em;
+}
+
+/* Thai typography fine-tuning */
+html[lang="th"] {
+    /* Global Thai text improvements */
+    word-spacing: 0.02em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+}
+
+/* Thai paragraph text adjustments */
+html[lang="th"] p,
+html[lang="th"] .text-muted {
+    font-size: 0.95rem;
+    letter-spacing: 0.005em;
+    line-height: 1.6;
+}
+
+/* Thai loading messages */
+html[lang="th"] #loadingMessage h5 {
+    font-size: 1.1rem;
+    letter-spacing: 0.01em;
+}
+
+/* Thai stats labels */
+html[lang="th"] .stat-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.01em;
+}
+
+/* Thai welcome messages */
+html[lang="th"] .card-body h2 {
+    line-height: 1.3;
+}
+
+/* Responsive Thai font adjustments */
+@media (max-width: 768px) {
+    /* Mobile Thai navigation adjustments */
+    html[lang="th"] .navbar-nav .nav-link {
+        font-size: 0.85rem !important;
+    }
+    
+    html[lang="th"] .dropdown-item {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Mobile Thai content adjustments */
+    html[lang="th"] .hero-subtitle {
+        font-size: 1.05rem;
+    }
+    
+    html[lang="th"] .card-body h2 {
+        font-size: 1.3rem;
+    }
+    
+    html[lang="th"] .card-title {
+        font-size: 1.05rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    /* Large screen Thai adjustments */
+    html[lang="th"] .navbar-nav .nav-link {
+        font-size: 0.92rem !important;
+    }
+    
+    html[lang="th"] .hero-subtitle {
+        font-size: 1.18rem;
+    }
 }
 
 /* Information cards consistent sizing */
