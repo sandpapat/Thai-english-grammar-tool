@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}BERT Classifier Performance - Thai-English Grammar Learning Tool{% endblock %}
+{% block title %}{% if get_current_locale() == 'th' %}ประสิทธิภาพตัวจำแนก BERT - Thaislate{% else %}BERT Classifier Performance - Thaislate{% endif %}{% endblock %}
 
 {% block content %}
 <style>
@@ -154,36 +154,63 @@
 <div class="hero-section">
     <div class="container">
         <h1 class="display-5 fw-bold mb-3">
-            <i class="bi bi-cpu"></i> BERT Classifier Performance
+            <i class="bi bi-cpu"></i> 
+            {% if get_current_locale() == 'th' %}
+                ประสิทธิภาพตัวจำแนก BERT
+            {% else %}
+                BERT Classifier Performance
+            {% endif %}
         </h1>
-        <h2 class="h4 mb-4">Isolated XLM-RoBERTa Fine-grained Tense Classification</h2>
+        <h2 class="h4 mb-4">
+            {% if get_current_locale() == 'th' %}
+                การจำแนก Tense แบบละเอียดด้วย XLM-RoBERTa
+            {% else %}
+                Isolated XLM-RoBERTa Fine-grained Tense Classification
+            {% endif %}
+        </h2>
         <div class="row">
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">{{ performance.classifier.metrics['Accuracy'] }}</div>
-                    <p class="lead mb-0">Accuracy</p>
-                    <small style="opacity: 0.8;">Overall classification accuracy</small>
+                    <p class="lead mb-0">
+                        {% if get_current_locale() == 'th' %}ความแม่นยำ{% else %}Accuracy{% endif %}
+                    </p>
+                    <small style="opacity: 0.8;">
+                        {% if get_current_locale() == 'th' %}ความแม่นยำในการจำแนกโดยรวม{% else %}Overall classification accuracy{% endif %}
+                    </small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">{{ performance.classifier.metrics['Macro F1 Score'] }}</div>
-                    <p class="lead mb-0">Macro F1</p>
-                    <small style="opacity: 0.8;">Unweighted average F1</small>
+                    <p class="lead mb-0">
+                        {% if get_current_locale() == 'th' %}Macro F1{% else %}Macro F1{% endif %}
+                    </p>
+                    <small style="opacity: 0.8;">
+                        {% if get_current_locale() == 'th' %}ค่าเฉลี่ย F1 ไม่ถ่วงน้ำหนัก{% else %}Unweighted average F1{% endif %}
+                    </small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">{{ performance.classifier.metrics['Weighted F1 Score'] }}</div>
-                    <p class="lead mb-0">Weighted F1</p>
-                    <small style="opacity: 0.8;">Support-weighted F1</small>
+                    <p class="lead mb-0">
+                        {% if get_current_locale() == 'th' %}Weighted F1{% else %}Weighted F1{% endif %}
+                    </p>
+                    <small style="opacity: 0.8;">
+                        {% if get_current_locale() == 'th' %}ค่า F1 ถ่วงน้ำหนักตามจำนวนตัวอย่าง{% else %}Support-weighted F1{% endif %}
+                    </small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">469</div>
-                    <p class="lead mb-0">Test Samples</p>
-                    <small style="opacity: 0.8;">24 tense classes</small>
+                    <p class="lead mb-0">
+                        {% if get_current_locale() == 'th' %}ตัวอย่างทดสอบ{% else %}Test Samples{% endif %}
+                    </p>
+                    <small style="opacity: 0.8;">
+                        {% if get_current_locale() == 'th' %}24 ประเภท tense{% else %}24 tense classes{% endif %}
+                    </small>
                 </div>
             </div>
         </div>
@@ -198,10 +225,22 @@
                 <i class="bi bi-check-circle-fill text-success fs-1"></i>
             </div>
             <div class="col-md-11">
-                <h5 class="alert-heading mb-2">Isolated Classifier Testing</h5>
+                <h5 class="alert-heading mb-2">
+                    {% if get_current_locale() == 'th' %}
+                        การทดสอบตัวจำแนกแบบแยก
+                    {% else %}
+                        Isolated Classifier Testing
+                    {% endif %}
+                </h5>
                 <p class="mb-0">
-                    This evaluation tests <strong>only the XLM-RoBERTa classifier</strong> in isolation, focusing purely on its ability to 
-                    classify Thai sentences into 24 fine-grained tense categories. No translation or explanation components are involved.
+                    {% if get_current_locale() == 'th' %}
+                        การประเมินนี้ทดสอบ <strong>เฉพาะตัวจำแนก XLM-RoBERTa</strong> แบบแยกเท่านั้น 
+                        โดยมุ่งเน้นที่ความสามารถในการจำแนกประโยคไทยเข้าไปใน 24 ประเภท tense แบบละเอียด 
+                        ไม่มีส่วนประกอบการแปลหรือคำอธิบาย
+                    {% else %}
+                        This evaluation tests <strong>only the XLM-RoBERTa classifier</strong> in isolation, focusing purely on its ability to 
+                        classify Thai sentences into 24 fine-grained tense categories. No translation or explanation components are involved.
+                    {% endif %}
                 </p>
             </div>
         </div>
@@ -213,11 +252,23 @@
                 <i class="bi bi-info-circle-fill text-info fs-1"></i>
             </div>
             <div class="col-md-11">
-                <h5 class="alert-heading mb-2">Dataset Characteristics</h5>
+                <h5 class="alert-heading mb-2">
+                    {% if get_current_locale() == 'th' %}
+                        ลักษณะของชุดข้อมูล
+                    {% else %}
+                        Dataset Characteristics
+                    {% endif %}
+                </h5>
                 <p class="mb-0">
-                    The test dataset consists primarily of <strong>simple sentences</strong> rather than compound or complex sentences. 
-                    This means the classifier was trained and tested on straightforward English sentences (translated from Thai) with single main clauses, 
-                    which helps achieve high accuracy by avoiding the ambiguity that can arise from multiple tenses within compound-complex structures.
+                    {% if get_current_locale() == 'th' %}
+                        ชุดข้อมูลทดสอบประกอบด้วย <strong>ประโยคง่าย</strong> เป็นหลัก แทนที่จะเป็นประโยคประสมหรือซับซ้อน 
+                        นั่นหมายความว่าตัวจำแนกถูกฝึกและทดสอบกับประโยคภาษาอังกฤษที่ตรงไปตรงมา (แปลจากภาษาไทย) 
+                        ที่มีอนุประโยคหลักเดียว ซึ่งช่วยให้ได้ความแม่นยำสูงโดยหลีกเลี่ยงความกำกวมที่อาจเกิดจาก tense หลายตัวในโครงสร้างที่ซับซ้อน
+                    {% else %}
+                        The test dataset consists primarily of <strong>simple sentences</strong> rather than compound or complex sentences. 
+                        This means the classifier was trained and tested on straightforward English sentences (translated from Thai) with single main clauses, 
+                        which helps achieve high accuracy by avoiding the ambiguity that can arise from multiple tenses within compound-complex structures.
+                    {% endif %}
                 </p>
             </div>
         </div>
@@ -226,47 +277,95 @@
 
 <!-- Performance Overview -->
 <section class="mb-5">
-    <h3 class="mb-4">Performance Overview</h3>
+    <h3 class="mb-4">
+        {% if get_current_locale() == 'th' %}
+            ภาพรวมประสิทธิภาพ
+        {% else %}
+            Performance Overview
+        {% endif %}
+    </h3>
     <div class="row g-4">
         <div class="col-md-4">
             <div class="metric-card">
-                <h5><i class="bi bi-bullseye me-2 text-success"></i>Overall Accuracy</h5>
+                <h5><i class="bi bi-bullseye me-2 text-success"></i>
+                    {% if get_current_locale() == 'th' %}
+                        ความแม่นยำโดยรวม
+                    {% else %}
+                        Overall Accuracy
+                    {% endif %}
+                </h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">{{ performance.classifier.metrics['Accuracy'] }}</span>
-                    <span class="performance-badge excellent">Excellent</span>
+                    <span class="performance-badge excellent">
+                        {% if get_current_locale() == 'th' %}ยอดเยี่ยม{% else %}Excellent{% endif %}
+                    </span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-success" style="width: 94.7%"></div>
                 </div>
-                <small class="text-muted">444 out of 469 samples correctly classified</small>
+                <small class="text-muted">
+                    {% if get_current_locale() == 'th' %}
+                        จำแนกถูกต้อง 444 จาก 469 ตัวอย่าง
+                    {% else %}
+                        444 out of 469 samples correctly classified
+                    {% endif %}
+                </small>
             </div>
         </div>
         
         <div class="col-md-4">
             <div class="metric-card">
-                <h5><i class="bi bi-graph-up me-2 text-success"></i>Macro F1 Score</h5>
+                <h5><i class="bi bi-graph-up me-2 text-success"></i>
+                    {% if get_current_locale() == 'th' %}
+                        คะแนน Macro F1
+                    {% else %}
+                        Macro F1 Score
+                    {% endif %}
+                </h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">{{ performance.classifier.metrics['Macro F1 Score'] }}</span>
-                    <span class="performance-badge excellent">Excellent</span>
+                    <span class="performance-badge excellent">
+                        {% if get_current_locale() == 'th' %}ยอดเยี่ยม{% else %}Excellent{% endif %}
+                    </span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-success" style="width: 91.3%"></div>
                 </div>
-                <small class="text-muted">Unweighted average across all 24 classes</small>
+                <small class="text-muted">
+                    {% if get_current_locale() == 'th' %}
+                        ค่าเฉลี่ยไม่ถ่วงน้ำหนักทั้ง 24 คลาส
+                    {% else %}
+                        Unweighted average across all 24 classes
+                    {% endif %}
+                </small>
             </div>
         </div>
         
         <div class="col-md-4">
             <div class="metric-card">
-                <h5><i class="bi bi-bar-chart me-2 text-success"></i>Weighted F1 Score</h5>
+                <h5><i class="bi bi-bar-chart me-2 text-success"></i>
+                    {% if get_current_locale() == 'th' %}
+                        คะแนน Weighted F1
+                    {% else %}
+                        Weighted F1 Score
+                    {% endif %}
+                </h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">{{ performance.classifier.metrics['Weighted F1 Score'] }}</span>
-                    <span class="performance-badge excellent">Excellent</span>
+                    <span class="performance-badge excellent">
+                        {% if get_current_locale() == 'th' %}ยอดเยี่ยม{% else %}Excellent{% endif %}
+                    </span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-success" style="width: 94.6%"></div>
                 </div>
-                <small class="text-muted">Weighted by class support (sample count)</small>
+                <small class="text-muted">
+                    {% if get_current_locale() == 'th' %}
+                        ถ่วงน้ำหนักตามจำนวนตัวอย่างของแต่ละคลาส
+                    {% else %}
+                        Weighted by class support (sample count)
+                    {% endif %}
+                </small>
             </div>
         </div>
     </div>
@@ -274,7 +373,13 @@
 
 <!-- Confusion Matrix -->
 <section class="mb-5">
-    <h3 class="mb-4">Confusion Matrix - Coarse Tense Classification</h3>
+    <h3 class="mb-4">
+        {% if get_current_locale() == 'th' %}
+            Confusion Matrix - การจำแนก Tense แบบหยาบ
+        {% else %}
+            Confusion Matrix - Coarse Tense Classification
+        {% endif %}
+    </h3>
     <div class="card shadow-sm" style="background: var(--card-bg); border: 1px solid var(--border-color);">
         <div class="card-body" style="color: var(--text-primary);">
             <div class="table-responsive">
@@ -304,7 +409,12 @@
                 </table>
             </div>
             <p class="text-muted mt-3 mb-0">
-                <i class="bi bi-info-circle"></i> Near-perfect classification with minimal confusion between tense categories.
+                <i class="bi bi-info-circle"></i> 
+                {% if get_current_locale() == 'th' %}
+                    การจำแนกที่ใกล้สมบูรณ์แบบด้วยความสับสนน้อยที่สุดระหว่างประเภท tense
+                {% else %}
+                    Near-perfect classification with minimal confusion between tense categories.
+                {% endif %}
             </p>
         </div>
     </div>
@@ -312,13 +422,24 @@
 
 <!-- Per-Class Performance -->
 <section class="mb-5">
-    <h3 class="mb-4">Per-Class Performance Analysis</h3>
+    <h3 class="mb-4">
+        {% if get_current_locale() == 'th' %}
+            การวิเคราะห์ประสิทธิภาพแต่ละคลาส
+        {% else %}
+            Per-Class Performance Analysis
+        {% endif %}
+    </h3>
     <div class="row g-4">
         <div class="col-md-6">
             <div class="card shadow-sm h-100" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">
-                        <i class="bi bi-trophy-fill"></i> Perfect Performance (F1 = 1.000)
+                        <i class="bi bi-trophy-fill"></i> 
+                        {% if get_current_locale() == 'th' %}
+                            ประสิทธิภาพสมบูรณ์แบบ (F1 = 1.000)
+                        {% else %}
+                            Perfect Performance (F1 = 1.000)
+                        {% endif %}
                     </h5>
                 </div>
                 <div class="card-body" style="color: var(--text-primary);">
@@ -333,7 +454,13 @@
                         </div>
                     {% endif %}
                     <hr>
-                    <small class="text-muted">6 out of 24 classes achieved perfect classification</small>
+                    <small class="text-muted">
+                        {% if get_current_locale() == 'th' %}
+                            6 จาก 24 คลาสได้รับการจำแนกที่สมบูรณ์แบบ
+                        {% else %}
+                            6 out of 24 classes achieved perfect classification
+                        {% endif %}
+                    </small>
                 </div>
             </div>
         </div>
@@ -342,7 +469,12 @@
             <div class="card shadow-sm h-100" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="mb-0">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Challenging Classes
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        {% if get_current_locale() == 'th' %}
+                            คลาสที่ท้าทาย
+                        {% else %}
+                            Challenging Classes
+                        {% endif %}
                     </h5>
                 </div>
                 <div class="card-body" style="color: var(--text-primary);">
@@ -357,7 +489,13 @@
                         </div>
                     {% endif %}
                     <hr>
-                    <small class="text-muted">4 classes require attention for improvement</small>
+                    <small class="text-muted">
+                        {% if get_current_locale() == 'th' %}
+                            4 คลาสต้องการปรับปรุงเพื่อคุณภาพที่ดีขึ้น
+                        {% else %}
+                            4 classes require attention for improvement
+                        {% endif %}
+                    </small>
                 </div>
             </div>
         </div>
@@ -366,7 +504,13 @@
 
 <!-- Detailed Class Breakdown -->
 <section class="mb-5">
-    <h3 class="mb-4">Complete Per-Label Results</h3>
+    <h3 class="mb-4">
+        {% if get_current_locale() == 'th' %}
+            ผลลัพธ์ตามลาเบลครบถ้วน
+        {% else %}
+            Complete Per-Label Results
+        {% endif %}
+    </h3>
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
@@ -415,12 +559,24 @@
 
 <!-- Key Insights -->
 <section class="mb-5">
-    <h3 class="mb-4">Key Insights</h3>
+    <h3 class="mb-4">
+        {% if get_current_locale() == 'th' %}
+            ข้อมูลเชิงลึกสำคัญ
+        {% else %}
+            Key Insights
+        {% endif %}
+    </h3>
     <div class="row g-4">
         <div class="col-md-6">
             <div class="card border-success" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>Classifier Strengths</h5>
+                    <h5 class="mb-0"><i class="bi bi-star-fill me-2"></i>
+                        {% if get_current_locale() == 'th' %}
+                            จุดแข็งของตัวจำแนก
+                        {% else %}
+                            Classifier Strengths
+                        {% endif %}
+                    </h5>
                 </div>
                 <div class="card-body" style="color: var(--text-primary);">
                     <ul class="mb-0">
@@ -435,7 +591,13 @@
         <div class="col-md-6">
             <div class="card border-warning" style="background: var(--card-bg); border: 1px solid var(--border-color);">
                 <div class="card-header bg-warning">
-                    <h5 class="mb-0"><i class="bi bi-target me-2"></i>Improvement Targets</h5>
+                    <h5 class="mb-0"><i class="bi bi-target me-2"></i>
+                        {% if get_current_locale() == 'th' %}
+                            เป้าหมายการปรับปรุง
+                        {% else %}
+                            Improvement Targets
+                        {% endif %}
+                    </h5>
                 </div>
                 <div class="card-body" style="color: var(--text-primary);">
                     <ul class="mb-0">

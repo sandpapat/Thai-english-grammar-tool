@@ -123,22 +123,35 @@
                 <ul class="navbar-nav ms-2" role="menubar">
                     <!-- Language Switcher -->
                     <li class="nav-item" role="none">
-                        {% if get_current_locale() == 'th' %}
-                        <a href="{{ url_for('main.set_language', language='en') }}" 
-                           class="nav-link btn btn-link border-0 p-2"
-                           role="menuitem"
-                           aria-label="Switch to English"
-                           title="Switch to English">
-                            <span class="fw-bold" style="font-size: 0.9rem;">EN</span>
-                        </a>
+                        {% if request.endpoint == 'main.predict' %}
+                            <!-- Disabled language switcher on results page -->
+                            <span class="nav-link btn btn-link border-0 p-2 text-muted" 
+                                  style="cursor: not-allowed; opacity: 0.5;"
+                                  title="{% if get_current_locale() == 'th' %}การเปลี่ยนภาษาไม่พร้อมใช้งานในหน้านี้{% else %}Language switching not available on this page{% endif %}">
+                                {% if get_current_locale() == 'th' %}
+                                    <span class="fw-bold" style="font-size: 0.9rem;">EN</span>
+                                {% else %}
+                                    <span class="fw-bold" style="font-size: 0.9rem;">ไทย</span>
+                                {% endif %}
+                            </span>
                         {% else %}
-                        <a href="{{ url_for('main.set_language', language='th') }}" 
-                           class="nav-link btn btn-link border-0 p-2"
-                           role="menuitem"
-                           aria-label="เปลี่ยนเป็นภาษาไทย"
-                           title="เปลี่ยนเป็นภาษาไทย">
-                            <span class="fw-bold" style="font-size: 0.9rem;">ไทย</span>
-                        </a>
+                            {% if get_current_locale() == 'th' %}
+                            <a href="{{ url_for('main.set_language', language='en') }}" 
+                               class="nav-link btn btn-link border-0 p-2"
+                               role="menuitem"
+                               aria-label="Switch to English"
+                               title="Switch to English">
+                                <span class="fw-bold" style="font-size: 0.9rem;">EN</span>
+                            </a>
+                            {% else %}
+                            <a href="{{ url_for('main.set_language', language='th') }}" 
+                               class="nav-link btn btn-link border-0 p-2"
+                               role="menuitem"
+                               aria-label="เปลี่ยนเป็นภาษาไทย"
+                               title="เปลี่ยนเป็นภาษาไทย">
+                                <span class="fw-bold" style="font-size: 0.9rem;">ไทย</span>
+                            </a>
+                            {% endif %}
                         {% endif %}
                     </li>
                     <!-- Dark Mode Toggle -->

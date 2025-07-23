@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}System Performance - Thaislate{% endblock %}
+{% block title %}{% if get_current_locale() == 'th' %}ประสิทธิภาพระบบ - Thaislate{% else %}System Performance - Thaislate{% endif %}{% endblock %}
 
 {% block content %}
 <style>
@@ -110,10 +110,18 @@
             <div class="col-lg-8">
                 <h1 class="display-4 fw-bold mb-3">
                     <i class="bi bi-speedometer2" aria-hidden="true"></i>
-                    System Performance
+                    {% if get_current_locale() == 'th' %}
+                        ประสิทธิภาพระบบ
+                    {% else %}
+                        System Performance
+                    {% endif %}
                 </h1>
                 <p class="lead mb-0">
-                    Real-time performance metrics and usage statistics for the Thaislate NLP pipeline
+                    {% if get_current_locale() == 'th' %}
+                        ข้อมูลประสิทธิภาพแบบเรียลไทม์และสถิติการใช้งานของระบบ NLP Thaislate
+                    {% else %}
+                        Real-time performance metrics and usage statistics for the Thaislate NLP pipeline
+                    {% endif %}
                 </p>
             </div>
             <div class="col-lg-4 text-end">
@@ -130,7 +138,12 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="section-header">
-            <i class="bi bi-bar-chart-fill me-2"></i>Usage Statistics
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            {% if get_current_locale() == 'th' %}
+                สถิติการใช้งาน
+            {% else %}
+                Usage Statistics
+            {% endif %}
         </h2>
     </div>
 </div>
@@ -139,34 +152,66 @@
     <div class="col-md-3 mb-3">
         <div class="metric-card">
             <div class="metric-value">{{ stats.total_requests }}</div>
-            <div class="metric-label">Total Requests</div>
+            <div class="metric-label">
+                {% if get_current_locale() == 'th' %}
+                    คำขอทั้งหมด
+                {% else %}
+                    Total Requests
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="metric-card">
             <div class="metric-value">{{ stats.success_rate }}%</div>
-            <div class="metric-label">Success Rate</div>
+            <div class="metric-label">
+                {% if get_current_locale() == 'th' %}
+                    อัตราความสำเร็จ
+                {% else %}
+                    Success Rate
+                {% endif %}
+            </div>
             {% if stats.success_rate >= 95 %}
-                <span class="performance-badge excellent mt-2">Excellent</span>
+                <span class="performance-badge excellent mt-2">
+                    {% if get_current_locale() == 'th' %}ยอดเยี่ยม{% else %}Excellent{% endif %}
+                </span>
             {% elif stats.success_rate >= 85 %}
-                <span class="performance-badge good mt-2">Good</span>
+                <span class="performance-badge good mt-2">
+                    {% if get_current_locale() == 'th' %}ดี{% else %}Good{% endif %}
+                </span>
             {% elif stats.success_rate >= 70 %}
-                <span class="performance-badge moderate mt-2">Moderate</span>
+                <span class="performance-badge moderate mt-2">
+                    {% if get_current_locale() == 'th' %}ปานกลาง{% else %}Moderate{% endif %}
+                </span>
             {% else %}
-                <span class="performance-badge warning mt-2">Needs Attention</span>
+                <span class="performance-badge warning mt-2">
+                    {% if get_current_locale() == 'th' %}ต้องปรับปรุง{% else %}Needs Attention{% endif %}
+                </span>
             {% endif %}
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="metric-card">
             <div class="metric-value">{{ stats.unique_users }}</div>
-            <div class="metric-label">Unique Users</div>
+            <div class="metric-label">
+                {% if get_current_locale() == 'th' %}
+                    ผู้ใช้ไม่ซ้ำ
+                {% else %}
+                    Unique Users
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="metric-card">
             <div class="metric-value">{{ stats.recent_requests_24h }}</div>
-            <div class="metric-label">Requests (24h)</div>
+            <div class="metric-label">
+                {% if get_current_locale() == 'th' %}
+                    คำขอ (24 ชม.)
+                {% else %}
+                    Requests (24h)
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -175,7 +220,12 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="section-header">
-            <i class="bi bi-stopwatch-fill me-2"></i>Average Response Times
+            <i class="bi bi-stopwatch-fill me-2"></i>
+            {% if get_current_locale() == 'th' %}
+                เวลาตอบสนองเฉลี่ย
+            {% else %}
+                Average Response Times
+            {% endif %}
         </h2>
     </div>
 </div>
@@ -184,25 +234,49 @@
     <div class="col-md-3 mb-3">
         <div class="timing-card">
             <div class="timing-value">{{ "%.3f"|format(stats.avg_translation_time) }}s</div>
-            <div class="timing-label">Translation</div>
+            <div class="timing-label">
+                {% if get_current_locale() == 'th' %}
+                    การแปล
+                {% else %}
+                    Translation
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="timing-card">
             <div class="timing-value">{{ "%.3f"|format(stats.avg_classification_time) }}s</div>
-            <div class="timing-label">Classification</div>
+            <div class="timing-label">
+                {% if get_current_locale() == 'th' %}
+                    การจำแนก
+                {% else %}
+                    Classification
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="timing-card">
             <div class="timing-value">{{ "%.3f"|format(stats.avg_explanation_time) }}s</div>
-            <div class="timing-label">Explanation</div>
+            <div class="timing-label">
+                {% if get_current_locale() == 'th' %}
+                    คำอธิบาย
+                {% else %}
+                    Explanation
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="col-md-3 mb-3">
         <div class="timing-card">
             <div class="timing-value">{{ "%.3f"|format(stats.avg_total_time) }}s</div>
-            <div class="timing-label">Total Pipeline</div>
+            <div class="timing-label">
+                {% if get_current_locale() == 'th' %}
+                    รวมทั้งหมด
+                {% else %}
+                    Total Pipeline
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -211,7 +285,12 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="section-header">
-            <i class="bi bi-file-text-fill me-2"></i>Input Analysis
+            <i class="bi bi-file-text-fill me-2"></i>
+            {% if get_current_locale() == 'th' %}
+                การวิเคราะห์ข้อมูลนำเข้า
+            {% else %}
+                Input Analysis
+            {% endif %}
         </h2>
     </div>
 </div>
@@ -220,13 +299,25 @@
     <div class="col-md-6 mb-3">
         <div class="metric-card">
             <div class="metric-value">{{ "%.1f"|format(stats.avg_input_length) }}</div>
-            <div class="metric-label">Average Input Length (characters)</div>
+            <div class="metric-label">
+                {% if get_current_locale() == 'th' %}
+                    ความยาวเฉลี่ยของข้อมูล (ตัวอักษร)
+                {% else %}
+                    Average Input Length (characters)
+                {% endif %}
+            </div>
         </div>
     </div>
     <div class="col-md-6 mb-3">
         <div class="metric-card">
             <div class="metric-value">{{ stats.successful_requests }}</div>
-            <div class="metric-label">Successful Requests</div>
+            <div class="metric-label">
+                {% if get_current_locale() == 'th' %}
+                    คำขอที่สำเร็จ
+                {% else %}
+                    Successful Requests
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -235,7 +326,12 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="section-header">
-            <i class="bi bi-lightbulb-fill me-2"></i>Performance Insights
+            <i class="bi bi-lightbulb-fill me-2"></i>
+            {% if get_current_locale() == 'th' %}
+                ข้อมูลเชิงลึกประสิทธิภาพ
+            {% else %}
+                Performance Insights
+            {% endif %}
         </h2>
     </div>
 </div>
@@ -245,18 +341,41 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">
-                    <i class="bi bi-translate text-primary me-2"></i>Translation
+                    <i class="bi bi-translate text-primary me-2"></i>
+                    {% if get_current_locale() == 'th' %}
+                        การแปล
+                    {% else %}
+                        Translation
+                    {% endif %}
                 </h5>
                 <p class="card-text">
                     {% if stats.avg_translation_time < 1.0 %}
-                        <span class="performance-badge excellent">Fast</span>
-                        Translation is performing excellently with sub-second response times.
+                        <span class="performance-badge excellent">
+                            {% if get_current_locale() == 'th' %}เร็ว{% else %}Fast{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            การแปลทำงานได้อย่างยอดเยี่ยมด้วยเวลาตอบสนองต่ำกว่า 1 วินาที
+                        {% else %}
+                            Translation is performing excellently with sub-second response times.
+                        {% endif %}
                     {% elif stats.avg_translation_time < 3.0 %}
-                        <span class="performance-badge good">Good</span>
-                        Translation performance is within acceptable ranges.
+                        <span class="performance-badge good">
+                            {% if get_current_locale() == 'th' %}ดี{% else %}Good{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            ประสิทธิภาพการแปลอยู่ในระดับที่ยอมรับได้
+                        {% else %}
+                            Translation performance is within acceptable ranges.
+                        {% endif %}
                     {% else %}
-                        <span class="performance-badge moderate">Slow</span>
-                        Translation may benefit from optimization or hardware upgrades.
+                        <span class="performance-badge moderate">
+                            {% if get_current_locale() == 'th' %}ช้า{% else %}Slow{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            การแปลอาจได้รับประโยชน์จากการปรับปรุงหรืออัปเกรดฮาร์ดแวร์
+                        {% else %}
+                            Translation may benefit from optimization or hardware upgrades.
+                        {% endif %}
                     {% endif %}
                 </p>
             </div>
@@ -267,18 +386,41 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">
-                    <i class="bi bi-cpu text-success me-2"></i>Classification
+                    <i class="bi bi-cpu text-success me-2"></i>
+                    {% if get_current_locale() == 'th' %}
+                        การจำแนก
+                    {% else %}
+                        Classification
+                    {% endif %}
                 </h5>
                 <p class="card-text">
                     {% if stats.avg_classification_time < 0.5 %}
-                        <span class="performance-badge excellent">Fast</span>
-                        BERT classification is highly optimized.
+                        <span class="performance-badge excellent">
+                            {% if get_current_locale() == 'th' %}เร็ว{% else %}Fast{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            การจำแนก BERT ถูกปรับปรุงให้มีประสิทธิภาพสูงสุด
+                        {% else %}
+                            BERT classification is highly optimized.
+                        {% endif %}
                     {% elif stats.avg_classification_time < 2.0 %}
-                        <span class="performance-badge good">Good</span>
-                        Classification performance is satisfactory.
+                        <span class="performance-badge good">
+                            {% if get_current_locale() == 'th' %}ดี{% else %}Good{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            ประสิทธิภาพการจำแนกอยู่ในระดับที่น่าพอใจ
+                        {% else %}
+                            Classification performance is satisfactory.
+                        {% endif %}
                     {% else %}
-                        <span class="performance-badge moderate">Slow</span>
-                        Consider GPU acceleration for better performance.
+                        <span class="performance-badge moderate">
+                            {% if get_current_locale() == 'th' %}ช้า{% else %}Slow{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            ควรพิจารณาใช้ GPU เพื่อประสิทธิภาพที่ดีกว่า
+                        {% else %}
+                            Consider GPU acceleration for better performance.
+                        {% endif %}
                     {% endif %}
                 </p>
             </div>
@@ -289,18 +431,41 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">
-                    <i class="bi bi-chat-quote text-info me-2"></i>Explanation
+                    <i class="bi bi-chat-quote text-info me-2"></i>
+                    {% if get_current_locale() == 'th' %}
+                        คำอธิบาย
+                    {% else %}
+                        Explanation
+                    {% endif %}
                 </h5>
                 <p class="card-text">
                     {% if stats.avg_explanation_time < 5.0 %}
-                        <span class="performance-badge excellent">Fast</span>
-                        Grammar explanations are generated quickly.
+                        <span class="performance-badge excellent">
+                            {% if get_current_locale() == 'th' %}เร็ว{% else %}Fast{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            คำอธิบายไวยากรณ์ถูกสร้างขึ้นอย่างรวดเร็ว
+                        {% else %}
+                            Grammar explanations are generated quickly.
+                        {% endif %}
                     {% elif stats.avg_explanation_time < 15.0 %}
-                        <span class="performance-badge good">Good</span>
-                        Explanation generation is within normal ranges.
+                        <span class="performance-badge good">
+                            {% if get_current_locale() == 'th' %}ดี{% else %}Good{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            การสร้างคำอธิบายอยู่ในช่วงเวลาปกติ
+                        {% else %}
+                            Explanation generation is within normal ranges.
+                        {% endif %}
                     {% else %}
-                        <span class="performance-badge moderate">Slow</span>
-                        LLM inference may need optimization.
+                        <span class="performance-badge moderate">
+                            {% if get_current_locale() == 'th' %}ช้า{% else %}Slow{% endif %}
+                        </span>
+                        {% if get_current_locale() == 'th' %}
+                            การประมวลผลจาก LLM อาจต้องปรับปรุง
+                        {% else %}
+                            LLM inference may need optimization.
+                        {% endif %}
                     {% endif %}
                 </p>
             </div>
@@ -312,10 +477,21 @@
 <!-- No Data Available -->
 <div class="no-data">
     <i class="bi bi-database-x icon-large"></i>
-    <h3>No Performance Data Available</h3>
+    <h3>
+        {% if get_current_locale() == 'th' %}
+            ไม่มีข้อมูลประสิทธิภาพ
+        {% else %}
+            No Performance Data Available
+        {% endif %}
+    </h3>
     <p class="text-muted">
-        System performance data will appear here once users start using the application.
-        <br>Make sure the database is properly configured and the SystemPerformance model is created.
+        {% if get_current_locale() == 'th' %}
+            ข้อมูลประสิทธิภาพระบบจะปรากฏที่นี่เมื่อผู้ใช้เริ่มใช้แอพพลิเคชัน
+            <br>ตรวจสอบให้แน่ใจว่าฐานข้อมูลถูกตั้งค่าอย่างถูกต้องและโมเดล SystemPerformance ถูกสร้าง
+        {% else %}
+            System performance data will appear here once users start using the application.
+            <br>Make sure the database is properly configured and the SystemPerformance model is created.
+        {% endif %}
     </p>
 </div>
 {% endif %}
