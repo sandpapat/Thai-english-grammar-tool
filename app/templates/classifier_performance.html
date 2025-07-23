@@ -4,9 +4,48 @@
 
 {% block content %}
 <style>
+    /* CSS Variables for theme-aware colors */
+    :root {
+        --classifier-hero-bg: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        --classifier-hero-text: white;
+        --badge-excellent-bg: #d4edda;
+        --badge-excellent-text: #155724;
+        --badge-good-bg: #cce5ff;
+        --badge-good-text: #004085;
+        --badge-moderate-bg: #fff3cd;
+        --badge-moderate-text: #856404;
+        --badge-poor-bg: #f8d7da;
+        --badge-poor-text: #721c24;
+        --matrix-excellent-bg: #28a745;
+        --matrix-excellent-text: white;
+        --matrix-warning-bg: #ffc107;
+        --matrix-warning-text: #212529;
+        --table-success-bg: #28a745;
+        --table-success-text: white;
+    }
+    
+    [data-theme="dark"] {
+        --classifier-hero-bg: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        --classifier-hero-text: white;
+        --badge-excellent-bg: rgba(25, 135, 84, 0.2);
+        --badge-excellent-text: #40d989;
+        --badge-good-bg: rgba(13, 110, 253, 0.2);
+        --badge-good-text: #6ea8fe;
+        --badge-moderate-bg: rgba(255, 193, 7, 0.2);
+        --badge-moderate-text: #ffda6a;
+        --badge-poor-bg: rgba(220, 53, 69, 0.2);
+        --badge-poor-text: #ea6a75;
+        --matrix-excellent-bg: rgba(25, 135, 84, 0.8);
+        --matrix-excellent-text: white;
+        --matrix-warning-bg: rgba(255, 193, 7, 0.8);
+        --matrix-warning-text: white;
+        --table-success-bg: rgba(25, 135, 84, 0.8);
+        --table-success-text: white;
+    }
+    
     .hero-section {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
+        background: var(--classifier-hero-bg);
+        color: var(--classifier-hero-text);
         padding: 3rem 0;
         margin: -2rem -12px 3rem -12px;
         border-radius: 0 0 1rem 1rem;
@@ -31,10 +70,10 @@
         font-size: 0.875rem;
         font-weight: 500;
     }
-    .excellent { background-color: #d4edda; color: #155724; }
-    .good { background-color: #cce5ff; color: #004085; }
-    .moderate { background-color: #fff3cd; color: #856404; }
-    .poor { background-color: #f8d7da; color: #721c24; }
+    .excellent { background-color: var(--badge-excellent-bg); color: var(--badge-excellent-text); }
+    .good { background-color: var(--badge-good-bg); color: var(--badge-good-text); }
+    .moderate { background-color: var(--badge-moderate-bg); color: var(--badge-moderate-text); }
+    .poor { background-color: var(--badge-poor-bg); color: var(--badge-poor-text); }
     .progress-custom {
         height: 8px;
         border-radius: 4px;
@@ -43,7 +82,7 @@
     .score-display {
         font-size: 2.5rem;
         font-weight: 700;
-        color: white;
+        color: var(--classifier-hero-text);
     }
     .confusion-table {
         font-size: 0.9rem;
@@ -61,20 +100,20 @@
         border: 1px solid var(--border-color);
     }
     .confusion-table .table-success-header {
-        background: #28a745 !important;
-        color: white !important;
+        background: var(--table-success-bg) !important;
+        color: var(--table-success-text) !important;
     }
     .confusion-table .table-light-header {
         background: var(--bg-secondary) !important;
         color: var(--text-primary) !important;
     }
     .confusion-matrix-excellent {
-        background: #28a745 !important;
-        color: white !important;
+        background: var(--matrix-excellent-bg) !important;
+        color: var(--matrix-excellent-text) !important;
     }
     .confusion-matrix-warning {
-        background: #ffc107 !important;
-        color: #212529 !important;
+        background: var(--matrix-warning-bg) !important;
+        color: var(--matrix-warning-text) !important;
     }
     .confusion-matrix-default {
         background: var(--card-bg) !important;
@@ -94,28 +133,28 @@
                 <div class="text-center">
                     <div class="score-display">{{ performance.classifier.metrics['Accuracy'] }}</div>
                     <p class="lead mb-0">Accuracy</p>
-                    <small class="text-white-50">Overall classification accuracy</small>
+                    <small style="opacity: 0.8;">Overall classification accuracy</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">{{ performance.classifier.metrics['Macro F1 Score'] }}</div>
                     <p class="lead mb-0">Macro F1</p>
-                    <small class="text-white-50">Unweighted average F1</small>
+                    <small style="opacity: 0.8;">Unweighted average F1</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">{{ performance.classifier.metrics['Weighted F1 Score'] }}</div>
                     <p class="lead mb-0">Weighted F1</p>
-                    <small class="text-white-50">Support-weighted F1</small>
+                    <small style="opacity: 0.8;">Support-weighted F1</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">469</div>
                     <p class="lead mb-0">Test Samples</p>
-                    <small class="text-white-50">24 tense classes</small>
+                    <small style="opacity: 0.8;">24 tense classes</small>
                 </div>
             </div>
         </div>
@@ -134,6 +173,22 @@
                 <p class="mb-0">
                     This evaluation tests <strong>only the XLM-RoBERTa classifier</strong> in isolation, focusing purely on its ability to 
                     classify Thai sentences into 24 fine-grained tense categories. No translation or explanation components are involved.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info border-info mt-3">
+        <div class="row align-items-center">
+            <div class="col-md-1">
+                <i class="bi bi-info-circle-fill text-info fs-1"></i>
+            </div>
+            <div class="col-md-11">
+                <h5 class="alert-heading mb-2">Dataset Characteristics</h5>
+                <p class="mb-0">
+                    The test dataset consists primarily of <strong>simple sentences</strong> rather than compound or complex sentences. 
+                    This means the classifier was trained and tested on straightforward Thai sentences with single main clauses, 
+                    which helps achieve high accuracy by avoiding the ambiguity that can arise from multiple tenses within compound-complex structures.
                 </p>
             </div>
         </div>

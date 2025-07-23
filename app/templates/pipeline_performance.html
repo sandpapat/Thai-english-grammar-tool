@@ -4,24 +4,54 @@
 
 {% block content %}
 <style>
+    /* CSS Variables for theme-aware colors */
+    :root {
+        --pipeline-hero-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --pipeline-hero-text: white;
+        --badge-excellent-bg: #d4edda;
+        --badge-excellent-text: #155724;
+        --badge-good-bg: #cce5ff;
+        --badge-good-text: #004085;
+        --badge-moderate-bg: #fff3cd;
+        --badge-moderate-text: #856404;
+        --timing-stat-bg: #f8f9fa;
+        --distribution-bar-bg: #e9ecef;
+        --recommendation-card-bg: #f8f9fa;
+    }
+    
+    [data-theme="dark"] {
+        --pipeline-hero-bg: linear-gradient(135deg, #5b69c3 0%, #6b4099 100%);
+        --pipeline-hero-text: white;
+        --badge-excellent-bg: rgba(25, 135, 84, 0.2);
+        --badge-excellent-text: #40d989;
+        --badge-good-bg: rgba(13, 110, 253, 0.2);
+        --badge-good-text: #6ea8fe;
+        --badge-moderate-bg: rgba(255, 193, 7, 0.2);
+        --badge-moderate-text: #ffda6a;
+        --timing-stat-bg: var(--bg-secondary);
+        --distribution-bar-bg: var(--bg-tertiary);
+        --recommendation-card-bg: var(--bg-secondary);
+    }
+    
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: var(--pipeline-hero-bg);
+        color: var(--pipeline-hero-text);
         padding: 3rem 0;
         margin: -2rem -12px 3rem -12px;
         border-radius: 0 0 1rem 1rem;
     }
     .metric-card {
-        background: white;
+        background: var(--card-bg);
         border-radius: 12px;
         padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        box-shadow: var(--card-shadow);
         transition: transform 0.2s;
         height: 100%;
+        color: var(--text-primary);
     }
     .metric-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        box-shadow: var(--card-shadow-hover);
     }
     .performance-badge {
         display: inline-block;
@@ -30,9 +60,9 @@
         font-size: 0.875rem;
         font-weight: 500;
     }
-    .excellent { background-color: #d4edda; color: #155724; }
-    .good { background-color: #cce5ff; color: #004085; }
-    .moderate { background-color: #fff3cd; color: #856404; }
+    .excellent { background-color: var(--badge-excellent-bg); color: var(--badge-excellent-text); }
+    .good { background-color: var(--badge-good-bg); color: var(--badge-good-text); }
+    .moderate { background-color: var(--badge-moderate-bg); color: var(--badge-moderate-text); }
     .progress-custom {
         height: 8px;
         border-radius: 4px;
@@ -41,16 +71,17 @@
     .score-display {
         font-size: 2.5rem;
         font-weight: 700;
-        color: white;
+        color: var(--pipeline-hero-text);
     }
     .timing-stat {
-        background: #f8f9fa;
+        background: var(--timing-stat-bg);
         padding: 1rem;
         border-radius: 8px;
         text-align: center;
+        color: var(--text-primary);
     }
     .distribution-bar {
-        background: #e9ecef;
+        background: var(--distribution-bar-bg);
         height: 30px;
         border-radius: 15px;
         overflow: hidden;
@@ -67,11 +98,12 @@
         font-size: 0.875rem;
     }
     .recommendation-card {
-        background: #f8f9fa;
+        background: var(--recommendation-card-bg);
         border-left: 4px solid #667eea;
         padding: 1.5rem;
         border-radius: 0 8px 8px 0;
         margin-bottom: 1rem;
+        color: var(--text-primary);
     }
 </style>
 
@@ -87,28 +119,28 @@
                 <div class="text-center">
                     <div class="score-display">B+</div>
                     <p class="lead mb-0">Overall Grade</p>
-                    <small class="text-white-50">85% performance</small>
+                    <small style="opacity: 0.8;">85% performance</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">96</div>
                     <p class="lead mb-0">Test Samples</p>
-                    <small class="text-white-50">Comprehensive evaluation</small>
+                    <small style="opacity: 0.8;">Comprehensive evaluation</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">7</div>
                     <p class="lead mb-0">Metrics</p>
-                    <small class="text-white-50">Multi-aspect evaluation</small>
+                    <small style="opacity: 0.8;">Multi-aspect evaluation</small>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="text-center">
                     <div class="score-display">12.25s</div>
                     <p class="lead mb-0">Avg Time</p>
-                    <small class="text-white-50">Total processing</small>
+                    <small style="opacity: 0.8;">Total processing</small>
                 </div>
             </div>
         </div>

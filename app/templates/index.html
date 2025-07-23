@@ -235,6 +235,92 @@
         background: rgba(255, 255, 255, 0.05);
         border-color: rgba(255, 255, 255, 0.1);
     }
+    
+    /* Tips Box Styling */
+    .tips-box {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        backdrop-filter: var(--glass-backdrop);
+        -webkit-backdrop-filter: var(--glass-backdrop);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .tips-header {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    
+    .tips-header h5 {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+    
+    .tips-content {
+        padding: 1.5rem;
+    }
+    
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.25rem;
+    }
+    
+    .tip-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .tip-icon {
+        font-size: 1.5rem;
+        margin-right: 1rem;
+        color: var(--brand-primary);
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+    }
+    
+    .tip-item strong {
+        color: var(--text-primary);
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+    
+    .tip-item p {
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+    
+    .btn-close {
+        opacity: 0.6;
+        transition: opacity 0.2s ease;
+    }
+    
+    .btn-close:hover {
+        opacity: 1;
+    }
+    
+    /* Dark mode adjustments */
+    [data-theme="dark"] .tips-header {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    }
+    
+    [data-theme="dark"] .btn-close {
+        filter: invert(1);
+    }
+    
+    /* Responsive tips */
+    @media (max-width: 768px) {
+        .tip-item {
+            flex-direction: column;
+        }
+        .tip-icon {
+            margin-bottom: 0.5rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -246,7 +332,7 @@
             <i class="bi bi-translate me-3"></i>Thaislate
         </h1>
         <p class="hero-subtitle">
-            AI-powered Thai-English grammar learning with intelligent explanations
+            NLP-powered Thai-English grammar learning with intelligent explanations
         </p>
     </div>
 </div>
@@ -265,6 +351,39 @@
                     <p class="text-center text-muted mb-4">
                         Enter a Thai sentence to analyze its English translation and grammatical structure
                     </p>
+
+                    <!-- Tips Box -->
+                    <div class="tips-box mb-4" id="tipsBox">
+                        <div class="tips-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-lightbulb me-2"></i>Tips for Best Results
+                            </h5>
+                            <button type="button" class="btn-close btn-sm" aria-label="Close tips" onclick="document.getElementById('tipsBox').style.display='none'"></button>
+                        </div>
+                        <div class="tips-content">
+                            <div class="tip-item">
+                                <i class="bi bi-person-x-fill tip-icon"></i>
+                                <div>
+                                    <strong>Avoid Real Names & Places</strong>
+                                    <p class="mb-0 small">For privacy, please avoid using real Thai names or specific locations in your sentences.</p>
+                                </div>
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-text-left tip-icon"></i>
+                                <div>
+                                    <strong>Simple Sentences Work Best</strong>
+                                    <p class="mb-0 small">The classifier performs optimally with simple sentence structures. While compound and complex sentences are allowed, accuracy may be higher with simpler constructions.</p>
+                                </div>
+                            </div>
+                            <div class="tip-item">
+                                <i class="bi bi-clock-history tip-icon"></i>
+                                <div>
+                                    <strong>Include Time Markers</strong>
+                                    <p class="mb-0 small">Since Thai doesn't have grammatical tense, add time markers (เมื่อวาน, พรุ่งนี้, ตอนนี้) or context clues to help the model identify the correct tense.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 <form method="POST" action="{{ url_for('main.predict') }}" id="analyseForm" novalidate>
                     <div class="mb-4">

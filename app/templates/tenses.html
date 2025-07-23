@@ -7,10 +7,10 @@
     /* Accordion Styling */
     .accordion {
         --bs-accordion-border-radius: 12px;
-        --bs-accordion-border-color: rgba(255, 255, 255, 0.2);
-        --bs-accordion-bg: rgba(255, 255, 255, 0.05);
-        --bs-accordion-btn-bg: rgba(255, 255, 255, 0.1);
-        --bs-accordion-btn-color: var(--bs-body-color);
+        --bs-accordion-border-color: var(--border-color);
+        --bs-accordion-bg: var(--glass-bg);
+        --bs-accordion-btn-bg: var(--glass-bg);
+        --bs-accordion-btn-color: var(--text-primary);
         --bs-accordion-body-padding-x: 1.5rem;
         --bs-accordion-body-padding-y: 1.5rem;
     }
@@ -19,16 +19,16 @@
         font-weight: 600;
         font-size: 1.1rem;
         border: none;
-        background: rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(10px);
-        color: var(--bs-body-color) !important;
+        background: var(--glass-bg) !important;
+        backdrop-filter: var(--glass-backdrop);
+        color: var(--text-primary) !important;
         transition: all 0.3s ease;
     }
     
     .accordion-button:not(.collapsed) {
-        background: rgba(255, 255, 255, 0.15) !important;
+        background: var(--card-bg) !important;
         box-shadow: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid var(--border-color);
     }
     
     .accordion-button::after {
@@ -36,35 +36,36 @@
     }
     
     .accordion-button:hover {
-        background: rgba(255, 255, 255, 0.2) !important;
+        background: var(--card-bg) !important;
         transform: translateY(-1px);
     }
     
     .accordion-body {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-backdrop);
     }
     
     /* Tense Cards within Accordion */
     .tense-card {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
         border-radius: 10px;
-        color: var(--bs-body-color);
+        color: var(--text-primary);
         transition: all 0.3s ease;
         margin-bottom: 1rem;
     }
     
     .tense-card:hover {
         transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.12);
-        border-color: rgba(255, 255, 255, 0.25);
+        background: var(--card-bg);
+        border-color: var(--input-border-focus);
+        box-shadow: var(--card-shadow-hover);
     }
     
     .tense-card-header {
-        background: rgba(255, 255, 255, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-        color: var(--bs-body-color);
+        background: var(--glass-bg);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
         padding: 1rem;
         border-radius: 9px 9px 0 0;
     }
@@ -74,9 +75,9 @@
     }
     
     .tense-list-item {
-        background: rgba(255, 255, 255, 0.05);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        color: var(--bs-body-color);
+        background: var(--glass-bg);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
         padding: 0.75rem;
         border-radius: 4px;
         margin-bottom: 0.5rem;
@@ -88,37 +89,38 @@
     }
     
     .text-muted-custom {
-        color: var(--bs-secondary-color) !important;
+        color: var(--text-secondary) !important;
     }
     
     /* Quick Navigation */
     .tense-nav {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+        background: var(--glass-bg);
+        backdrop-filter: var(--glass-backdrop);
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: 1px solid var(--glass-border);
     }
     
     .tense-nav-item {
         display: inline-block;
         margin: 0.25rem;
         padding: 0.5rem 1rem;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
         border-radius: 20px;
-        color: var(--bs-body-color);
+        color: var(--text-primary);
         text-decoration: none;
         font-size: 0.9rem;
         transition: all 0.3s ease;
     }
     
     .tense-nav-item:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: var(--bs-body-color);
+        background: var(--card-bg);
+        color: var(--text-primary);
         text-decoration: none;
         transform: translateY(-2px);
+        box-shadow: var(--card-shadow);
     }
     
     /* Color-coded badges */
@@ -129,19 +131,27 @@
         font-weight: 500;
     }
     
+    /* Ensure proper subscript rendering */
+    .badge-formula sub {
+        font-size: 0.65em;
+        vertical-align: baseline;
+        position: relative;
+        top: 0.3em;
+    }
+    
     /* Back to top button */
     .back-to-top {
         position: fixed;
         bottom: 30px;
         right: 30px;
-        background: var(--bs-primary);
+        background: var(--button-primary);
         color: white;
         border: none;
         border-radius: 50%;
         width: 50px;
         height: 50px;
         font-size: 1.2rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        box-shadow: var(--button-shadow);
         transition: all 0.3s ease;
         opacity: 0;
         visibility: hidden;
@@ -154,7 +164,7 @@
     }
     
     .back-to-top:hover {
-        background: var(--bs-primary);
+        background: var(--button-primary-hover);
         transform: translateY(-3px);
     }
     
@@ -238,7 +248,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#presentSimple" aria-expanded="false" aria-controls="presentSimple">
                                         <span class="text-primary me-2">Present Simple</span>
-                                        <span class="badge badge-formula bg-primary">Subject + V₁ (s/es)</span>
+                                        <span class="badge badge-formula bg-primary">Subject + V<sub>1</sub> (s/es)</span>
                                     </button>
                                 </h2>
                                 <div id="presentSimple" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
@@ -281,7 +291,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#presentContinuous" aria-expanded="false" aria-controls="presentContinuous">
                                         <span class="text-success me-2">Present Continuous</span>
-                                        <span class="badge badge-formula bg-success">Subject + am/is/are + Vᵢₙᵍ</span>
+                                        <span class="badge badge-formula bg-success">Subject + am/is/are + V<sub>ing</sub></span>
                                     </button>
                                 </h2>
                                 <div id="presentContinuous" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
@@ -316,7 +326,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#presentPerfect" aria-expanded="false" aria-controls="presentPerfect">
                                         <span class="text-info me-2">Present Perfect</span>
-                                        <span class="badge badge-formula bg-info">Subject + have/has + V₃</span>
+                                        <span class="badge badge-formula bg-info">Subject + have/has + V<sub>3</sub></span>
                                     </button>
                                 </h2>
                                 <div id="presentPerfect" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
@@ -347,7 +357,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#presentPerfectCont" aria-expanded="false" aria-controls="presentPerfectCont">
                                         <span class="text-warning me-2">Present Perfect Continuous</span>
-                                        <span class="badge badge-formula bg-warning text-dark">Subject + have/has + been + Vᵢₙᵍ</span>
+                                        <span class="badge badge-formula bg-warning text-dark">Subject + have/has + been + V<sub>ing</sub></span>
                                     </button>
                                 </h2>
                                 <div id="presentPerfectCont" class="accordion-collapse collapse" data-bs-parent="#presentAccordion">
@@ -389,7 +399,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#pastSimple" aria-expanded="false" aria-controls="pastSimple">
                                         <span class="text-secondary me-2">Past Simple</span>
-                                        <span class="badge badge-formula bg-secondary">Subject + V₂</span>
+                                        <span class="badge badge-formula bg-secondary">Subject + V<sub>2</sub></span>
                                     </button>
                                 </h2>
                                 <div id="pastSimple" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
@@ -412,7 +422,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#pastContinuous" aria-expanded="false" aria-controls="pastContinuous">
                                         <span class="text-dark me-2">Past Continuous</span>
-                                        <span class="badge badge-formula bg-dark">Subject + was/were + Vᵢₙᵍ</span>
+                                        <span class="badge badge-formula bg-dark">Subject + was/were + V<sub>ing</sub></span>
                                     </button>
                                 </h2>
                                 <div id="pastContinuous" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
@@ -439,7 +449,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#pastPerfect" aria-expanded="false" aria-controls="pastPerfect">
                                         <span class="text-danger me-2">Past Perfect</span>
-                                        <span class="badge badge-formula bg-danger">Subject + had + V₃</span>
+                                        <span class="badge badge-formula bg-danger">Subject + had + V<sub>3</sub></span>
                                     </button>
                                 </h2>
                                 <div id="pastPerfect" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
@@ -462,7 +472,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#pastPerfectCont" aria-expanded="false" aria-controls="pastPerfectCont">
                                         <span class="text-primary me-2">Past Perfect Continuous</span>
-                                        <span class="badge badge-formula bg-primary">Subject + had + been + Vᵢₙᵍ</span>
+                                        <span class="badge badge-formula bg-primary">Subject + had + been + V<sub>ing</sub></span>
                                     </button>
                                 </h2>
                                 <div id="pastPerfectCont" class="accordion-collapse collapse" data-bs-parent="#pastAccordion">
@@ -504,7 +514,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#futureSimple" aria-expanded="false" aria-controls="futureSimple">
                                         <span class="text-success me-2">Future Simple</span>
-                                        <span class="badge badge-formula bg-success">Subject + will + Vᵢₙf</span>
+                                        <span class="badge badge-formula bg-success">Subject + will + V<sub>inf</sub></span>
                                     </button>
                                 </h2>
                                 <div id="futureSimple" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
@@ -535,7 +545,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#futureContinuous" aria-expanded="false" aria-controls="futureContinuous">
                                         <span class="text-info me-2">Future Continuous</span>
-                                        <span class="badge badge-formula bg-info">Subject + will + be + Vᵢₙᵍ</span>
+                                        <span class="badge badge-formula bg-info">Subject + will + be + V<sub>ing</sub></span>
                                     </button>
                                 </h2>
                                 <div id="futureContinuous" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
@@ -558,7 +568,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#futurePerfect" aria-expanded="false" aria-controls="futurePerfect">
                                         <span class="text-warning me-2">Future Perfect</span>
-                                        <span class="badge badge-formula bg-warning text-dark">Subject + will + have + V₃</span>
+                                        <span class="badge badge-formula bg-warning text-dark">Subject + will + have + V<sub>3</sub></span>
                                     </button>
                                 </h2>
                                 <div id="futurePerfect" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">
@@ -581,7 +591,7 @@
                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                                             data-bs-target="#futurePerfectCont" aria-expanded="false" aria-controls="futurePerfectCont">
                                         <span class="text-danger me-2">Future Perfect Continuous</span>
-                                        <span class="badge badge-formula bg-danger">Subject + will + have + been + Vᵢₙᵍ</span>
+                                        <span class="badge badge-formula bg-danger">Subject + will + have + been + V<sub>ing</sub></span>
                                     </button>
                                 </h2>
                                 <div id="futurePerfectCont" class="accordion-collapse collapse" data-bs-parent="#futureAccordion">

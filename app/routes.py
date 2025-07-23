@@ -272,13 +272,6 @@ def about():
     return render_template('about.html')
 
 
-@main_bp.route('/performance')
-def performance():
-    """Display model performance metrics"""
-    performance_data = get_performance_data()
-    return render_template('performance.html', performance=performance_data)
-
-
 @main_bp.route('/classifier-performance')
 def classifier_performance():
     """Display BERT classifier isolated test results"""
