@@ -30,14 +30,38 @@ def index():
     return render_template('index.html')
 
 
-@main_bp.route('/set-language/<language>')
+@main_bp.route('/set-language/<language>', methods=['GET', 'POST'])
 def set_language(language):
     """Set user's language preference"""
-    if language in current_app.config['LANGUAGES']:
-        session['language'] = language
+    # Validate language parameter
+    if language not in current_app.config['LANGUAGES']:
+        flash(f'Language "{language}" is not supported', 'error')
+        return redirect(url_for('main.index'))
     
-    # Redirect back to the referring page or home
-    return redirect(request.referrer or url_for('main.index'))
+    # Set language in session
+    session['language'] = language
+    
+    # Improved redirect logic to handle POST referrers
+    referrer = request.referrer
+    if referrer:
+        try:
+            # If referrer is a POST route or contains unsafe paths, redirect to safe GET route
+            unsafe_paths = ['/predict', '/api/', '/set-language']
+            if any(path in referrer for path in unsafe_paths) or request.method == 'POST':
+                return redirect(url_for('main.index'))
+            else:
+                # Only redirect to referrer if it's a safe GET route on our domain
+                from urllib.parse import urlparse
+                parsed_referrer = urlparse(referrer)
+                if parsed_referrer.netloc in ['', request.host]:
+                    return redirect(referrer)
+                else:
+                    return redirect(url_for('main.index'))
+        except Exception:
+            # If there's any issue with referrer parsing, go to safe route
+            return redirect(url_for('main.index'))
+    else:
+        return redirect(url_for('main.index'))
 
 
 @main_bp.route('/predict', methods=['POST'])
