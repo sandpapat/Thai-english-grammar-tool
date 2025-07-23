@@ -6,7 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Flask-based web application for an MSc dissertation in Computer Science with Speech and Language Processing. The application provides a Thai-to-English NLP pipeline with tense classification and grammar explanation, featuring comprehensive performance evaluation across two distinct testing methodologies.
 
-**Latest Updates (2025-01-21):**
+**Latest Updates (2025-07-23):**
+- ✅ **System Stability Recovery**: Reverted problematic language management system via git reset
+- ✅ **Website Functionality Restored**: All pages now load correctly with proper English content
+- ✅ **Template Cleanup**: Removed `data-translate` attributes causing blank page issues
+- ✅ **Navigation Fixes**: Simplified navigation without language toggle functionality
+- ✅ **Dark Mode Preserved**: Complete dark/light theme system remains fully operational
+- ✅ **Performance Pages Working**: All performance monitoring pages accessible and functional
+
+**Previous Updates (2025-01-21):**
 - ✅ **Single Sentence Analysis**: Implemented first sentence extraction for improved classification accuracy
 - ✅ **Multi-Sentence Warning System**: Clear user warnings when multiple sentences detected
 - ✅ **Enhanced Classification Pipeline**: Only first sentence analyzed for tense classification (74% → 85-90% accuracy expected)
@@ -43,11 +51,11 @@ Website/
 │   │   ├── index.html          # Homepage with modern hero section & glassmorphism
 │   │   ├── result.html         # Results page with proper Thai font support
 │   │   ├── tenses.html         # Tense explanations with Thai language attributes
-│   │   ├── about.html          # Bilingual About Us page (NEW)
-│   │   ├── performance.html    # Performance overview
-│   │   ├── classifier_performance.html # BERT results with dark mode fixes
+│   │   ├── about.html          # About Us page
+│   │   ├── classifier_performance.html # BERT results with dark mode support
 │   │   ├── pipeline_performance.html   # Pipeline results
-│   │   └── system_performance.html     # Real-time system performance monitoring (NEW)
+│   │   ├── system_performance.html     # Real-time system performance monitoring
+│   │   └── user_analytics.html # User analytics page
 │   └── static/                  # Static files (ENHANCED)
 │       └── css/
 │           └── style.css       # Modern design with glassmorphism + Prompt font
@@ -84,11 +92,11 @@ Website/
      - Route `/validate`: Real-time input validation API
      - Route `/api/average-response-time`: Performance data API for countdown timer
      - Route `/tenses`: Display tense usage explanations with Thai language support
-     - Route `/about`: Bilingual About Us page with team and technology info
-     - Route `/performance`: Combined view of both evaluation approaches
+     - Route `/about`: About Us page with team and technology info
      - Route `/classifier-performance`: BERT classifier isolated testing results
      - Route `/pipeline-performance`: Full pipeline end-to-end evaluation results
      - Route `/system-performance`: Real-time system performance monitoring dashboard
+     - Route `/user-analytics`: User analytics and personal statistics
    - **Authentication Blueprint** (`app/auth.py`):
      - Route `/login`: User authentication with 5-digit pseudocode
      - Route `/logout`: User logout functionality
@@ -138,21 +146,28 @@ The application implements a **dual evaluation approach** to comprehensively ass
 ## Template Structure and Navigation
 
 ### Template Files
-- `app/templates/base.html`: Main layout with Bootstrap dropdown navigation
-- `app/templates/index.html`: Homepage with Thai text input form
-- `app/templates/result.html`: Displays pipeline processing results
-- `app/templates/tenses.html`: Tense usage explanations and examples
-- `app/templates/performance.html`: Combined view of both evaluation approaches
-- `app/templates/classifier_performance.html`: Green-themed isolated classifier results
+- `app/templates/base.html`: Main layout with Bootstrap dropdown navigation and dark mode toggle
+- `app/templates/index.html`: Homepage with Thai text input form and modern glassmorphism design
+- `app/templates/result.html`: Displays pipeline processing results with rating system
+- `app/templates/tenses.html`: Thai tense usage explanations and examples
+- `app/templates/about.html`: About Us page with team and technology information
+- `app/templates/login.html`: User authentication page
+- `app/templates/classifier_performance.html`: Green-themed isolated BERT classifier results
 - `app/templates/pipeline_performance.html`: Blue-themed full pipeline evaluation
+- `app/templates/system_performance.html`: Real-time system performance monitoring
+- `app/templates/user_analytics.html`: Personal user analytics and statistics
 
 ### Navigation Structure
-The performance section uses a Bootstrap dropdown menu:
-- **Performance** (dropdown)
+The navigation includes the following sections:
+- **Home**: Main homepage with Thai text input
+- **Tense Guide**: Thai language tense explanations
+- **Performance** (dropdown menu):
   - **System Performance**: Real-time performance monitoring and usage statistics
   - **BERT Classifier**: Isolated testing results (469 samples)
   - **Full Pipeline**: End-to-end evaluation (96 samples)
-  - **Combined View**: Integrated presentation of both approaches
+- **About Us**: Team and technology information
+- **Dark Mode Toggle**: Moon/sun icon for theme switching
+- **User Menu** (when logged in): Welcome message, user type, analytics, logout
 
 ## Data Sources and Evaluation Datasets
 
@@ -465,9 +480,9 @@ python -c "from app import create_app; app = create_app(); app.app_context().pus
 ## Performance Page Color Coding
 - **Green Theme**: `classifier_performance.html` - Isolated BERT classifier testing
 - **Blue/Purple Theme**: `pipeline_performance.html` - Full pipeline evaluation
-- **Mixed Theme**: `performance.html` - Combined view of both approaches
+- **Purple Theme**: `system_performance.html` - Real-time system monitoring
 
-This color coding helps users immediately distinguish between the two evaluation methodologies.
+This color coding helps users immediately distinguish between the different evaluation methodologies and system monitoring.
 
 ## Recent Improvements (2025-01-20)
 
@@ -583,3 +598,44 @@ This color coding helps users immediately distinguish between the two evaluation
 - **docs/**: Contains documentation files including analysis and reports
 - **config/**: Reserved for configuration files (currently empty)
 - **Root**: Contains main Flask app file and requirements.txt
+
+## Current System Status (2025-07-23)
+
+### ✅ Working Features
+- **Core NLP Pipeline**: Translation, classification, and explanation generation
+- **User Authentication**: 5-digit pseudocode login system
+- **User Type System**: Normal vs Proficient user differentiation
+- **Rating System**: Proficient users can rate analysis quality
+- **Performance Monitoring**: Real-time system performance tracking
+- **Dark Mode**: Complete light/dark theme switching
+- **Responsive Design**: Mobile-optimized interface
+- **Thai Language Support**: Proper Thai text rendering and attributes
+
+### ⚠️ Temporarily Removed Features
+- **Language Switching**: Bilingual Thai-English interface was removed due to JavaScript conflicts
+- **Translation Dictionary**: `data-translate` attributes removed from templates
+- **Language Toggle Button**: Removed from navigation bar
+
+### 🔧 Recent Recovery Actions
+- **Git Reset**: Reverted to stable working state (commit 16649bf "Fix visual bugs and add user guide")
+- **Template Cleanup**: Removed problematic `data-translate` attributes causing blank pages
+- **JavaScript Simplification**: Removed complex language management system
+- **Navigation Simplification**: Removed language toggle to prevent conflicts
+
+## Troubleshooting Notes
+
+### Language System Issues (Resolved)
+**Problem**: Website showed blank pages due to JavaScript language management conflicts
+**Solution**: Git reset to stable state, removed language switching system
+**Prevention**: Future language implementations should:
+- Use server-side templating instead of client-side JavaScript
+- Implement proper fallbacks for missing translations
+- Test thoroughly in isolation before integration
+
+### Website Recovery Process
+If similar issues occur in the future:
+1. **Check git status**: `git status` and `git log --oneline -10`
+2. **Identify last working commit**: Look for stable commits like "Fix visual bugs"
+3. **Reset if needed**: `git reset --hard [commit-hash]`
+4. **Force push to remote**: `git push --force-with-lease origin main`
+5. **Update documentation**: Update CLAUDE.md to reflect current state

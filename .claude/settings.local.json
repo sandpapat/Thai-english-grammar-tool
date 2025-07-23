@@ -17,7 +17,9 @@
       "Bash(find:*)",
       "Bash(sqlite3:*)",
       "Bash(timeout:*)",
-      "WebFetch(domain:cloud.google.com)"
+      "WebFetch(domain:cloud.google.com)",
+      "Bash(cd:*)",
+      "Bash(cd:*)"
     ],
     "deny": []
   }

@@ -4,6 +4,7 @@ Flask application factory and configuration
 import os
 from flask import Flask, session, request, redirect, url_for
 from flask_login import LoginManager, current_user, logout_user
+from flask_babel import Babel, get_locale
 from .models import db
 from .auth import auth_bp
 
@@ -44,8 +45,37 @@ def create_app(config_name=None):
     app.config['MIN_THAI_PERCENTAGE'] = 0.8
     app.config['ENABLE_PROFANITY_FILTER'] = True
     
+    # Babel configuration
+    app.config['LANGUAGES'] = {
+        'en': 'English',
+        'th': 'ไทย'
+    }
+    app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+    app.config['BABEL_DEFAULT_TIMEZONE'] = 'UTC'
+    
     # Initialize extensions
     db.init_app(app)
+    
+    # Initialize Babel
+    babel = Babel(app)
+    
+    @babel.localeselector
+    def get_locale():
+        # 1. URL parameter (?lang=th)
+        if request.args.get('lang'):
+            lang = request.args.get('lang')
+            if lang in app.config['LANGUAGES']:
+                session['language'] = lang
+                return lang
+        
+        # 2. User session preference  
+        if 'language' in session:
+            lang = session['language']
+            if lang in app.config['LANGUAGES']:
+                return lang
+        
+        # 3. Request headers (Accept-Language)
+        return request.accept_languages.best_match(app.config['LANGUAGES'].keys()) or 'en'
     
     # Initialize login manager
     login_manager = LoginManager()

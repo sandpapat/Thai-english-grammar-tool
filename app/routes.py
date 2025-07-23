@@ -2,8 +2,9 @@
 Main application routes
 """
 import time
-from flask import Blueprint, render_template, request, flash, jsonify, session
+from flask import Blueprint, render_template, request, flash, jsonify, session, redirect, url_for, current_app
 from flask_login import login_required, current_user
+from flask_babel import get_locale
 from .pipeline import ModelManager
 from .validation import InputValidator
 from .utils import format_explanation_content, parse_explanation
@@ -27,6 +28,16 @@ input_validator = InputValidator(
 def index():
     """Homepage with Thai text input form"""
     return render_template('index.html')
+
+
+@main_bp.route('/set-language/<language>')
+def set_language(language):
+    """Set user's language preference"""
+    if language in current_app.config['LANGUAGES']:
+        session['language'] = language
+    
+    # Redirect back to the referring page or home
+    return redirect(request.referrer or url_for('main.index'))
 
 
 @main_bp.route('/predict', methods=['POST'])
