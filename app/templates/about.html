@@ -102,6 +102,149 @@
         transform: translateY(-3px);
     }
     
+    /* Enhanced Pipeline Technology Section */
+    .pipeline-container {
+        position: relative;
+        margin: 2rem 0;
+    }
+    
+    .pipeline-stage {
+        background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-secondary) 100%);
+        border: 2px solid var(--border-color);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .pipeline-stage::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--button-primary);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+    
+    .pipeline-stage:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .pipeline-stage:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        border-color: var(--button-primary);
+    }
+    
+    .stage-number {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        background: var(--button-primary);
+        color: white;
+        border-radius: 50%;
+        line-height: 40px;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .stage-icon {
+        font-size: 2.5rem;
+        color: var(--button-primary);
+        margin-bottom: 1rem;
+        display: block;
+    }
+    
+    .stage-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stage-model {
+        font-weight: 700;
+        color: var(--button-primary);
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stage-description {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .pipeline-arrow {
+        position: absolute;
+        top: 50%;
+        right: -20px;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        color: var(--button-primary);
+        z-index: 10;
+    }
+    
+    .pipeline-stage:last-child .pipeline-arrow {
+        display: none;
+    }
+    
+    /* Performance metrics styling */
+    .performance-grid {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+        backdrop-filter: var(--glass-backdrop);
+    }
+    
+    .performance-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .performance-item:last-child {
+        border-bottom: none;
+    }
+    
+    .performance-icon {
+        width: 30px;
+        color: var(--button-primary);
+        margin-right: 1rem;
+    }
+    
+    .performance-label {
+        flex: 1;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .performance-value {
+        font-weight: 600;
+        color: var(--button-primary);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .pipeline-arrow {
+            display: none;
+        }
+        
+        .pipeline-stage {
+            margin-bottom: 2rem;
+        }
+    }
+    
     .brand-highlight {
         color: var(--button-primary);
         font-weight: bold;
@@ -293,47 +436,91 @@
                 <div class="col-md-10">
                     <h2 class="mb-3">Our Technology</h2>
                     <p class="mb-3">Our system utilizes a sophisticated three-stage NLP pipeline, each component carefully selected and optimized for Thai-English language learning:</p>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="feature-card">
-                                <i class="bi bi-translate text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>Stage 1: Translation</h6>
-                                <small><strong>Typhoon-Translate 4B (Local)</strong><br>Local GGUF model deployment for fast translation processing</small>
+                    <div class="pipeline-container">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="pipeline-stage">
+                                    <div class="stage-number">1</div>
+                                    <i class="bi bi-translate stage-icon"></i>
+                                    <div class="stage-title">Neural Translation Engine</div>
+                                    <div class="stage-model">Typhoon-Translate 4B</div>
+                                    <div class="stage-description">Local GGUF model deployment for lightning-fast Thai-to-English translation processing</div>
+                                    <div class="pipeline-arrow">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="feature-card">
-                                <i class="bi bi-diagram-3 text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>Stage 2: Classification</h6>
-                                <small><strong>XLM-RoBERTa Hierarchical</strong><br>Custom-trained model with coarse (3) and fine-grained (24) tense categories</small>
+                            <div class="col-md-4 mb-3">
+                                <div class="pipeline-stage">
+                                    <div class="stage-number">2</div>
+                                    <i class="bi bi-diagram-3 stage-icon"></i>
+                                    <div class="stage-title">Hierarchical Tense Classifier</div>
+                                    <div class="stage-model">XLM-RoBERTa Custom</div>
+                                    <div class="stage-description">Fine-tuned multilingual model with coarse (3) and fine-grained (24) tense categories</div>
+                                    <div class="pipeline-arrow">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="feature-card">
-                                <i class="bi bi-chat-text text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>Stage 3: Explanation</h6>
-                                <small><strong>Typhoon 2.1 12B Instruct</strong><br>Advanced explanation generation via Together NLP API</small>
+                            <div class="col-md-4 mb-3">
+                                <div class="pipeline-stage">
+                                    <div class="stage-number">3</div>
+                                    <i class="bi bi-chat-text stage-icon"></i>
+                                    <div class="stage-title">Intelligent Explanation Generator</div>
+                                    <div class="stage-model">Typhoon 2.1 12B Instruct</div>
+                                    <div class="stage-description">Advanced explanation generation with cultural context via Together NLP API</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <h6><i class="bi bi-cpu me-2"></i>Performance Specs</h6>
-                            <ul class="list-unstyled small">
-                                <li>• Translation: ~1.2s average</li>
-                                <li>• Classification: 94.7% isolated accuracy</li>
-                                <li>• Pipeline: 74% real-world accuracy</li>
-                                <li>• Explanation: ~11s generation time</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6><i class="bi bi-shield-check me-2"></i>Reliability Features</h6>
-                            <ul class="list-unstyled small">
-                                <li>• Confidence-based explanation adjustment</li>
-                                <li>• Input validation (100 token limit)</li>
-                                <li>• Graceful fallback mechanisms</li>
-                                <li>• Thai profanity filtering</li>
-                            </ul>
+                    <div class="performance-grid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-cpu me-2"></i>Performance Metrics</h6>
+                                <div class="performance-item">
+                                    <i class="bi bi-translate performance-icon"></i>
+                                    <span class="performance-label">Translation Speed</span>
+                                    <span class="performance-value">~1.2s avg</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-diagram-3 performance-icon"></i>
+                                    <span class="performance-label">Classification Accuracy</span>
+                                    <span class="performance-value">94.7% isolated</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-gear performance-icon"></i>
+                                    <span class="performance-label">Pipeline Accuracy</span>
+                                    <span class="performance-value">74% real-world</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-chat-text performance-icon"></i>
+                                    <span class="performance-label">Explanation Time</span>
+                                    <span class="performance-value">~11s generation</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-shield-check me-2"></i>Reliability Features</h6>
+                                <div class="performance-item">
+                                    <i class="bi bi-sliders performance-icon"></i>
+                                    <span class="performance-label">Confidence Tuning</span>
+                                    <span class="performance-value">Adaptive</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-check-circle performance-icon"></i>
+                                    <span class="performance-label">Input Validation</span>
+                                    <span class="performance-value">100 token limit</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-arrow-repeat performance-icon"></i>
+                                    <span class="performance-label">Fallback System</span>
+                                    <span class="performance-value">Graceful</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-shield performance-icon"></i>
+                                    <span class="performance-label">Content Filter</span>
+                                    <span class="performance-value">Thai profanity</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -515,47 +702,91 @@
                 <div class="col-md-10">
                     <h2 class="mb-3">เทคโนโลยีของเรา</h2>
                     <p class="mb-3">ระบบของเราใช้ไปป์ไลน์ NLP สามขั้นตอนที่ซับซ้อน แต่ละองค์ประกอบถูกเลือกและปรับแต่งอย่างระมัดระวังสำหรับการเรียนรู้ภาษาไทย-อังกฤษ:</p>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="feature-card">
-                                <i class="bi bi-translate text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>ขั้นตอนที่ 1: การแปล</h6>
-                                <small><strong>Typhoon-Translate 4B (Local)</strong><br>โมเดล GGUF ที่ติดตั้งในเครื่องเพื่อการแปลที่รวดเร็ว</small>
+                    <div class="pipeline-container">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="pipeline-stage">
+                                    <div class="stage-number">1</div>
+                                    <i class="bi bi-translate stage-icon"></i>
+                                    <div class="stage-title">เครื่องมือแปลภาษาแบบ Neural</div>
+                                    <div class="stage-model">Typhoon-Translate 4B</div>
+                                    <div class="stage-description">โมเดล GGUF ที่ติดตั้งในเครื่องสำหรับการแปลไทย-อังกฤษอย่างรวดเร็ว</div>
+                                    <div class="pipeline-arrow">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="feature-card">
-                                <i class="bi bi-diagram-3 text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>ขั้นตอนที่ 2: การจำแนก</h6>
-                                <small><strong>XLM-RoBERTa Hierarchical</strong><br>โมเดลที่ฝึกเฉพาะด้วยหมวดหมู่ tense แบบหยาบ (3) และละเอียด (24)</small>
+                            <div class="col-md-4 mb-3">
+                                <div class="pipeline-stage">
+                                    <div class="stage-number">2</div>
+                                    <i class="bi bi-diagram-3 stage-icon"></i>
+                                    <div class="stage-title">ตัวจำแนก Tense แบบลำดับชั้น</div>
+                                    <div class="stage-model">XLM-RoBERTa Custom</div>
+                                    <div class="stage-description">โมเดลหลายภาษาที่ปรับแต่งเฉพาะ พร้อมหมวดหมู่ tense แบบหยาบ (3) และละเอียด (24)</div>
+                                    <div class="pipeline-arrow">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="feature-card">
-                                <i class="bi bi-chat-text text-primary mb-2" style="font-size: 1.5rem;"></i>
-                                <h6>ขั้นตอนที่ 3: คำอธิบาย</h6>
-                                <small><strong>Typhoon 2.1 12B Instruct</strong><br>การสร้างคำอธิบายขั้นสูงผ่าน Together NLP API</small>
+                            <div class="col-md-4 mb-3">
+                                <div class="pipeline-stage">
+                                    <div class="stage-number">3</div>
+                                    <i class="bi bi-chat-text stage-icon"></i>
+                                    <div class="stage-title">ตัวสร้างคำอธิบายอัจฉริยะ</div>
+                                    <div class="stage-model">Typhoon 2.1 12B Instruct</div>
+                                    <div class="stage-description">การสร้างคำอธิบายขั้นสูงพร้อมบริบททางวัฒนธรรมผ่าน Together NLP API</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <h6><i class="bi bi-cpu me-2"></i>ข้อมูลประสิทธิภาพ</h6>
-                            <ul class="list-unstyled small">
-                                <li>• การแปล: เฉลี่ย ~1.2 วินาทีา</li>
-                                <li>• การจำแนก: ความแม่นยำ 94.7% แบบแยกส่วน</li>
-                                <li>• ไปป์ไลน์: ความแม่นยำ 74% ในโลกจริง</li>
-                                <li>• คำอธิบาย: เวลาสร้าง ~11 วินาที</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6><i class="bi bi-shield-check me-2"></i>คุณสมบัติความน่าเชื่อถือ</h6>
-                            <ul class="list-unstyled small">
-                                <li>• การปรับคำอธิบายตามความมั่นใจ</li>
-                                <li>• การตรวจสอบข้อมูลนำเข้า (จำกัด 100 โทเค็น)</li>
-                                <li>• กลไกสำรองที่ลื่นไหล</li>
-                                <li>• การกรองคำหยาบภาษาไทย</li>
-                            </ul>
+                    <div class="performance-grid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-cpu me-2"></i>ข้อมูลประสิทธิภาพ</h6>
+                                <div class="performance-item">
+                                    <i class="bi bi-translate performance-icon"></i>
+                                    <span class="performance-label">ความเร็วในการแปล</span>
+                                    <span class="performance-value">เฉลี่ย ~1.2 วิ</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-diagram-3 performance-icon"></i>
+                                    <span class="performance-label">ความแม่นยำการจำแนก</span>
+                                    <span class="performance-value">94.7% แยกส่วน</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-gear performance-icon"></i>
+                                    <span class="performance-label">ความแม่นยำไปป์ไลน์</span>
+                                    <span class="performance-value">74% โลกจริง</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-chat-text performance-icon"></i>
+                                    <span class="performance-label">เวลาสร้างคำอธิบาย</span>
+                                    <span class="performance-value">~11 วิ</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="bi bi-shield-check me-2"></i>คุณสมบัติความน่าเชื่อถือ</h6>
+                                <div class="performance-item">
+                                    <i class="bi bi-sliders performance-icon"></i>
+                                    <span class="performance-label">การปรับความมั่นใจ</span>
+                                    <span class="performance-value">อัตโนมัติ</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-check-circle performance-icon"></i>
+                                    <span class="performance-label">การตรวจสอบข้อมูล</span>
+                                    <span class="performance-value">จำกัด 100 โทเค็น</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-arrow-repeat performance-icon"></i>
+                                    <span class="performance-label">ระบบสำรอง</span>
+                                    <span class="performance-value">ลื่นไหล</span>
+                                </div>
+                                <div class="performance-item">
+                                    <i class="bi bi-shield performance-icon"></i>
+                                    <span class="performance-label">ตัวกรองเนื้อหา</span>
+                                    <span class="performance-value">คำหยาบไทย</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
