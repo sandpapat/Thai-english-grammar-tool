@@ -119,6 +119,35 @@
         background: var(--card-bg) !important;
         color: var(--text-primary) !important;
     }
+    
+    /* Fix dark mode for list groups and tables */
+    .list-group-item {
+        background: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    .card {
+        background: var(--card-bg) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    .table {
+        background: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+    }
+    
+    .table td, .table th {
+        background: var(--card-bg) !important;
+        color: var(--text-primary) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    .table-hover tbody tr:hover {
+        background: var(--bg-secondary) !important;
+        color: var(--text-primary) !important;
+    }
 </style>
 
 <!-- Hero Section -->
@@ -187,7 +216,7 @@
                 <h5 class="alert-heading mb-2">Dataset Characteristics</h5>
                 <p class="mb-0">
                     The test dataset consists primarily of <strong>simple sentences</strong> rather than compound or complex sentences. 
-                    This means the classifier was trained and tested on straightforward Thai sentences with single main clauses, 
+                    This means the classifier was trained and tested on straightforward English sentences (translated from Thai) with single main clauses, 
                     which helps achieve high accuracy by avoiding the ambiguity that can arise from multiple tenses within compound-complex structures.
                 </p>
             </div>
