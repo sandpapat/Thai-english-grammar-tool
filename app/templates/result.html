@@ -118,7 +118,30 @@
                 </div>
                 {% endif %}
 
-                <!-- Tense Classification -->
+                <!-- Fragment Warning (if fragment detected) -->
+                {% if result.is_fragment %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert alert-warning d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>
+                                <strong>ข้อความไม่ใช่ประโยคสมบูรณ์</strong><br>
+                                <small>ระบบตรวจพบว่าข้อความที่ป้อนไม่ใช่ประโยคสมบูรณ์ จึงไม่สามารถวิเคราะห์ tense ได้ กรุณาดูคำแนะนำด้านล่าง</small>
+                            </div>
+                        </div>
+                        <div class="card border-warning">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">
+                                    <i class="bi bi-info-circle me-2"></i>ข้อความที่แปลได้
+                                </h5>
+                                <p class="card-text fs-5 fst-italic">{{ result.translation }}</p>
+                                <small class="text-muted">ข้อความนี้ขาดประธาน (Subject) หรือกริยา (Verb) ที่จำเป็นสำหรับการวิเคราะห์ tense</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Tense Classification (only for complete sentences) -->
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="card border-primary">
@@ -144,14 +167,19 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Grammar Explanation -->
+        <!-- Grammar Explanation / Fragment Guide -->
         <div class="card shadow mb-4">
-            <div class="card-header bg-info text-white">
+            <div class="card-header {% if result.is_fragment %}bg-warning text-dark{% else %}bg-info text-white{% endif %}">
                 <h4 class="mb-0">
+                    {% if result.is_fragment %}
+                    <i class="bi bi-book me-2"></i>คำแนะนำการสร้างประโยค
+                    {% else %}
                     <i class="bi bi-lightbulb me-2"></i>Grammar Explanation
+                    {% endif %}
                 </h4>
             </div>
             <div class="card-body">

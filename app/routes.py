@@ -120,27 +120,63 @@ def predict():
             performance_callback=log_performance_data
         )
         
-        # Handle the new explanation format
-        explanation = result.get('explanation', '')
-        if isinstance(explanation, dict) and 'parsed_sections' in explanation:
-            # New format with parsed sections - apply formatting
-            explanation_sections = {
-                'section_1': {
-                    'title': 'วิเคราะห์ Tense ที่ใช้',
-                    'content': format_explanation_content(explanation['parsed_sections'].get('tense_analysis', 'ส่วนนี้ไม่สามารถแยกได้'))
-                },
-                'section_2': {
-                    'title': 'คำศัพท์ที่น่าสนใจ',
-                    'content': format_explanation_content(explanation['parsed_sections'].get('vocabulary', 'ส่วนนี้ไม่สามารถแยกได้'))
-                },
-                'section_3': {
-                    'title': 'ข้อผิดพลาดที่พบบ่อย',
-                    'content': format_explanation_content(explanation['parsed_sections'].get('common_mistakes', 'ส่วนนี้ไม่สามารถแยกได้'))
+        # Check if this is a fragment result (no BERT classification)
+        if result.get('is_fragment'):
+            # Handle fragment results with different section titles
+            explanation = result.get('explanation', '')
+            if isinstance(explanation, dict) and 'parsed_sections' in explanation:
+                explanation_sections = {
+                    'section_1': {
+                        'title': 'เหตุผลที่ไม่สามารถวิเคราะห์ได้',
+                        'content': format_explanation_content(explanation['parsed_sections'].get('why_no_analysis', 'ส่วนนี้ไม่สามารถแยกได้'))
+                    },
+                    'section_2': {
+                        'title': 'ความหมายและการใช้งาน',
+                        'content': format_explanation_content(explanation['parsed_sections'].get('meaning_usage', 'ส่วนนี้ไม่สามารถแยกได้'))
+                    },
+                    'section_3': {
+                        'title': 'วิธีสร้างประโยคสมบูรณ์',
+                        'content': format_explanation_content(explanation['parsed_sections'].get('complete_sentence_guide', 'ส่วนนี้ไม่สามารถแยกได้'))
+                    }
                 }
-            }
+            else:
+                # Fallback for fragment without proper sections
+                explanation_sections = {
+                    'section_1': {
+                        'title': 'เหตุผลที่ไม่สามารถวิเคราะห์ได้',
+                        'content': 'ข้อความที่ป้อนไม่ใช่ประโยคสมบูรณ์ จึงไม่สามารถวิเคราะห์ tense ได้'
+                    },
+                    'section_2': {
+                        'title': 'ความหมายและการใช้งาน',
+                        'content': 'กรุณาป้อนประโยคที่สมบูรณ์เพื่อการวิเคราะห์ที่ถูกต้อง'
+                    },
+                    'section_3': {
+                        'title': 'วิธีสร้างประโยคสมบูรณ์',
+                        'content': 'ประโยคสมบูรณ์ต้องมีประธาน (Subject) และกริยา (Verb) อย่างน้อย'
+                    }
+                }
         else:
-            # Legacy format - try to parse as before
-            explanation_sections = parse_explanation(explanation)
+            # Handle normal sentence results (with BERT classification)
+            explanation = result.get('explanation', '')
+            if isinstance(explanation, dict) and 'parsed_sections' in explanation:
+                # New format with parsed sections - apply formatting
+                explanation_sections = {
+                    'section_1': {
+                        'title': 'วิเคราะห์ Tense ที่ใช้',
+                        'content': format_explanation_content(explanation['parsed_sections'].get('tense_analysis', 'ส่วนนี้ไม่สามารถแยกได้'))
+                    },
+                    'section_2': {
+                        'title': 'คำศัพท์ที่น่าสนใจ',
+                        'content': format_explanation_content(explanation['parsed_sections'].get('vocabulary', 'ส่วนนี้ไม่สามารถแยกได้'))
+                    },
+                    'section_3': {
+                        'title': 'ข้อผิดพลาดที่พบบ่อย',
+                        'content': format_explanation_content(explanation['parsed_sections'].get('common_mistakes', 'ส่วนนี้ไม่สามารถแยกได้'))
+                    }
+                }
+            else:
+                # Legacy format - try to parse as before
+                explanation_sections = parse_explanation(explanation)
         
         return render_template('result.html', 
                                result=result,

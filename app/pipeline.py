@@ -101,6 +101,253 @@ def extract_first_sentence(text):
     return first_sentence, is_multi_sentence
 
 
+def is_fragment(translation):
+    """
+    Simple, reliable fragment detection without complex rules.
+    Returns True if the translation appears to be a fragment rather than a complete sentence.
+    """
+    if not translation or not translation.strip():
+        return True
+    
+    # Clean and split into words
+    text = translation.strip().lower()
+    words = text.split()
+    
+    # Too short to be a sentence (but check for subject+verb first)
+    if len(words) < 2:
+        return True
+    
+    # For 2-word cases, check if it has subject + verb pattern
+    if len(words) == 2:
+        # Common pronouns that can be subjects
+        pronouns = ['i', 'you', 'he', 'she', 'it', 'we', 'they']
+        # If first word is a pronoun and second word is a verb, it's a sentence
+        if words[0] in pronouns:
+            # Check if second word is a verb (will be checked later)
+            pass  # Let it continue to verb checking
+        else:
+            # Two words but first is not a pronoun - likely a fragment
+            return True
+    
+    # Very short character count (but not for pronoun+verb cases)
+    if len(text.replace(' ', '')) < 6 and len(words) < 2:
+        return True
+    
+    # Common fragment patterns
+    fragment_patterns = [
+        r'^(to|in|at|on|the|a|an)\s+\w+$',  # "to market", "in house"
+        r'^(very|really|so|quite)\s+\w+$',  # "very good", "really nice"
+        r'^\w+ly$',  # Single adverbs like "quickly"
+        r'^(yes|no|maybe|perhaps)$',  # Single response words
+    ]
+    
+    for pattern in fragment_patterns:
+        if re.match(pattern, text):
+            return True
+    
+    # Check for basic verb presence (improved approach)
+    # Common verbs and auxiliary verbs
+    common_verbs = [
+        'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+        'have', 'has', 'had', 'having',
+        'do', 'does', 'did', 'doing',
+        'will', 'would', 'shall', 'should', 'can', 'could', 
+        'may', 'might', 'must', 'ought',
+        'go', 'goes', 'went', 'come', 'came', 'get', 'got',
+        'make', 'made', 'take', 'took', 'give', 'gave',
+        'see', 'saw', 'know', 'knew', 'think', 'thought',
+        'say', 'said', 'tell', 'told', 'ask', 'asked',
+        'want', 'wanted', 'need', 'needed', 'like', 'liked',
+        'eat', 'ate', 'drink', 'drank', 'sleep', 'slept',
+        'work', 'works', 'worked', 'study', 'studies', 'studied', 
+        'play', 'plays', 'played', 'live', 'lives', 'lived',
+        'love', 'loves', 'loved', 'help', 'helps', 'helped',
+        'use', 'uses', 'used', 'find', 'finds', 'found'
+    ]
+    
+    # Check if any verb is present
+    has_verb = any(verb in words for verb in common_verbs)
+    
+    # Also check for common verb endings (but be more careful)
+    verb_endings = ['ed', 'ing']
+    for word in words:
+        if len(word) > 3:
+            for ending in verb_endings:
+                if word.endswith(ending):
+                    has_verb = True
+                    break
+    
+    # Special check for 3rd person singular verbs ending in 's'
+    # But avoid false positives like plurals
+    for word in words:
+        if len(word) > 2 and word.endswith('s'):
+            # Common verb patterns ending in s
+            if word in ['goes', 'does', 'says', 'gets', 'comes', 'works', 'plays', 'lives', 'loves', 'helps', 'uses', 'finds', 'makes', 'takes', 'gives', 'sees', 'knows', 'thinks', 'tells', 'asks', 'wants', 'needs', 'likes', 'eats', 'drinks', 'sleeps', 'studies']:
+                has_verb = True
+                break
+    
+    # If no verb found, likely a fragment
+    if not has_verb:
+        return True
+    
+    return False
+
+
+class FragmentHandler:
+    """Handles educational content for text fragments that aren't complete sentences"""
+    
+    def __init__(self, explainer_client=None):
+        self.client = explainer_client
+    
+    def handle_fragment(self, thai_text, translation):
+        """
+        Generate educational content for fragments.
+        Completely bypasses BERT classification.
+        """
+        if self.client:
+            try:
+                explanation = self._generate_fragment_explanation_api(thai_text, translation)
+                return {
+                    'is_fragment': True,
+                    'input_thai': thai_text,
+                    'translation': translation,
+                    'explanation': self._parse_fragment_sections(explanation)
+                }
+            except Exception as e:
+                print(f"Fragment API explanation failed: {e}")
+                # Fall back to mock explanation
+        
+        # Mock explanation as fallback
+        return {
+            'is_fragment': True,
+            'input_thai': thai_text,
+            'translation': translation,
+            'explanation': self._generate_mock_fragment_explanation(thai_text, translation)
+        }
+    
+    def _generate_fragment_explanation_api(self, thai_text, translation):
+        """Generate fragment explanation using Together AI API with separate prompts"""
+        
+        # Completely separate prompt template - no tense classification context
+        prompt_body = f"""<context>
+คุณคือครูสอนภาษาอังกฤษสำหรับผู้เรียนไทย ที่เชี่ยวชาญด้านการสร้างประโยค
+ผู้เรียนได้ป้อนข้อมูลที่ไม่ใช่ประโยคสมบูรณ์ คุณต้องช่วยอธิบายและแนะนำ
+</context>
+
+<task>
+ผู้เรียนป้อนข้อความที่ไม่ใช่ประโยคสมบูรณ์ โปรดให้คำแนะนำเชิงการศึกษา
+ไม่ต้องวิเคราะห์ tense เนื่องจากไม่ใช่ประโยคสมบูรณ์
+</task>
+
+<input>
+ข้อความภาษาไทย: {thai_text}
+การแปลภาษาอังกฤษ: {translation}
+</input>
+
+<requirements>
+โปรดอธิบายใน 3 ส่วนดังนี้:
+
+**1) เหตุผลที่ไม่สามารถวิเคราะห์ได้**
+- อธิบายว่าทำไมข้อความนี้ไม่ใช่ประโยคสมบูรณ์
+- บอกว่าการวิเคราะห์ tense ต้องการประโยคที่มีประธานและกริยา
+- อธิบายความแตกต่างระหว่างคำ/วลี กับประโยคสมบูรณ์
+
+**2) ความหมายและการใช้งาน**
+- อธิบายความหมายของคำหรือวลีที่แปลมา
+- แนะนำสถานการณ์ที่เหมาะสมสำหรับการใช้คำ/วลีนี้
+- ยกตัวอย่างการใช้งานจริง
+
+**3) วิธีสร้างประโยคสมบูรณ์**
+- แนะนำวิธีการนำคำหรือวลีนี้ไปสร้างเป็นประโยคที่สมบูรณ์
+- อธิบายโครงสร้างประโยคพื้นฐาน: ประธาน + กริยา + กรรม
+- ให้ตัวอย่างประโยคสมบูรณ์ 2-3 ประโยค
+</requirements>
+
+<format>
+- ใช้ภาษาไทยที่เข้าใจง่าย
+- อธิบายเป็นขั้นตอนที่ชัดเจน
+- ยกตัวอย่างประกอบในแต่ละส่วน
+- เน้นการให้คำแนะนำเชิงบวก
+- ใช้รูปแบบหัวข้อเป็น: **1) เหตุผลที่ไม่สามารถวิเคราะห์ได้** **2) ความหมายและการใช้งาน** **3) วิธีสร้างประโยคสมบูรณ์**
+</format>"""
+
+        messages = [
+            {
+                "role": "system",
+                "content": """คุณคือครูสอนภาษาอังกฤษสำหรับผู้เรียนไทย ที่เชี่ยวชาญด้านการสอนโครงสร้างประโยค
+
+กฎสำคัญ:
+- ไม่ต้องวิเคราะห์ tense เพราะข้อมูลที่ได้รับไม่ใช่ประโยคสมบูรณ์
+- โฟกัสที่การสอนโครงสร้างประโยคและการสร้างประโยคสมบูรณ์
+- ให้คำแนะนำเชิงบวกและสร้างสรรค์
+- เริ่มต้นทันทีโดยไม่ต้องมีคำทักทาย
+- ใช้รูปแบบหัวข้อตามที่กำหนดเท่านั้น"""
+            },
+            {"role": "user", "content": prompt_body}
+        ]
+
+        # Call Together AI API
+        response = self.client.chat.completions.create(
+            model="scb10x/scb10x-typhoon-2-1-gemma3-12b",
+            messages=messages,
+            max_tokens=500,
+            temperature=0.7,
+            top_p=0.9,
+            top_k=50,
+            repetition_penalty=1.1
+        )
+
+        return response.choices[0].message.content.strip()
+    
+    def _parse_fragment_sections(self, explanation):
+        """Parse fragment explanation into sections"""
+        sections = {}
+        
+        # Fragment-specific section patterns
+        patterns = {
+            'why_no_analysis': r'\*\*1\)\s*เหตุผลที่ไม่สามารถวิเคราะห์ได้\*\*\s*(.*?)(?=\*\*2\)|$)',
+            'meaning_usage': r'\*\*2\)\s*ความหมายและการใช้งาน\*\*\s*(.*?)(?=\*\*3\)|$)',
+            'complete_sentence_guide': r'\*\*3\)\s*วิธีสร้างประโยคสมบูรณ์\*\*\s*(.*?)$'
+        }
+        
+        for section_name, pattern in patterns.items():
+            match = re.search(pattern, explanation, re.DOTALL | re.IGNORECASE)
+            if match:
+                raw_content = match.group(1).strip()
+                sections[section_name] = raw_content
+            else:
+                sections[section_name] = "ส่วนนี้ไม่สามารถแยกได้"
+        
+        return {
+            'raw_explanation': explanation,
+            'parsed_sections': sections
+        }
+    
+    def _generate_mock_fragment_explanation(self, thai_text, translation):
+        """Generate mock fragment explanation as fallback"""
+        explanation = f"""**1) เหตุผลที่ไม่สามารถวิเคราะห์ได้**
+ข้อความ "{translation}" ไม่ใช่ประโยคสมบูรณ์ เนื่องจากขาดองค์ประกอบสำคัญของประโยค
+
+การวิเคราะห์ tense ต้องการประโยคที่มีประธาน (Subject) และกริยา (Verb) อย่างครบถ้วน
+
+**2) ความหมายและการใช้งาน**
+คำหรือวลี "{translation}" มีความหมายคือ "{thai_text}"
+
+คำนี้สามารถใช้เป็นส่วนหนึ่งของประโยคได้ แต่ไม่สามารถใช้เพียงลำพังได้
+
+**3) วิธีสร้างประโยคสมบูรณ์**
+เพื่อสร้างประโยคสมบูรณ์ ควรเพิ่มประธานและกริยา
+
+**โครงสร้างพื้นฐาน:** ประธาน + กริยา + กรรม
+
+**ตัวอย่างประโยคสมบูรณ์:**
+- I go {translation.lower()}
+- She likes {translation.lower()}
+- We visited {translation.lower()}"""
+        
+        return self._parse_fragment_sections(explanation)
+
+
 class XLMRHierClassifier(PreTrainedModel):
     """
     Hierarchical XLM-RoBERTa classifier for tense classification
@@ -945,6 +1192,7 @@ class ModelManager:
         self.translator = None
         self.classifier = None
         self.explainer = None
+        self.fragment_handler = None
         self._load_models()
     
     def _load_models(self):
@@ -966,6 +1214,14 @@ class ModelManager:
             print("✓ Explainer loaded successfully")
         except Exception as e:
             print(f"✗ Explanation model failed to load: {e}")
+        
+        try:
+            # Initialize fragment handler with the same client as explainer
+            explainer_client = self.explainer.client if self.explainer else None
+            self.fragment_handler = FragmentHandler(explainer_client)
+            print("✓ Fragment handler loaded successfully")
+        except Exception as e:
+            print(f"✗ Fragment handler failed to load: {e}")
     
     def full_pipeline(self, thai_text, progress_callback=None, user_id=None, log_performance=True, performance_callback=None, timeout=75):
         """
@@ -1021,6 +1277,25 @@ class ModelManager:
                 first_sentence, is_multi_sentence = extract_first_sentence(full_translation)
                 result["analyzed_sentence"] = first_sentence
                 result["is_multi_sentence"] = is_multi_sentence
+                
+                # Step 1.5: Fragment detection - BYPASS BERT if fragment detected
+                if is_fragment(first_sentence):
+                    if self.fragment_handler:
+                        fragment_result = self.fragment_handler.handle_fragment(thai_text, first_sentence)
+                        # Return fragment result immediately - NO BERT classification
+                        return fragment_result
+                    else:
+                        # Fallback if fragment handler not available
+                        result["is_fragment"] = True
+                        result["explanation"] = {
+                            'raw_explanation': 'Fragment handler unavailable',
+                            'parsed_sections': {
+                                'why_no_analysis': 'ข้อความนี้ไม่ใช่ประโยคสมบูรณ์',
+                                'meaning_usage': 'ไม่สามารถวิเคราะห์ได้',
+                                'complete_sentence_guide': 'กรุณาใส่ประโยคสมบูรณ์'
+                            }
+                        }
+                        return result
                 
             except Exception as e:
                 translation_time = time.time() - start_time if 'start_time' in locals() else 0
