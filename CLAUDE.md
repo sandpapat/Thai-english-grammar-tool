@@ -6,7 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Flask-based web application for an MSc dissertation in Computer Science with Speech and Language Processing. The application provides a Thai-to-English NLP pipeline with tense classification and grammar explanation, featuring comprehensive performance evaluation across two distinct testing methodologies.
 
-**Latest Updates (2025-07-23):**
+**Latest Updates (2025-07-26):**
+- ✅ **Fragment Detection System**: Implemented intelligent text fragment detection with complete BERT bypass
+- ✅ **Educational Fragment Handling**: Fragments receive specialized educational content instead of tense analysis
+- ✅ **Separate Fragment Prompts**: Complete separation of fragment vs sentence handling with distinct prompts
+- ✅ **Enhanced User Experience**: Clear warnings and guidance for incomplete text inputs
+- ✅ **Smart Detection Logic**: Simple, reliable fragment detection without complex rule-based systems
+- ✅ **Clean Architecture**: Fragment handling completely bypasses BERT classification for optimal performance
+
+**Previous Updates (2025-07-23):**
 - ✅ **System Stability Recovery**: Reverted problematic language management system via git reset
 - ✅ **Website Functionality Restored**: All pages now load correctly with proper English content
 - ✅ **Template Cleanup**: Removed `data-translate` attributes causing blank page issues
