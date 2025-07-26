@@ -61,40 +61,6 @@
         border: 1px solid rgba(255, 193, 7, 0.3);
     }
     
-    .activity-breakdown {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-    
-    .activity-item {
-        flex: 1;
-        min-width: 140px;
-        text-align: center;
-        padding: 1.5rem;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .activity-item:hover {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.2);
-        transform: translateY(-2px);
-    }
-    
-    .activity-item .count {
-        font-size: 1.8rem;
-        font-weight: bold;
-        color: var(--bs-success);
-    }
-    
-    .activity-item .label {
-        font-size: 0.8rem;
-        color: var(--bs-body-color);
-        text-transform: capitalize;
-    }
 </style>
 {% endblock %}
 
@@ -162,23 +128,6 @@
         </div>
     </div>
 
-    <!-- Activity Breakdown -->
-    {% if user_stats.activity_breakdown %}
-    <div class="analytics-card">
-        <h3 class="mb-3">
-            <i class="bi bi-bar-chart me-2"></i>
-            Activity Breakdown (Last {{ user_stats.days_analyzed }} days)
-        </h3>
-        <div class="activity-breakdown">
-            {% for activity_type, count in user_stats.activity_breakdown.items() %}
-            <div class="activity-item">
-                <div class="count">{{ count }}</div>
-                <div class="label">{{ activity_type.replace('_', ' ') }}</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
 
 
     <!-- Current Session Info -->
