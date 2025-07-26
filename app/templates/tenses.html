@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}คู่มือ Tense - Thai-English Grammar Learning Tool{% endblock %}
+{% block title %}{% if get_current_locale() == 'th' %}คู่มือ Tense - Thaislate{% else %}Tense Guide - Thaislate{% endif %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -201,25 +201,34 @@
         <!-- Header -->
         <div class="text-center mb-5" id="top">
             <h1 class="mb-3">
-                <i class="bi bi-book"></i> <span lang="th">คู่มือการใช้ Tense ภาษาอังกฤษ</span>
+                <i class="bi bi-book"></i> 
+                {% if get_current_locale() == 'th' %}
+                    <span lang="th">คู่มือการใช้ Tense ภาษาอังกฤษ</span>
+                {% else %}
+                    English Tense Usage Guide
+                {% endif %}
             </h1>
             <p class="text-muted-custom mb-4">
-                <span lang="th">ความเข้าใจการใช้ Tense ภาษาอังกฤษที่แตกต่างกันสำหรับการแปลไทย-อังกฤษ</span>
+                {% if get_current_locale() == 'th' %}
+                    <span lang="th">ความเข้าใจการใช้ Tense ภาษาอังกฤษที่แตกต่างกันสำหรับการแปลไทย-อังกฤษ</span>
+                {% else %}
+                    Understanding different English tense usages for Thai-English translation
+                {% endif %}
             </p>
         </div>
 
         <!-- Quick Navigation -->
         <div class="tense-nav text-center">
-            <h5 class="mb-3"><i class="bi bi-compass"></i> Quick Navigation</h5>
+            <h5 class="mb-3"><i class="bi bi-compass"></i> {% if get_current_locale() == 'th' %}เมนูด่วน{% else %}Quick Navigation{% endif %}</h5>
             <div class="d-flex flex-wrap justify-content-center">
                 <a href="#present-section" class="tense-nav-item">
-                    <i class="bi bi-clock me-1"></i>Present Tenses
+                    <i class="bi bi-clock me-1"></i>{% if get_current_locale() == 'th' %}Present Tenses{% else %}Present Tenses{% endif %}
                 </a>
                 <a href="#past-section" class="tense-nav-item">
-                    <i class="bi bi-clock-history me-1"></i>Past Tenses
+                    <i class="bi bi-clock-history me-1"></i>{% if get_current_locale() == 'th' %}Past Tenses{% else %}Past Tenses{% endif %}
                 </a>
                 <a href="#future-section" class="tense-nav-item">
-                    <i class="bi bi-clock-forward me-1"></i>Future Tenses
+                    <i class="bi bi-clock-forward me-1"></i>{% if get_current_locale() == 'th' %}Future Tenses{% else %}Future Tenses{% endif %}
                 </a>
             </div>
         </div>
@@ -233,8 +242,8 @@
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" 
                             data-bs-target="#collapsePresent" aria-expanded="true" aria-controls="collapsePresent">
                         <i class="bi bi-clock me-2"></i>
-                        <strong>Present Tenses (<span lang="th">ปัจจุบัน</span>)</strong>
-                        <span class="badge bg-primary ms-2">4 Tenses</span>
+                        <strong>{% if get_current_locale() == 'th' %}Present Tenses (ปัจจุบัน){% else %}Present Tenses{% endif %}</strong>
+                        <span class="badge bg-primary ms-2">{% if get_current_locale() == 'th' %}4 Tenses{% else %}4 Tenses{% endif %}</span>
                     </button>
                 </h2>
                 <div id="collapsePresent" class="accordion-collapse collapse show" data-bs-parent="#tenseAccordion">
@@ -256,28 +265,100 @@
                                         <div class="tense-card">
                                             <div class="tense-card-body">
                                                 <div class="tense-list-item">
-                                                    <strong><span lang="th">กิจวัตรและพฤติกรรมประจำ:</span></strong><br>
-                                                    <small class="text-muted-custom"><span lang="th">ใช้เมื่อพูดถึงกิจวัตรหรือพฤติกรรมที่ทำเป็นประจำ</span></small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            <span lang="th">กิจวัตรและพฤติกรรมประจำ:</span>
+                                                        {% else %}
+                                                            Routines and Habits:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            <span lang="th">ใช้เมื่อพูดถึงกิจวัตรหรือพฤติกรรมที่ทำเป็นประจำ</span>
+                                                        {% else %}
+                                                            Used for routines or behaviors done regularly
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>ข้อเท็จจริงและความรู้วิทยาศาสตร์:</strong><br>
-                                                    <small class="text-muted-custom">ใช้กับข้อเท็จจริงที่เป็นสัจธรรมหรือเป็นความรู้ทางวิทยาศาสตร์</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ข้อเท็จจริงและความรู้วิทยาศาสตร์:
+                                                        {% else %}
+                                                            Facts and Scientific Knowledge:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ใช้กับข้อเท็จจริงที่เป็นสัจธรรมหรือเป็นความรู้ทางวิทยาศาสตร์
+                                                        {% else %}
+                                                            Used for universal facts or scientific knowledge
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>ตารางเวลาและแผนการ:</strong><br>
-                                                    <small class="text-muted-custom">ใช้เมื่อกล่าวถึงตารางเวลา เช่น ตารางเดินรถ หรือแผนที่กำหนดไว้</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ตารางเวลาและแผนการ:
+                                                        {% else %}
+                                                            Schedules and Plans:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ใช้เมื่อกล่าวถึงตารางเวลา เช่น ตารางเดินรถ หรือแผนที่กำหนดไว้
+                                                        {% else %}
+                                                            Used for schedules like train timetables or fixed plans
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>สุภาษิตและคำกล่าวทั่วไป:</strong><br>
-                                                    <small class="text-muted-custom">ใช้กับสุภาษิต คำพังเพย หรือคำกล่าวทั่วไป</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            สุภาษิตและคำกล่าวทั่วไป:
+                                                        {% else %}
+                                                            Proverbs and General Statements:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ใช้กับสุภาษิต คำพังเพย หรือคำกล่าวทั่วไป
+                                                        {% else %}
+                                                            Used for proverbs, sayings, or general statements
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>พาดหัวข่าว:</strong><br>
-                                                    <small class="text-muted-custom">ใช้ในพาดหัวข่าวหรือข้อความที่เน้นย่อประโยค สังเกตว่าแม้จะพูดถึงเหตุการณ์ที่เกิดขึ้นแล้ว แต่พาดหัวข่าวมักใช้ Present Simple เพื่อสร้างความรู้สึกสดใหม่และดึงดูดความสนใจผู้อ่าน</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            พาดหัวข่าว:
+                                                        {% else %}
+                                                            News Headlines:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ใช้ในพาดหัวข่าวหรือข้อความที่เน้นย่อประโยค สังเกตว่าแม้จะพูดถึงเหตุการณ์ที่เกิดขึ้นแล้ว แต่พาดหัวข่าวมักใช้ Present Simple เพื่อสร้างความรู้สึกสดใหม่และดึงดูดความสนใจผู้อ่าน
+                                                        {% else %}
+                                                            Used in news headlines for brevity. Even when referring to past events, headlines often use Present Simple to create a sense of immediacy and grab reader attention
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>แผนการและความตั้งใจในอนาคต:</strong><br>
-                                                    <small class="text-muted-custom">ใช้เมื่อพูดถึง "แผนการ" หรือ "ความตั้งใจ" ในอนาคต แม้ว่าโครงสร้างจะใช้ Present Simple แต่ความหมายมักชี้ไปยังสิ่งที่ผู้พูดหรือผู้ถูกถาม "ตั้งใจจะทำ" ในอนาคต</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            แผนการและความตั้งใจในอนาคต:
+                                                        {% else %}
+                                                            Future Plans and Intentions:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ใช้เมื่อพูดถึง "แผนการ" หรือ "ความตั้งใจ" ในอนาคต แม้ว่าโครงสร้างจะใช้ Present Simple แต่ความหมายมักชี้ไปยังสิ่งที่ผู้พูดหรือผู้ถูกถาม "ตั้งใจจะทำ" ในอนาคต
+                                                        {% else %}
+                                                            Used when discussing "plans" or "intentions" for the future. Although using Present Simple structure, the meaning often points to what the speaker or subject "intends to do" in the future
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -299,20 +380,68 @@
                                         <div class="tense-card">
                                             <div class="tense-card-body">
                                                 <div class="tense-list-item">
-                                                    <strong>การกระทำที่เกิดขึ้นขณะพูด:</strong><br>
-                                                    <small class="text-muted-custom">สิ่งที่ทำอยู่ขณะพูด</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            การกระทำที่เกิดขึ้นขณะพูด:
+                                                        {% else %}
+                                                            Actions Happening While Speaking:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            สิ่งที่ทำอยู่ขณะพูด
+                                                        {% else %}
+                                                            Things being done at the moment of speaking
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>กิจกรรมในช่วงเวลานี้:</strong><br>
-                                                    <small class="text-muted-custom">สิ่งที่ทำอยู่ในช่วงนี้ เช่น โปรเจค หรือ สิ่งที่ใช้เวลาทำนาน เป็นหลักวัน</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            กิจกรรมในช่วงเวลานี้:
+                                                        {% else %}
+                                                            Activities During This Period:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            สิ่งที่ทำอยู่ในช่วงนี้ เช่น โปรเจค หรือ สิ่งที่ใช้เวลาทำนาน เป็นหลักวัน
+                                                        {% else %}
+                                                            Things being done during this time period, such as projects or long-term activities that take days
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>เหตุการณ์ในอนาคตที่วางแผนแล้ว:</strong><br>
-                                                    <small class="text-muted-custom">เหตุการณ์ที่จะเกิดขึ้นในอนาคตโดยมี "การวางแผนไว้แล้ว" โดยมักจะเจอ "v.to be + going to"</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            เหตุการณ์ในอนาคตที่วางแผนแล้ว:
+                                                        {% else %}
+                                                            Future Events Already Planned:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            เหตุการณ์ที่จะเกิดขึ้นในอนาคตโดยมี "การวางแผนไว้แล้ว" โดยมักจะเจอ "v.to be + going to"
+                                                        {% else %}
+                                                            Events that will happen in the future with "planning already done", often seen with "v.to be + going to"
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>การเปลี่ยนแปลงที่กำลังดำเนินอยู่:</strong><br>
-                                                    <small class="text-muted-custom">เหตุการณ์ที่กำลังมีการเปลี่ยนแปลง พัฒนาขึ้น หรือก้าวหน้าขึ้น</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            การเปลี่ยนแปลงที่กำลังดำเนินอยู่:
+                                                        {% else %}
+                                                            Ongoing Changes:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            เหตุการณ์ที่กำลังมีการเปลี่ยนแปลง พัฒนาขึ้น หรือก้าวหน้าขึ้น
+                                                        {% else %}
+                                                            Events that are currently changing, developing, or progressing
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -334,16 +463,52 @@
                                         <div class="tense-card">
                                             <div class="tense-card-body">
                                                 <div class="tense-list-item">
-                                                    <strong>การกระทำที่เพิ่งสิ้นสุด:</strong><br>
-                                                    <small class="text-muted-custom">ใช้เมื่อเหตุการณ์เพิ่งจะสิ้นสุดลง</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            การกระทำที่เพิ่งสิ้นสุด:
+                                                        {% else %}
+                                                            Actions Just Completed:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ใช้เมื่อเหตุการณ์เพิ่งจะสิ้นสุดลง
+                                                        {% else %}
+                                                            Used when events have just ended
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>การกระทำในอดีตที่มีผลต่อปัจจุบัน:</strong><br>
-                                                    <small class="text-muted-custom">สิ่งที่เกิดขึ้นตั้งแต่อดีตและมีผลหรือคงสภาพจนถึงปัจจุบัน (การกระทำอาจจะจบไปแล้ว)</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            การกระทำในอดีตที่มีผลต่อปัจจุบัน:
+                                                        {% else %}
+                                                            Past Actions Affecting Present:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            สิ่งที่เกิดขึ้นตั้งแต่อดีตและมีผลหรือคงสภาพจนถึงปัจจุบัน (การกระทำอาจจะจบไปแล้ว)
+                                                        {% else %}
+                                                            Things that happened since the past and have effects or continue to the present (the action may be completed)
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                                 <div class="tense-list-item">
-                                                    <strong>ประสบการณ์:</strong><br>
-                                                    <small class="text-muted-custom">ประสบการณ์ (เจอคำว่า "First / ... time")</small>
+                                                    <strong>
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ประสบการณ์:
+                                                        {% else %}
+                                                            Experience:
+                                                        {% endif %}
+                                                    </strong><br>
+                                                    <small class="text-muted-custom">
+                                                        {% if get_current_locale() == 'th' %}
+                                                            ประสบการณ์ (เจอคำว่า "First / ... time")
+                                                        {% else %}
+                                                            Experience (often with "First / ... time")
+                                                        {% endif %}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -384,8 +549,8 @@
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                             data-bs-target="#collapsePast" aria-expanded="false" aria-controls="collapsePast">
                         <i class="bi bi-clock-history me-2"></i>
-                        <strong>Past Tenses (<span lang="th">อดีต</span>)</strong>
-                        <span class="badge bg-secondary ms-2">4 Tenses</span>
+                        <strong>{% if get_current_locale() == 'th' %}Past Tenses (อดีต){% else %}Past Tenses{% endif %}</strong>
+                        <span class="badge bg-secondary ms-2">{% if get_current_locale() == 'th' %}4 Tenses{% else %}4 Tenses{% endif %}</span>
                     </button>
                 </h2>
                 <div id="collapsePast" class="accordion-collapse collapse" data-bs-parent="#tenseAccordion">
@@ -499,8 +664,8 @@
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
                             data-bs-target="#collapseFuture" aria-expanded="false" aria-controls="collapseFuture">
                         <i class="bi bi-clock-forward me-2"></i>
-                        <strong>Future Tenses (<span lang="th">อนาคต</span>)</strong>
-                        <span class="badge bg-success ms-2">4 Tenses</span>
+                        <strong>{% if get_current_locale() == 'th' %}Future Tenses (อนาคต){% else %}Future Tenses{% endif %}</strong>
+                        <span class="badge bg-success ms-2">{% if get_current_locale() == 'th' %}4 Tenses{% else %}4 Tenses{% endif %}</span>
                     </button>
                 </h2>
                 <div id="collapseFuture" class="accordion-collapse collapse" data-bs-parent="#tenseAccordion">
@@ -615,11 +780,23 @@
 
         <!-- Usage Note -->
         <div class="alert alert-info mt-4">
-            <h5><i class="bi bi-info-circle"></i> หมายเหตุสำหรับการแปลไทย-อังกฤษ</h5>
+            <h5><i class="bi bi-info-circle"></i> 
+                {% if get_current_locale() == 'th' %}
+                    หมายเหตุสำหรับการแปลไทย-อังกฤษ
+                {% else %}
+                    Notes for Thai-English Translation
+                {% endif %}
+            </h5>
             <p class="mb-0">
-                เนื่องจากกริยาภาษาไทยไม่เปลี่ยนรูปเพื่อแสดง Tense ดังนั้น Tense ในภาษาอังกฤษจึงต้องอนุมานจากบริบท เช่น คำบอกเวลา 
-                อนุภาค (เช่น จะ สำหรับอนาคต) และบริบทของสถานการณ์ ระบบการจำแนกประเภทนี้ช่วยระบุ Tense ภาษาอังกฤษที่เหมาะสมที่สุด
-                โดยอิงจากความหมายและบริบทของประโยคภาษาไทย
+                {% if get_current_locale() == 'th' %}
+                    เนื่องจากกริยาภาษาไทยไม่เปลี่ยนรูปเพื่อแสดง Tense ดังนั้น Tense ในภาษาอังกฤษจึงต้องอนุมานจากบริบท เช่น คำบอกเวลา 
+                    อนุภาค (เช่น จะ สำหรับอนาคต) และบริบทของสถานการณ์ ระบบการจำแนกประเภทนี้ช่วยระบุ Tense ภาษาอังกฤษที่เหมาะสมที่สุด
+                    โดยอิงจากความหมายและบริบทของประโยคภาษาไทย
+                {% else %}
+                    Since Thai verbs don't conjugate to show tense, English tenses must be inferred from context, such as time markers, 
+                    particles (like จะ for future), and situational context. This classification system helps identify the most appropriate English tense 
+                    based on the meaning and context of the Thai sentence.
+                {% endif %}
             </p>
         </div>
     </div>

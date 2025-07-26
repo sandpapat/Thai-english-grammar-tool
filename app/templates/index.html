@@ -397,7 +397,7 @@
                                 <div>
                                     {% if get_current_locale() == 'th' %}
                                         <strong>ประโยคเรียบง่ายทำงานได้ดีที่สุด</strong>
-                                        <p class="mb-0 small">ตัวจำแนกทำงานได้ดีที่สุดกับโครงสร้างประโยคที่เรียบง่าย แม้ว่าจะรองรับประโยคความซ้อนได้ แต่ความแม่นยำอาจสูงกว่าในประโยคเรียบง่าย</p>
+                                        <p class="mb-0 small">ตัวจำแนกทำงานได้ดีที่สุดกับโครงสร้างประโยคที่เรียบง่าย แม้ว่าจะรองรับประโยคความซ้อนได้ แต่ความแม่นยำจะต่ำกว่าประโยคความเดียว</p>
                                     {% else %}
                                         <strong>Simple Sentences Work Best</strong>
                                         <p class="mb-0 small">The classifier performs optimally with simple sentence structures. While compound and complex sentences are allowed, accuracy may be higher with simpler constructions.</p>
@@ -614,7 +614,7 @@
                                 Keyboard Shortcuts
                             {% endif %}
                         </h5>
-                        <div class="card-text small text-start">
+                        <div class="card-text small">
                             {% if get_current_locale() == 'th' %}
                                 <p class="mb-1"><kbd>Alt + S</kbd> โฟกัสช่องใส่ข้อความ</p>
                                 <p class="mb-1"><kbd>Alt + Enter</kbd> ส่ง</p>

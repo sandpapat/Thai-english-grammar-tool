@@ -67,7 +67,7 @@
         <div class="card shadow mb-4">
             <div class="card-body">
                 <h2 class="card-title text-center mb-4">
-                    <i class="bi bi-check-circle text-success"></i> Analysis Results
+                    <i class="bi bi-check-circle text-success me-2"></i>Analysis Results
                 </h2>
                 
                 <!-- Input and Translation -->
@@ -76,7 +76,7 @@
                         <div class="card bg-light">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <i class="bi bi-chat-left-text"></i> Thai Input
+                                    <i class="bi bi-chat-left-text me-2"></i>Thai Input
                                 </h5>
                                 <p class="card-text fs-5" lang="th">{{ result.input_thai }}</p>
                             </div>
@@ -86,7 +86,7 @@
                         <div class="card bg-light">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    <i class="bi bi-translate"></i> English Translation
+                                    <i class="bi bi-translate me-2"></i>English Translation
                                 </h5>
                                 <p class="card-text fs-5">{{ result.translation }}</p>
                             </div>
@@ -108,7 +108,7 @@
                         <div class="card border-primary">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">
-                                    <i class="bi bi-bullseye"></i> Analyzed Sentence
+                                    <i class="bi bi-bullseye me-2"></i>Analyzed Sentence
                                 </h5>
                                 <p class="card-text fs-5 fw-bold analyzed-sentence">{{ result.analyzed_sentence }}</p>
                                 <small class="text-muted">This is the sentence that was used for tense classification and grammar explanation.</small>
@@ -138,7 +138,7 @@
                                     {{ result.fine_label }}
                                 </p>
                                 <p class="text-muted">
-                                    <i class="bi bi-speedometer2"></i> Confidence: {{ "%.1f"|format(result.confidence * 100) }}%
+                                    <i class="bi bi-speedometer2 me-2"></i>Confidence: {{ "%.1f"|format(result.confidence * 100) }}%
                                 </p>
                             </div>
                         </div>
@@ -151,7 +151,7 @@
         <div class="card shadow mb-4">
             <div class="card-header bg-info text-white">
                 <h4 class="mb-0">
-                    <i class="bi bi-lightbulb"></i> Grammar Explanation
+                    <i class="bi bi-lightbulb me-2"></i>Grammar Explanation
                 </h4>
             </div>
             <div class="card-body">
@@ -316,7 +316,7 @@
                 </form>
                 
                 <div id="ratingSuccess" class="alert alert-success mt-3 d-none">
-                    <i class="bi bi-check-circle"></i> Thank you for your feedback! Your detailed rating has been submitted successfully.
+                    <i class="bi bi-check-circle me-2"></i>Thank you for your feedback! Your detailed rating has been submitted successfully.
                 </div>
                 
                 <div id="ratingError" class="alert alert-danger mt-3 d-none">
@@ -329,10 +329,10 @@
         <!-- Action Buttons -->
         <div class="text-center">
             <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
-                <i class="bi bi-arrow-clockwise"></i> Try Another Sentence
+                <i class="bi bi-arrow-clockwise me-2"></i>Try Another Sentence
             </a>
             <a href="{{ url_for('main.system_performance') }}" class="btn btn-outline-secondary btn-lg ms-2">
-                <i class="bi bi-speedometer2"></i> View Model Performance
+                <i class="bi bi-speedometer2 me-2"></i>View Model Performance
             </a>
         </div>
     </div>

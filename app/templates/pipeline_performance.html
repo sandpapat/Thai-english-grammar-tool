@@ -273,71 +273,71 @@
         
         <div class="col-md-6 col-lg-4">
             <div class="metric-card">
-                <h5><i class="bi bi-clock me-2 text-primary"></i>Coarse Classification</h5>
+                <h5><i class="bi bi-clock me-2 text-primary"></i>{% if get_current_locale() == 'th' %}การจำแนกหลัก{% else %}Coarse Classification{% endif %}</h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">92.7%</span>
-                    <span class="performance-badge excellent">Excellent</span>
+                    <span class="performance-badge excellent">{% if get_current_locale() == 'th' %}ยอดเยี่ยม{% else %}Excellent{% endif %}</span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-success" style="width: 92.7%"></div>
                 </div>
-                <small class="text-muted">0.927/1 score - Past/Present/Future</small>
+                <small class="text-muted">{% if get_current_locale() == 'th' %}คะแนน 0.927/1 - อดีต/ปัจจุบัน/อนาคต{% else %}0.927/1 score - Past/Present/Future{% endif %}</small>
             </div>
         </div>
         
         <div class="col-md-6 col-lg-4">
             <div class="metric-card">
-                <h5><i class="bi bi-bullseye me-2 text-primary"></i>Fine-grained Classification</h5>
+                <h5><i class="bi bi-bullseye me-2 text-primary"></i>{% if get_current_locale() == 'th' %}การจำแนกละเอียด{% else %}Fine-grained Classification{% endif %}</h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">74.0%</span>
-                    <span class="performance-badge moderate">Moderate</span>
+                    <span class="performance-badge moderate">{% if get_current_locale() == 'th' %}ปานกลาง{% else %}Moderate{% endif %}</span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-warning" style="width: 74%"></div>
                 </div>
-                <small class="text-muted">0.740/1 score - 24 tense classes</small>
+                <small class="text-muted">{% if get_current_locale() == 'th' %}คะแนน 0.740/1 - 24 ประเภท Tense{% else %}0.740/1 score - 24 tense classes{% endif %}</small>
             </div>
         </div>
         
         <div class="col-md-6 col-lg-4">
             <div class="metric-card">
-                <h5><i class="bi bi-book me-2 text-primary"></i>Explanation Quality</h5>
+                <h5><i class="bi bi-book me-2 text-primary"></i>{% if get_current_locale() == 'th' %}คุณภาพคำอธิบาย{% else %}Explanation Quality{% endif %}</h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">84.9%</span>
-                    <span class="performance-badge good">Good</span>
+                    <span class="performance-badge good">{% if get_current_locale() == 'th' %}ดี{% else %}Good{% endif %}</span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-info" style="width: 84.9%"></div>
                 </div>
-                <small class="text-muted">1.698/2 score - Typhoon 2.1 4B Instruct</small>
+                <small class="text-muted">{% if get_current_locale() == 'th' %}คะแนน 1.698/2 - Typhoon 2.1 4B Instruct{% else %}1.698/2 score - Typhoon 2.1 4B Instruct{% endif %}</small>
             </div>
         </div>
         
         <div class="col-md-6 col-lg-4">
             <div class="metric-card">
-                <h5><i class="bi bi-shield-check me-2 text-primary"></i>No Code Hallucination</h5>
+                <h5><i class="bi bi-shield-check me-2 text-primary"></i>{% if get_current_locale() == 'th' %}ไม่มีข้อผิดพลาดในคำอธิบาย{% else %}No Code Hallucination{% endif %}</h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">77.1%</span>
-                    <span class="performance-badge moderate">Moderate</span>
+                    <span class="performance-badge moderate">{% if get_current_locale() == 'th' %}ปานกลาง{% else %}Moderate{% endif %}</span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-warning" style="width: 77.1%"></div>
                 </div>
-                <small class="text-muted">0.771/1 score - Explanation clarity</small>
+                <small class="text-muted">{% if get_current_locale() == 'th' %}คะแนน 0.771/1 - ความชัดเจนของคำอธิบาย{% else %}0.771/1 score - Explanation clarity{% endif %}</small>
             </div>
         </div>
         
         <div class="col-md-6 col-lg-4">
             <div class="metric-card">
-                <h5><i class="bi bi-search me-2 text-primary"></i>Signal Word Detection</h5>
+                <h5><i class="bi bi-search me-2 text-primary"></i>{% if get_current_locale() == 'th' %}การตรวจจับคำสัญญาณ{% else %}Signal Word Detection{% endif %}</h5>
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="h3 mb-0">95.8%</span>
-                    <span class="performance-badge excellent">Excellent</span>
+                    <span class="performance-badge excellent">{% if get_current_locale() == 'th' %}ยอดเยี่ยม{% else %}Excellent{% endif %}</span>
                 </div>
                 <div class="progress progress-custom">
                     <div class="progress-bar bg-success" style="width: 95.8%"></div>
                 </div>
-                <small class="text-muted">0.958/1 score - Temporal markers</small>
+                <small class="text-muted">{% if get_current_locale() == 'th' %}คะแนน 0.958/1 - ตัวบ่งชี้เวลา{% else %}0.958/1 score - Temporal markers{% endif %}</small>
             </div>
         </div>
     </div>
