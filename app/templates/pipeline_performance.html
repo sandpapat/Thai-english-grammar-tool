@@ -126,18 +126,7 @@
             {% endif %}
         </h2>
         <div class="row">
-            <div class="col-md-3">
-                <div class="text-center">
-                    <div class="score-display">B+</div>
-                    <p class="lead mb-0">
-                        {% if get_current_locale() == 'th' %}เกรดรวม{% else %}Overall Grade{% endif %}
-                    </p>
-                    <small style="opacity: 0.8;">
-                        {% if get_current_locale() == 'th' %}ประสิทธิภาพ 85%{% else %}85% performance{% endif %}
-                    </small>
-                </div>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="text-center">
                     <div class="score-display">96</div>
                     <p class="lead mb-0">
@@ -148,7 +137,7 @@
                     </small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="text-center">
                     <div class="score-display">7</div>
                     <p class="lead mb-0">
@@ -159,7 +148,7 @@
                     </small>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="text-center">
                     <div class="score-display">12.25s</div>
                     <p class="lead mb-0">
@@ -562,51 +551,5 @@
 </section>
 
 
-<!-- Overall Assessment -->
-<section class="mb-5">
-    <div class="card border-primary">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="bi bi-award me-2"></i>
-                {% if get_current_locale() == 'th' %}
-                    การประเมินโดยรวม: B+ (85%)
-                {% else %}
-                    Overall Assessment: B+ (85%)
-                {% endif %}
-            </h4>
-        </div>
-        <div class="card-body">
-            <p class="mb-3">
-                The hybrid pipeline demonstrates <strong>strong performance across most metrics</strong>, with excellent 
-                translation quality and good educational potential. The system successfully provides fluent Thai-to-English 
-                translation with accurate tense classification and meaningful grammar explanations.
-            </p>
-            <div class="row">
-                <div class="col-md-6">
-                    <h6 class="text-success">Key Achievements:</h6>
-                    <ul class="mb-0">
-                        <li>High-quality translation output (93.2% fluency)</li>
-                        <li>Fast inference time (1.2s translation)</li>
-                        <li>Excellent basic tense recognition (92.7%)</li>
-                        <li>Strong signal word detection (95.8%)</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <h6 class="text-warning">Improvement Focus:</h6>
-                    <ul class="mb-0">
-                        <li>Fine-grained temporal classification accuracy</li>
-                        <li>Explanation quality and clarity</li>
-                        <li>Processing speed optimization</li>
-                        <li>Technical jargon elimination</li>
-                    </ul>
-                </div>
-            </div>
-            <hr>
-            <p class="mb-0 text-muted">
-                <strong>Conclusion:</strong> This performance level is suitable for dissertation requirements and demonstrates 
-                a functional educational tool with clear paths for enhancement.
-            </p>
-        </div>
-    </div>
-</section>
 
 {% endblock %}

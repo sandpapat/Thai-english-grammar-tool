@@ -57,6 +57,120 @@
         background: linear-gradient(135deg, #bbdefb 0%, #e1bee7 100%);
         transition: background 0.3s ease;
     }
+
+    /* Improved Feedback Tag Styles */
+    .quick-feedback {
+        margin-top: 1.5rem;
+    }
+    
+    .feedback-section {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid;
+    }
+    
+    .issues-section {
+        background-color: #fff8f0;
+        border-color: #ffc107;
+    }
+    
+    .positive-section {
+        background-color: #f0f9f0;
+        border-color: #28a745;
+    }
+    
+    .feedback-section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .feedback-section-title {
+        color: #333;
+    }
+    
+    .tag-subsection {
+        margin-bottom: 1rem;
+    }
+    
+    .tag-subsection:last-child {
+        margin-bottom: 0;
+    }
+    
+    .tag-subsection-title {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    /* Issue Tags Styling */
+    .issue-tag {
+        background-color: #fff;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        padding: 0.4rem 0.8rem;
+        margin: 0.25rem;
+        border-radius: 20px;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    
+    .issue-tag:hover {
+        background-color: #dc3545;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .issue-tag.selected {
+        background-color: #dc3545;
+        color: white;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+    }
+    
+    /* Positive Tags Styling */
+    .positive-tag {
+        background-color: #fff;
+        border: 1px solid #28a745;
+        color: #28a745;
+        padding: 0.4rem 0.8rem;
+        margin: 0.25rem;
+        border-radius: 20px;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    
+    .positive-tag:hover {
+        background-color: #28a745;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .positive-tag.selected {
+        background-color: #28a745;
+        color: white;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    }
+    
+    /* Legacy tag support for backward compatibility */
+    .tag.positive {
+        background-color: #fff;
+        border: 1px solid #28a745;
+        color: #28a745;
+    }
+    
+    .tag.positive:hover,
+    .tag.positive.selected {
+        background-color: #28a745;
+        color: white;
+    }
 </style>
 {% endblock %}
 
@@ -299,31 +413,55 @@
 
                         <!-- Quick Feedback Tags -->
                         <div class="quick-feedback">
-                            <div class="comments-title">Quick Issues (Optional - Click any that apply)</div>
+                            <div class="comments-title">Quick Feedback (Optional - Click any that apply)</div>
                             
-                            <div class="tag-section">
-                                <div class="tag-section-title">Translation Issues:</div>
-                                <div class="quick-tags" data-category="translation">
-                                    <span class="tag" data-tag="Wrong word choice">Wrong word choice</span>
-                                    <span class="tag" data-tag="Missing context">Missing context</span>
-                                    <span class="tag" data-tag="Too literal">Too literal</span>
-                                    <span class="tag" data-tag="Awkward phrasing">Awkward phrasing</span>
-                                    <span class="tag" data-tag="Grammar error">Grammar error</span>
-                                    <span class="tag positive" data-tag="Perfect translation">Perfect translation</span>
+                            <!-- Issues to Report Section -->
+                            <div class="feedback-section issues-section">
+                                <div class="feedback-section-header">
+                                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                    <span class="feedback-section-title">Issues to Report</span>
+                                </div>
+                                
+                                <div class="tag-subsection">
+                                    <div class="tag-subsection-title">Translation Issues:</div>
+                                    <div class="quick-tags" data-category="translation-issues">
+                                        <span class="tag issue-tag" data-tag="Wrong word choice">Wrong word choice</span>
+                                        <span class="tag issue-tag" data-tag="Missing context">Missing context</span>
+                                        <span class="tag issue-tag" data-tag="Too literal">Too literal</span>
+                                        <span class="tag issue-tag" data-tag="Awkward phrasing">Awkward phrasing</span>
+                                        <span class="tag issue-tag" data-tag="Grammar error">Grammar error</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="tag-subsection">
+                                    <div class="tag-subsection-title">Explanation Issues:</div>
+                                    <div class="quick-tags" data-category="explanation-issues">
+                                        <span class="tag issue-tag" data-tag="Wrong grammar rule">Wrong grammar rule</span>
+                                        <span class="tag issue-tag" data-tag="Too complex">Too complex</span>
+                                        <span class="tag issue-tag" data-tag="Too basic">Too basic</span>
+                                        <span class="tag issue-tag" data-tag="Missing key points">Missing key points</span>
+                                        <span class="tag issue-tag" data-tag="Incorrect tense analysis">Incorrect tense analysis</span>
+                                        <span class="tag issue-tag" data-tag="Poor examples">Poor examples</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="tag-section">
-                                <div class="tag-section-title">Explanation Issues:</div>
-                                <div class="quick-tags" data-category="explanation">
-                                    <span class="tag" data-tag="Wrong grammar rule">Wrong grammar rule</span>
-                                    <span class="tag" data-tag="Too complex">Too complex</span>
-                                    <span class="tag" data-tag="Too basic">Too basic</span>
-                                    <span class="tag" data-tag="Missing key points">Missing key points</span>
-                                    <span class="tag" data-tag="Incorrect tense analysis">Incorrect tense analysis</span>
-                                    <span class="tag" data-tag="Poor examples">Poor examples</span>
-                                    <span class="tag positive" data-tag="Clear explanation">Clear explanation</span>
-                                    <span class="tag positive" data-tag="Very educational">Very educational</span>
+                            <!-- Positive Feedback Section -->
+                            <div class="feedback-section positive-section">
+                                <div class="feedback-section-header">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    <span class="feedback-section-title">Positive Feedback</span>
+                                </div>
+                                
+                                <div class="tag-subsection">
+                                    <div class="tag-subsection-title">What worked well:</div>
+                                    <div class="quick-tags" data-category="positive-feedback">
+                                        <span class="tag positive-tag" data-tag="Perfect translation">Perfect translation</span>
+                                        <span class="tag positive-tag" data-tag="Clear explanation">Clear explanation</span>
+                                        <span class="tag positive-tag" data-tag="Very educational">Very educational</span>
+                                        <span class="tag positive-tag" data-tag="Good examples">Good examples</span>
+                                        <span class="tag positive-tag" data-tag="Helpful analysis">Helpful analysis</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -374,8 +512,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Track selected tags
     let selectedTags = [];
     
-    // Tag selection functionality
-    document.querySelectorAll('.tag').forEach(function(tag) {
+    // Tag selection functionality - Updated for new tag structure
+    document.querySelectorAll('.tag, .issue-tag, .positive-tag').forEach(function(tag) {
         tag.addEventListener('click', function() {
             const tagText = this.getAttribute('data-tag');
             
