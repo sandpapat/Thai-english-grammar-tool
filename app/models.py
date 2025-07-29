@@ -606,6 +606,19 @@ class Admin(UserMixin, db.Model):
         )
         db.session.add(activity)
         db.session.commit()
+    
+    def is_proficient(self):
+        """Admin users are always considered proficient for compatibility"""
+        return True
+    
+    def get_user_type_display(self):
+        """Get user type display for admin users"""
+        return "Admin"
+    
+    @property
+    def pseudocode(self):
+        """Return username for template compatibility"""
+        return self.username
 
 
 class AdminActivity(db.Model):
