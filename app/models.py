@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from datetime import datetime, timedelta
 from sqlalchemy import func
 import uuid
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
@@ -540,3 +541,83 @@ class UserActivity(db.Model):
                 activity_type: count for activity_type, count in activity_dist
             }
         }
+
+
+class Admin(UserMixin, db.Model):
+    """Admin user model for dashboard access"""
+    __tablename__ = 'admins'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False, index=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    full_name = db.Column(db.String(120))
+    is_active = db.Column(db.Boolean, default=True)
+    is_super_admin = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_login = db.Column(db.DateTime)
+    
+    # Activity logging
+    activities = db.relationship('AdminActivity', backref='admin', lazy='dynamic')
+    
+    def __repr__(self):
+        return f'<Admin {self.username}>'
+    
+    def set_password(self, password):
+        """Set password hash"""
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check password against hash"""
+        return check_password_hash(self.password_hash, password)
+    
+    def get_id(self):
+        """Required for Flask-Login"""
+        return f"admin-{self.id}"
+    
+    @staticmethod
+    def create_admin(username, email, password, full_name=None, is_super_admin=False):
+        """Create a new admin user"""
+        # Check if admin already exists
+        existing = Admin.query.filter(
+            (Admin.username == username) | (Admin.email == email)
+        ).first()
+        if existing:
+            raise ValueError("Admin with this username or email already exists")
+        
+        admin = Admin(
+            username=username,
+            email=email,
+            full_name=full_name,
+            is_super_admin=is_super_admin
+        )
+        admin.set_password(password)
+        
+        db.session.add(admin)
+        db.session.commit()
+        return admin
+    
+    def log_activity(self, activity_type, details=None):
+        """Log admin activity"""
+        activity = AdminActivity(
+            admin_id=self.id,
+            activity_type=activity_type,
+            details=details
+        )
+        db.session.add(activity)
+        db.session.commit()
+
+
+class AdminActivity(db.Model):
+    """Admin activity logging"""
+    __tablename__ = 'admin_activities'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    admin_id = db.Column(db.Integer, db.ForeignKey('admins.id'), nullable=False)
+    activity_type = db.Column(db.String(50), nullable=False)  # login, user_add, user_edit, data_export, etc.
+    details = db.Column(db.JSON)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    ip_address = db.Column(db.String(45))
+    
+    def __repr__(self):
+        return f'<AdminActivity {self.admin_id}: {self.activity_type} at {self.timestamp}>'

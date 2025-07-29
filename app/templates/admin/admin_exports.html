@@ -1,0 +1,148 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Export Data - Admin Panel{% endblock %}
+{% block page_title %}Data Export{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Ratings Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-star-fill text-warning"></i> Rating Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Export all rating data including Thai input, English translations, 
+                    multi-criteria ratings, issue tags, and user comments.
+                </p>
+                <ul class="small text-muted">
+                    <li>Translation Accuracy & Fluency ratings</li>
+                    <li>Explanation Quality ratings</li>
+                    <li>Educational Value ratings</li>
+                    <li>Issue tags and comments</li>
+                    <li>User information and timestamps</li>
+                </ul>
+                <a href="{{ url_for('admin.export_ratings') }}" class="btn btn-primary">
+                    <i class="bi bi-download"></i> Export Ratings CSV
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-people-fill text-primary"></i> User Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Export complete user list with activity statistics and account information.
+                </p>
+                <ul class="small text-muted">
+                    <li>Pseudocodes and user types</li>
+                    <li>Account creation dates</li>
+                    <li>Last login timestamps</li>
+                    <li>Translation counts</li>
+                    <li>Rating submission counts</li>
+                </ul>
+                <a href="{{ url_for('admin.export_users') }}" class="btn btn-primary">
+                    <i class="bi bi-download"></i> Export Users CSV
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Activity Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-activity text-info"></i> User Activity Log
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Export detailed user activity logs for analysis and tracking.
+                </p>
+                <ul class="small text-muted">
+                    <li>Login/logout events</li>
+                    <li>Translation activities</li>
+                    <li>Rating submissions</li>
+                    <li>Session information</li>
+                    <li>IP addresses and timestamps</li>
+                </ul>
+                <form method="GET" action="{{ url_for('admin.export_activity') }}" class="d-flex gap-2">
+                    <select name="days" class="form-select form-select-sm" style="width: auto;">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="365">Last year</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-download"></i> Export Activity CSV
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Export -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="bi bi-speedometer2 text-success"></i> System Performance
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Export system performance metrics and response time data.
+                </p>
+                <ul class="small text-muted">
+                    <li>Translation processing times</li>
+                    <li>Classification times</li>
+                    <li>Explanation generation times</li>
+                    <li>Total response times</li>
+                    <li>Success/failure rates</li>
+                </ul>
+                <button class="btn btn-primary" disabled>
+                    <i class="bi bi-download"></i> Coming Soon
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export History -->
+<div class="card mt-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            <i class="bi bi-clock-history"></i> Recent Exports
+        </h5>
+    </div>
+    <div class="card-body">
+        <p class="text-muted text-center py-3">
+            Export history will appear here after your first export.
+        </p>
+    </div>
+</div>
+
+<!-- Notes -->
+<div class="alert alert-info mt-4">
+    <h6 class="alert-heading">
+        <i class="bi bi-info-circle"></i> Export Notes
+    </h6>
+    <ul class="mb-0 small">
+        <li>All exports are in CSV format, compatible with Excel and Google Sheets</li>
+        <li>Timestamps are in UTC format</li>
+        <li>Large exports may take a few seconds to generate</li>
+        <li>User privacy is maintained - no personal identifying information is included</li>
+    </ul>
+</div>
+{% endblock %}

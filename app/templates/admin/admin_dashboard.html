@@ -1,0 +1,271 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Dashboard - Admin Panel{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-number text-primary">{{ stats.total_users }}</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="text-primary opacity-25">
+                        <i class="bi bi-people-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-number text-success">{{ stats.online_users }}</div>
+                        <div class="stat-label">Online Now</div>
+                    </div>
+                    <div class="text-success opacity-25">
+                        <i class="bi bi-person-check-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-number text-info">{{ stats.total_translations }}</div>
+                        <div class="stat-label">Translations</div>
+                    </div>
+                    <div class="text-info opacity-25">
+                        <i class="bi bi-translate" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-0">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-number text-warning">{{ stats.total_ratings }}</div>
+                        <div class="stat-label">Ratings</div>
+                    </div>
+                    <div class="text-warning opacity-25">
+                        <i class="bi bi-star-fill" style="font-size: 2.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Online Users Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <span class="online-indicator"></span>Currently Online Users
+                    <span class="badge bg-success ms-2" id="online-count">{{ stats.online_users }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="online-users-list" class="table-responsive">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Activity -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    {% for activity in recent_activities %}
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>{{ activity.user.pseudocode }}</strong>
+                                <span class="badge bg-secondary ms-1">{{ activity.user.user_type }}</span>
+                                <div class="small text-muted">
+                                    {{ activity.activity_type|replace('_', ' ')|title }}
+                                    {% if activity.details and activity.details.input_length %}
+                                        ({{ activity.details.input_length }} chars)
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="text-muted small">
+                                {{ activity.timestamp|safe_strftime('%I:%M %p') }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Users & Rating Stats -->
+    <div class="col-lg-6 mb-4">
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Top Active Users</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th class="text-end">Translations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user_id, pseudocode, count in top_users %}
+                            <tr>
+                                <td>
+                                    <strong>{{ pseudocode }}</strong>
+                                </td>
+                                <td class="text-end">
+                                    <span class="badge bg-primary rounded-pill">{{ count }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rating Statistics -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Rating Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <div class="small text-muted">Translation Accuracy</div>
+                            <div class="h4 mb-0">{{ rating_stats.avg_translation_accuracy }}/5</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <div class="small text-muted">Translation Fluency</div>
+                            <div class="h4 mb-0">{{ rating_stats.avg_translation_fluency }}/5</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <div class="small text-muted">Explanation Quality</div>
+                            <div class="h4 mb-0">{{ rating_stats.avg_explanation_quality }}/5</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <div class="small text-muted">Educational Value</div>
+                            <div class="h4 mb-0">{{ rating_stats.avg_educational_value }}/5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Function to fetch and display online users
+function updateOnlineUsers() {
+    fetch('{{ url_for("admin.get_online_users") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const container = document.getElementById('online-users-list');
+                const countBadge = document.getElementById('online-count');
+                
+                countBadge.textContent = data.online_count;
+                
+                if (data.users.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center mb-0">No users currently online</p>';
+                } else {
+                    let html = '<table class="table table-sm mb-0">';
+                    html += '<thead><tr><th>User</th><th>Type</th><th>Session Duration</th><th>Last Activity</th></tr></thead>';
+                    html += '<tbody>';
+                    
+                    data.users.forEach(user => {
+                        const lastActivity = new Date(user.last_activity);
+                        const timeAgo = getTimeAgo(lastActivity);
+                        
+                        html += `<tr>
+                            <td><strong>${user.pseudocode}</strong></td>
+                            <td><span class="badge bg-${user.user_type === 'proficient' ? 'warning' : 'secondary'}">${user.user_type}</span></td>
+                            <td>${user.duration_minutes} min</td>
+                            <td class="text-muted small">${timeAgo}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching online users:', error);
+        });
+}
+
+// Helper function to get relative time
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    return `${Math.floor(hours / 24)}d ago`;
+}
+
+// Update online users on page load and every 30 seconds
+updateOnlineUsers();
+setInterval(updateOnlineUsers, 30000);
+
+// Auto-refresh dashboard stats every minute
+setInterval(function() {
+    fetch('{{ url_for("admin.get_dashboard_stats") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update stat cards if needed
+                console.log('Dashboard stats updated', data.stats);
+            }
+        });
+}, 60000);
+</script>
+{% endblock %}

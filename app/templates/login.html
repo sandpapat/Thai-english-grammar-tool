@@ -63,6 +63,94 @@
                 
                 <hr class="my-4">
                 
+                <!-- Pseudocode Generation Guide -->
+                <div class="alert alert-info">
+                    <h6 class="alert-heading mb-2">
+                        <i class="bi bi-info-circle"></i> 
+                        {% if get_current_locale() == 'th' %}
+                            <span lang="th">ลืมรหัสผู้เข้าร่วมของคุณ?</span>
+                        {% else %}
+                            Forgot your participant code?
+                        {% endif %}
+                    </h6>
+                    <p class="small mb-2">
+                        {% if get_current_locale() == 'th' %}
+                            <span lang="th">เพื่อปกป้องความเป็นส่วนตัวของท่านในขณะที่ยอมให้ท่านเข้าร่วมระยะที่สอง ท่านจะสร้างรหัสผู้เข้าร่วมเฉพาะตัวของท่านเองโดยใช้อัลกอริธึมง่าย ๆ ที่อิงจากข้อมูลส่วนบุคคลที่ไม่สามารถติดตามกลับมาถึงตัวท่านได้:</span>
+                        {% else %}
+                            To protect your privacy while allowing you to participate in second phase, you will generate your own unique participant code using a simple algorithm based on personal information that cannot be traced back to you:
+                        {% endif %}
+                    </p>
+                    
+                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#codeGuide" aria-expanded="false" aria-controls="codeGuide">
+                        <i class="bi bi-chevron-down"></i> 
+                        {% if get_current_locale() == 'th' %}
+                            <span lang="th">ดูวิธีสร้างรหัส</span>
+                        {% else %}
+                            Show how to generate code
+                        {% endif %}
+                    </button>
+                    
+                    <div class="collapse mt-3" id="codeGuide">
+                        <div class="card card-body small">
+                            <ol class="mb-2">
+                                <li>
+                                    {% if get_current_locale() == 'th' %}
+                                        <span lang="th">อักษรตัวแรกของเดือนที่เกิด (เช่น มกราคม = J, มีนาคม = M)</span>
+                                    {% else %}
+                                        First letter of your birth month (e.g., January = J, March = M)
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if get_current_locale() == 'th' %}
+                                        <span lang="th">หลักที่สองของอายุ (เช่น หากอายุ 24 ปี ใช้ 4)</span>
+                                    {% else %}
+                                        Second digit of your age (e.g., if 24 years old, use 4)
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if get_current_locale() == 'th' %}
+                                        <span lang="th">จำนวนตัวอักษรในชื่อแรกในภาษาอังกฤษของท่าน หารด้วย 10 เอาเศษ (เช่นถ้าชื่อภาษาอังกฤษท่านมี 11 ตัว = 1)</span>
+                                    {% else %}
+                                        Number of letters in your first name (if more than 10, take remainder after dividing by 10)
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if get_current_locale() == 'th' %}
+                                        <span lang="th">จำนวนพี่น้อง (ถ้าเกิน 10 เอาหลักหน่วยอย่างเดียว)</span>
+                                    {% else %}
+                                        Number of siblings (if more than 10, take only the units digit)
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    {% if get_current_locale() == 'th' %}
+                                        <span lang="th">หลักสุดท้ายของหมายเลขโทรศัพท์</span>
+                                    {% else %}
+                                        Last digit of your phone number
+                                    {% endif %}
+                                </li>
+                            </ol>
+                            
+                            <div class="alert alert-light mb-0">
+                                <strong>
+                                    {% if get_current_locale() == 'th' %}
+                                        <span lang="th">ตัวอย่าง:</span>
+                                    {% else %}
+                                        Example:
+                                    {% endif %}
+                                </strong>
+                                <br>
+                                {% if get_current_locale() == 'th' %}
+                                    <span lang="th">หากท่านเกิดเดือนมิถุนายน อายุ 23 ชื่อ "Somchai" (7 ตัวอักษร) มีพี่น้อง 2 คน และหมายเลขโทรศัพท์ลงท้ายด้วย 8 รหัสของท่านจะเป็น: <strong>J3728</strong></span>
+                                {% else %}
+                                    If you were born in June, age 23, first name "Somchai" (7 letters), have 2 siblings, and phone number ending in 8, your code would be: <strong>J3728</strong>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
                 <div class="text-center text-muted small">
                     <i class="bi bi-shield-lock"></i> 
                     {% if get_current_locale() == 'th' %}

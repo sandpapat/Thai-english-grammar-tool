@@ -113,7 +113,14 @@ def create_app(config_name=None):
     
     @login_manager.user_loader
     def load_user(user_id):
-        from .models import Pseudocode
+        from .models import Pseudocode, Admin
+        
+        # Check if it's an admin ID (format: "admin-123")
+        if isinstance(user_id, str) and user_id.startswith('admin-'):
+            admin_id = int(user_id.replace('admin-', ''))
+            return Admin.query.get(admin_id)
+        
+        # Otherwise, it's a regular user
         return Pseudocode.query.get(int(user_id))
     
     # Session validation middleware (idle timeout check)
@@ -184,6 +191,10 @@ def create_app(config_name=None):
     # Register main routes
     from .routes import main_bp
     app.register_blueprint(main_bp)
+    
+    # Register admin routes
+    from .admin import admin_bp
+    app.register_blueprint(admin_bp)
     
     # Create database tables
     with app.app_context():

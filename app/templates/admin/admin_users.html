@@ -1,0 +1,191 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Users - Admin Panel{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('admin.users') }}" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">User Type</label>
+                <select name="type" class="form-select">
+                    <option value="all" {% if user_type == 'all' %}selected{% endif %}>All Users</option>
+                    <option value="normal" {% if user_type == 'normal' %}selected{% endif %}>Normal Users</option>
+                    <option value="proficient" {% if user_type == 'proficient' %}selected{% endif %}>Proficient Users</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Search by pseudocode" value="{{ search }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Filter
+                    </button>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add User Section -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Add New User</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('admin.add_user') }}" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Pseudocode</label>
+                <input type="text" 
+                       name="pseudocode" 
+                       class="form-control text-uppercase" 
+                       placeholder="5 characters" 
+                       maxlength="5" 
+                       pattern="[A-Za-z0-9]{5}" 
+                       required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">User Type</label>
+                <select name="user_type" class="form-select" required>
+                    <option value="normal">Normal</option>
+                    <option value="proficient">Proficient</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">&nbsp;</label>
+                <div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-person-plus"></i> Add User
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">
+            Users List 
+            <span class="badge bg-secondary">{{ pagination.total }} total</span>
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Pseudocode</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Translations</th>
+                        <th>Ratings</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <strong>{{ user.pseudocode }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'warning' if user.user_type == 'proficient' else 'secondary' }}">
+                                {{ user.user_type|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if user.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted">
+                            {{ user.created_at|safe_strftime('%b %d, %Y') if user.created_at else 'N/A' }}
+                        </td>
+                        <td class="text-muted">
+                            {{ user.last_login|safe_strftime('%b %d, %Y %I:%M %p') if user.last_login else 'Never' }}
+                        </td>
+                        <td>
+                            <span class="badge bg-info rounded-pill">{{ user.translation_count }}</span>
+                        </td>
+                        <td>
+                            <span class="badge bg-warning rounded-pill">{{ user.rating_count }}</span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <form method="POST" action="{{ url_for('admin.toggle_user_type', user_id=user.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-outline-primary" title="Toggle user type">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.toggle_user_active', user_id=user.id) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-outline-{{ 'danger' if user.is_active else 'success' }}" 
+                                            title="{{ 'Deactivate' if user.is_active else 'Activate' }}">
+                                        <i class="bi bi-{{ 'x-circle' if user.is_active else 'check-circle' }}"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <nav aria-label="User pagination">
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.users', page=pagination.prev_num, type=user_type, search=search) if pagination.has_prev else '#' }}">
+                        Previous
+                    </a>
+                </li>
+                
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('admin.users', page=page_num, type=user_type, search=search) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin.users', page=pagination.next_num, type=user_type, search=search) if pagination.has_next else '#' }}">
+                        Next
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Auto-uppercase pseudocode input
+document.querySelector('input[name="pseudocode"]').addEventListener('input', function(e) {
+    this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+</script>
+{% endblock %}
