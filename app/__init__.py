@@ -127,15 +127,20 @@ def create_app(config_name=None):
     @app.before_request
     def validate_session():
         """Validate session on each request and check for idle timeout"""
-        from .models import UserSession, UserActivity
+        from .models import UserSession, UserActivity, Admin
         
         # Skip validation for certain routes
-        skip_routes = ['auth.login', 'auth.logout', 'static', 'main.health_check']
+        skip_routes = ['auth.login', 'auth.logout', 'static', 'main.health_check', 
+                      'admin.login', 'admin.logout']
         if request.endpoint in skip_routes or request.endpoint is None:
             return
         
         # Skip validation for non-authenticated users
         if not current_user.is_authenticated:
+            return
+        
+        # Skip validation for admin users (they don't use session tokens)
+        if isinstance(current_user, Admin):
             return
         
         # Get session token
